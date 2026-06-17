@@ -7,6 +7,7 @@ ShellRoot {
 
   property string bg: "#171717"
   property string fg: "#eeeeee"
+  property string fontFamily: "Monocraft"
 
   PanelWindow {
     implicitWidth: 500
@@ -44,7 +45,7 @@ ShellRoot {
             color: isActive ? fg : "#5d5d5d"
 
             font {
-              family: "Monocraft"
+              family: fontFamily
               weight: 500
               pixelSize: 10
               letterSpacing: -1.5
