@@ -4,30 +4,44 @@ import QtQuick
 import QtQuick.Layouts
 
 ShellRoot {
+
+  property string bg: "#171717"
+  property string fg: "#eeeeee"
+
   PanelWindow {
+    implicitWidth: 500
+    implicitHeight: 32
+
     anchors {
       top: true
-      left: true
-      right: true
     }
-    implicitHeight: 32
-    color: "#1d1d1d"
 
-    RowLayout {
-      anchors.fill: parent
-      anchors.leftMargin: 15
-      anchors.rightMargin: 15
+    margins {
+      top: 8 // margin top for the bar
+    }
+
+    exclusionMode: ExclusionMode.High
+    color: "transparent"
+
+    Rectangle {
+      width: parent.width
+      height: parent.height
+      color: bg
+      implicitWidth: row.implicitWidth + 24
+      radius: 99
 
       RowLayout {
         spacing: 7
+        anchors.centerIn: parent
+        id: row
 
         Repeater {
-          model: 5 // max available workspaces to show in bar
+          model: 5 // max workspaces to show in bar
 
           Text {
             property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
             text: index + 1
-            color: isActive ? "#fbfbfb" : "#5d5d5d"
+            color: isActive ? fg : "#5d5d5d"
 
             font {
               family: "Monocraft"
@@ -37,14 +51,17 @@ ShellRoot {
             }
           }
         }
+
+        Item { Layout.fillWidth: true }
+
       }
 
       Clock {} // import clock from the other code
-    }
 
-    SystemClock {
-      id: clock
-      precision: SystemClock.Minutes
+      SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
+      }
     }
   }
 }
