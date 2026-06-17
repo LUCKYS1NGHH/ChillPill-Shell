@@ -10,8 +10,8 @@ ShellRoot {
   property string fontFamily: "Monocraft"
 
   PanelWindow {
-    implicitWidth: 500
-    implicitHeight: 32
+    implicitWidth: 700
+    implicitHeight: box.height
 
     anchors {
       top: true
@@ -25,11 +25,28 @@ ShellRoot {
     color: "transparent"
 
     Rectangle {
-      width: parent.width
-      height: parent.height
-      color: bg
+      id: box
+      width: hovered ? 508 : 500
+      height: 30
       implicitWidth: row.implicitWidth + 24
+      anchors.centerIn: parent
       radius: 99
+      color: bg
+      property bool hovered: false
+
+      Behavior on width {
+        NumberAnimation {
+          duration: 270
+          easing.type: Easing.OutExpo
+        }
+      }
+
+      MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        onEntered: box.hovered = true
+        onExited: box.hovered = false
+      }
 
       RowLayout {
         spacing: 7
