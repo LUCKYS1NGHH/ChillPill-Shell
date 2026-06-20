@@ -74,6 +74,8 @@ ShellRoot {
 
       }
 
+      Weather {}
+
       Clock {} // import clock from the other code
 
       SystemClock {
