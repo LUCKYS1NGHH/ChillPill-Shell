@@ -24,10 +24,10 @@ Item {
 
   Text {
     id: weatherText
-    color: fg
+    color: Theme.fg
 
     font {
-      family: fontFamily
+      family: Theme.fontFamily
       weight: 500
       pixelSize: 10
       letterSpacing: -0.3

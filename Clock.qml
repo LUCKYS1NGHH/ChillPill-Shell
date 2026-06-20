@@ -14,7 +14,7 @@ Text {
   color: "#dadada"
 
   font {
-    family: fontFamily
+    family: Theme.fontFamily
     weight: 500
     pixelSize: 10
     letterSpacing: -0.5

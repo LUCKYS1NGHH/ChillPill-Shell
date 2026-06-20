@@ -5,9 +5,9 @@ import QtQuick.Layouts
 
 ShellRoot {
 
-  property string bg: "#171717"
-  property string fg: "#eeeeee"
-  property string fontFamily: "Monocraft"
+  property string bg: Theme.bg
+  property string fg: Theme.fg
+  property string fontFamily: Theme.fontFamily
 
   PanelWindow {
     implicitWidth: 700
