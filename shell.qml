@@ -58,9 +58,11 @@ ShellRoot {
         Item { Layout.fillWidth: true }
       }
 
-      Clock {} // same method to import clock
-
       Battery {}
+
+      Volume {}
+
+      Clock {} // same method to import clock
 
       SystemClock {
         id: clock

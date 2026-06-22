@@ -7,6 +7,8 @@ RowLayout {
   id: root
   spacing: 6
 
+  property string fg: "#dadada"
+
   anchors {
     left: parent.left
     leftMargin: 20
@@ -40,7 +42,7 @@ RowLayout {
 
   Text {
     text: root.level + "%"
-    color: Theme.fg
+    color: fg
 
     font {
       family: Theme.fontFamily
