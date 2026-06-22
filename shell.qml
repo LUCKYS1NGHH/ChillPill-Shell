@@ -62,6 +62,8 @@ ShellRoot {
 
       Volume {}
 
+      Network {}
+
       Clock {} // same method to import clock
 
       SystemClock {
