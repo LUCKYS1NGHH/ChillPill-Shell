@@ -53,28 +53,12 @@ ShellRoot {
         anchors.centerIn: parent
         id: row
 
-        Repeater {
-          model: 5 // max workspaces to show in bar
-
-          Text {
-            property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
-            text: index + 1
-            color: isActive ? fg : "#5d5d5d"
-
-            font {
-              family: fontFamily
-              weight: 500
-              pixelSize: 10
-              letterSpacing: -1.5
-            }
-          }
-        }
+        Workspaces {} // import workspace buttons code from other file
 
         Item { Layout.fillWidth: true }
-
       }
 
-      Clock {} // import clock from the other code
+      Clock {} // same method to import clock
 
       SystemClock {
         id: clock
