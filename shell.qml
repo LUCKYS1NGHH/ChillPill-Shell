@@ -60,6 +60,8 @@ ShellRoot {
 
       Clock {} // same method to import clock
 
+      Battery {}
+
       SystemClock {
         id: clock
         precision: SystemClock.Minutes

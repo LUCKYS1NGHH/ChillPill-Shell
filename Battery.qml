@@ -1,32 +1,51 @@
 import Quickshell
 import QtQuick
+import QtQuick.Layouts
 import Quickshell.Services.UPower
 
-Text {
-  id: batteryText
-  property string fontFamily: "Monocraft"
+RowLayout {
+  id: root
+  spacing: 6
 
   anchors {
-    right: parent.right
-    rightMargin: 85
+    left: parent.left
+    leftMargin: 20
     verticalCenter: parent.verticalCenter
   }
 
-  text: {
-    var val = UPower.displayDevice.percentage;
-    // Only multiply if value is low (0-1 range) but non-zero
-    if (val < 1.0 && val > 0) {
-        val = val * 100;
-    }
-    Math.round(val) + "%"
+  property var battery: UPower.displayDevice
+  property bool charging: battery.stats === UPowerDeviceState.Charging
+  readonly property int level: Math.round(battery.percentage * 100)
+
+  readonly property string icon:{
+    if (charging) return String.fromCodePoint(0xf0084)
+    if (level >= 100) return String.fromCodePoint(0xf0082)
+    if (level < 10) return String.fromCodePoint(0xf007d)
+
+    return String.fromCodePoint(0xf0081 + (Math.floor(level / 10) - 1))
   }
 
-  color: "#dadada"
+  Text {
+    text: root.icon
+    color: root.charging ? "#53ce62"
+                         : root.level <= 15 ? "#ff2525"
+                         : root.level <= 30 ? "#ceb353"
+                         : "#53ce62"
 
-  font {
-    family: fontFamily
-    weight: 500
-    pixelSize: 10
-    letterSpacing: -0.5
+    font {
+      family: "JetBrainsMono Nerd Font"
+      pixelSize: 10
+    }
+  }
+
+  Text {
+    text: root.level + "%"
+    color: Theme.fg
+
+    font {
+      family: Theme.fontFamily
+      weight: 500
+      pixelSize: 10
+    }
   }
 }
