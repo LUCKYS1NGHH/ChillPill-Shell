@@ -8,8 +8,8 @@ RowLayout {
   spacing: 6
   Layout.leftMargin: 0
 
-  property string fg: "#557cc1"
-  property string disconFg: "#768594"
+  property string fg: "#6791dc"
+  property string disconFg: "#9ea9bd"
 
   property var wifiDevice: Networking.devices.values.find(d => d.type === DeviceType.Wifi)
   property var active: wifiDevice ? wifiDevice.networks.values.find(n => n.connected) : null
