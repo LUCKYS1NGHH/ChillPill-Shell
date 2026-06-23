@@ -10,7 +10,7 @@ ShellRoot {
   property string fontFamily: Theme.fontFamily
 
   PanelWindow {
-    implicitWidth: 700
+    implicitWidth: box.implicitWidth + 90
     implicitHeight: box.height
 
     anchors {
@@ -18,7 +18,7 @@ ShellRoot {
     }
 
     margins {
-      top: 8 // margin top for the bar
+      top: 9 // margin top for the bar
     }
 
     exclusionMode: ExclusionMode.High
@@ -26,17 +26,17 @@ ShellRoot {
 
     Rectangle {
       id: box
-      width: hovered ? 508 : 500
       height: 30
-      implicitWidth: row.implicitWidth + 24
+      implicitWidth: row.implicitWidth + (hovered ? 70 : 56)
       anchors.centerIn: parent
       radius: 99
+
       color: bg
       property bool hovered: false
 
-      Behavior on width {
+      Behavior on implicitWidth {
         NumberAnimation {
-          duration: 270
+          duration: 200
           easing.type: Easing.OutExpo
         }
       }
@@ -49,22 +49,18 @@ ShellRoot {
       }
 
       RowLayout {
-        spacing: 7
-        anchors.centerIn: parent
         id: row
+        spacing: 18
+        anchors.fill: parent
+        anchors.leftMargin: 28
+        anchors.rightMargin: 28
 
-        Workspaces {} // import workspace buttons code from other file
-
-        Item { Layout.fillWidth: true }
+        Battery {}
+        Volume {}
+        Workspaces {}
+        Network {}
+        Clock {}
       }
-
-      Battery {}
-
-      Volume {}
-
-      Network {}
-
-      Clock {} // same method to import clock
 
       SystemClock {
         id: clock

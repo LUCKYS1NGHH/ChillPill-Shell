@@ -9,12 +9,6 @@ RowLayout {
 
   property string fg: "#dadada"
 
-  anchors {
-    left: parent.left
-    leftMargin: 20
-    verticalCenter: parent.verticalCenter
-  }
-
   property var battery: UPower.displayDevice
   property bool charging: battery.stats === UPowerDeviceState.Charging
   readonly property int level: Math.round(battery.percentage * 100)

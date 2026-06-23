@@ -6,12 +6,7 @@ import QtQuick.Layouts
 RowLayout {
   id: root
   spacing: 6
-
-  anchors {
-    right: parent.right
-    rightMargin: 105
-    verticalCenter: parent.verticalCenter
-  }
+  Layout.leftMargin: 0
 
   property string fg: "#557cc1"
   property string disconFg: "#768594"
@@ -46,7 +41,7 @@ RowLayout {
   Text {
     text: {
       if (!Networking.wifiEnabled) return "off"
-      if (!root.active) return "Disconnected"
+      if (!root.active) return "N/A"
 
       return root.active.name
     }

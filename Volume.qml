@@ -10,12 +10,6 @@ RowLayout {
   property string fg: "#dadada"
   property string mutedFg: "#fd2222"
 
-  anchors {
-    left: parent.left
-    leftMargin: 103
-    verticalCenter: parent.verticalCenter
-  }
-
   property var sink: Pipewire.defaultAudioSink
 
   readonly property bool ready: sink && sink.ready
