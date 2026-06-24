@@ -7,6 +7,7 @@ RowLayout {
   id: root
 
   property string fg: "#dadada"
+  property int fontSize: 10
 
   property var battery: UPower.displayDevice
   property bool charging: battery.state === UPowerDeviceState.Charging
@@ -34,7 +35,7 @@ RowLayout {
 
     font {
       family: "JetBrainsMono Nerd Font"
-      pixelSize: 10
+      pixelSize: fontSize
     }
   }
 
@@ -45,7 +46,7 @@ RowLayout {
     font {
       family: Theme.fontFamily
       weight: 500
-      pixelSize: 10
+      pixelSize: fontSize
     }
   }
 }

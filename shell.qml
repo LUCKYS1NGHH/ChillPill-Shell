@@ -130,7 +130,7 @@ ShellRoot {
             command: ["sh", "-c", 'whoami']
             running: true
             stdout: StdioCollector {
-              onStreamFinished: whoamiText.text = this.text
+              onStreamFinished: whoamiText.text = this.text.trim()
             }
           }
 
@@ -164,7 +164,16 @@ ShellRoot {
               font { family: Theme.fontFamily; pixelSize: 8; weight: 400 }
             }
           }
-        } 
+        }
+
+        Battery {
+          fontSize: 14
+          anchors.top: parent.top
+          anchors.right: parent.right
+          anchors.topMargin: 8
+          anchors.rightMargin: 12
+        }
+
       }
       SystemClock {
         id: clock
