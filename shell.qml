@@ -27,7 +27,7 @@ ShellRoot {
     Rectangle {
       id: box
       height: 30
-      implicitWidth: row.implicitWidth + (hovered ? 70 : 56)
+      implicitWidth: row.implicitWidth + (hovered ? 68 : 56)
       anchors.centerIn: parent
       radius: 99
 
@@ -36,7 +36,7 @@ ShellRoot {
 
       Behavior on implicitWidth {
         NumberAnimation {
-          duration: 200
+          duration: 320
           easing.type: Easing.OutExpo
         }
       }
@@ -50,7 +50,7 @@ ShellRoot {
 
       RowLayout {
         id: row
-        spacing: 18
+        spacing: 15
         anchors.fill: parent
         anchors.leftMargin: 28
         anchors.rightMargin: 28

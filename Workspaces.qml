@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 
 RowLayout {
-  spacing: 5
+  //spacing: 5
 
   anchors {
     centerIn: parent
@@ -22,13 +22,13 @@ RowLayout {
       property string activeBg: "#4d5258"
       property string inactiveBg: "#393c41"
 
-      implicitWidth: 17.5
-      implicitHeight: implicitWidth
+      width: 17.5
+      height: width
       radius: 8
       color: isActive ? activeBg : (ws ? inactiveBg : "transparent")
 
       Behavior on color {
-        ColorAnimation { duration: 150 }
+        ColorAnimation { duration: 120 }
       }
 
       Text {
@@ -38,7 +38,7 @@ RowLayout {
         font {
           family: Theme.fontFamily
           pixelSize: 9
-          weight: Font.Medium
+          weight: 300
         }
       }
 

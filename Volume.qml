@@ -5,7 +5,6 @@ import QtQuick.Layouts
 
 RowLayout {
   id: root
-  spacing: 6
 
   property string fg: "#dadada"
   property string mutedFg: "#fd2222"

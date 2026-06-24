@@ -5,7 +5,6 @@ import Quickshell.Services.UPower
 
 RowLayout {
   id: root
-  spacing: 6
 
   property string fg: "#dadada"
 

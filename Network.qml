@@ -5,8 +5,6 @@ import QtQuick.Layouts
 
 RowLayout {
   id: root
-  spacing: 6
-  Layout.leftMargin: 0
 
   property string fg: "#6791dc"
   property string disconFg: "#9ea9bd"
