@@ -130,7 +130,7 @@ ShellRoot {
             command: ["sh", "-c", 'whoami']
             running: true
             stdout: StdioCollector {
-              onStreamFinished: whoamiText.text = this.text.trim()
+              onStreamFinished: whoamiText.text = this.text
             }
           }
 
