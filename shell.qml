@@ -2,11 +2,13 @@ import Quickshell
 import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 
 ShellRoot {
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
+  property int avatarSize: 48
 
   PanelWindow {
 
@@ -18,9 +20,9 @@ ShellRoot {
       right: true
     }
     margins {
-      top: 5
+      top: 9
     }
-    exclusiveZone: 28 // fixed strut, never changes
+    exclusiveZone: 26 // fixed strut, never changes
     color: "transparent"
 
     // Mask input to only the capsule
@@ -36,8 +38,9 @@ ShellRoot {
 
     Rectangle {
       id: box
-      anchors.centerIn: parent
-
+      //anchors.centerIn: parent
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
       property bool hovered: false
       property bool expanded: false
 
@@ -48,10 +51,10 @@ ShellRoot {
       color: bg
 
       Behavior on implicitWidth {
-        NumberAnimation { duration: 220; easing.type: Easing.OutExpo }
+        NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
       Behavior on implicitHeight {
-        NumberAnimation { duration: 450; easing.type: Easing.OutExpo }
+        NumberAnimation { duration: 550; easing.type: Easing.OutExpo }
       }
 
       MouseArea {
@@ -80,15 +83,45 @@ ShellRoot {
 
       // placeholder for expanded control center content
       Item {
-        anchors.fill: parent
-        anchors.margins: 16
+        anchors.centerIn: parent
+        width: box.implicitWidth - 30
+        height: box.expanded ? box.implicitHeight - 30 : 0  // don't fight the animation
         opacity: box.expanded ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.InOutQuad } }
+        Behavior on opacity {
+          SequentialAnimation {
+            PauseAnimation { duration: box.expanded ? 20 : 0 }
+            NumberAnimation { duration: 100; easing.type: Easing.OutExpo }
+          }
+        }
         visible: opacity > 0
 
-        // Widgets addition later to add from here
-      }
+        // profile picture
+        Item {
+          anchors.top: parent.top
+          anchors.left: parent.left
+          width: avatarSize
+          height: avatarSize
 
+          Image {
+            id: avatarImg
+            anchors.fill: parent
+            source: "file:///home/xingyun/.pfp.png"
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: false
+            visible: false
+          }
+
+          OpacityMask {
+            anchors.fill: parent
+            source: avatarImg
+            maskSource: Rectangle {
+              width: avatarSize
+              height: avatarSize
+              radius: avatarSize / 2
+            }
+          }
+        }
+      }
       SystemClock {
         id: clock
         precision: SystemClock.Minutes
