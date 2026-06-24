@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
@@ -95,32 +96,75 @@ ShellRoot {
         }
         visible: opacity > 0
 
-        // profile picture
-        Item {
-          anchors.top: parent.top
-          anchors.left: parent.left
-          width: avatarSize
-          height: avatarSize
+        RowLayout {
+          // profile picture
+          Item {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            width: avatarSize
+            height: avatarSize
 
-          Image {
-            id: avatarImg
-            anchors.fill: parent
-            source: "file:///home/xingyun/.pfp.png"
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: false
-            visible: false
-          }
+            Image {
+              id: avatarImg
+              anchors.fill: parent
+              source: "file:///home/xingyun/.pfp.png"
+              fillMode: Image.PreserveAspectCrop
+              asynchronous: false
+              visible: false
+            }
 
-          OpacityMask {
-            anchors.fill: parent
-            source: avatarImg
-            maskSource: Rectangle {
-              width: avatarSize
-              height: avatarSize
-              radius: avatarSize / 2
+            OpacityMask {
+              anchors.fill: parent
+              source: avatarImg
+              maskSource: Rectangle {
+                width: avatarSize
+                height: avatarSize
+                radius: avatarSize / 2
+              }
             }
           }
-        }
+
+          // username
+          Process {
+            id: whoamiProc
+            command: ["sh", "-c", 'whoami']
+            running: true
+            stdout: StdioCollector {
+              onStreamFinished: whoamiText.text = this.text.trim()
+            }
+          }
+
+          // uptime
+          Process {
+            id: uptimeProc
+            command: ["sh", "-c", 'uptime -p']
+            running: true
+            stdout: StdioCollector {
+              onStreamFinished: uptimeText.text = this.text
+            }
+          }
+
+          // username + uptime stacked
+          ColumnLayout {
+            spacing: 2
+            Layout.alignment: Qt.AlignVCenter
+
+            Text {
+              id: whoamiText
+              color: Theme.fg
+              Layout.leftMargin: 10
+              font { family: Theme.fontFamily; pixelSize: 13; weight: 600 }
+            }
+
+            Text {
+              id: uptimeText
+              color: Theme.fg
+              opacity: 0.6
+              Layout.leftMargin: 10
+              font { family: Theme.fontFamily; pixelSize: 8; weight: 400 }
+            }
+          }
+        } 
       }
       SystemClock {
         id: clock
