@@ -4,41 +4,54 @@ import QtQuick
 import QtQuick.Layouts
 
 ShellRoot {
-
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
 
   PanelWindow {
-    implicitWidth: box.implicitWidth + 90
-    implicitHeight: box.height
+
+    implicitHeight: box.implicitHeight + margins.top
 
     anchors {
       top: true
+      left: true
+      right: true
     }
-
     margins {
-      top: 9 // margin top for the bar
+      top: 5
     }
-
-    exclusionMode: ExclusionMode.High
+    exclusiveZone: 28 // fixed strut, never changes
     color: "transparent"
+
+    // Mask input to only the capsule
+    mask: Region {
+      Region {
+        intersection: Intersection.Combine
+        x: Math.floor(box.x)
+        y: Math.floor(box.y)
+        width: Math.ceil(box.width)
+        height: Math.ceil(box.height)
+      }
+    }
 
     Rectangle {
       id: box
-      height: 30
-      implicitWidth: row.implicitWidth + (hovered ? 68 : 56)
       anchors.centerIn: parent
-      radius: 99
 
-      color: bg
       property bool hovered: false
+      property bool expanded: false
+
+      implicitWidth: expanded ? 420 : row.implicitWidth + (hovered ? 68 : 56)
+      implicitHeight: expanded ? 420 : row.implicitHeight + (hovered ? 10 : 10)
+
+      radius: 20
+      color: bg
 
       Behavior on implicitWidth {
-        NumberAnimation {
-          duration: 320
-          easing.type: Easing.OutExpo
-        }
+        NumberAnimation { duration: 220; easing.type: Easing.OutExpo }
+      }
+      Behavior on implicitHeight {
+        NumberAnimation { duration: 450; easing.type: Easing.OutExpo }
       }
 
       MouseArea {
@@ -46,20 +59,34 @@ ShellRoot {
         hoverEnabled: true
         onEntered: box.hovered = true
         onExited: box.hovered = false
+        onClicked: box.expanded = !box.expanded
       }
 
       RowLayout {
         id: row
         spacing: 15
-        anchors.fill: parent
+        anchors.centerIn: parent
         anchors.leftMargin: 28
         anchors.rightMargin: 28
+        opacity: box.expanded ? 0 : 1
+        Behavior on opacity { NumberAnimation { duration: 150 } }
 
         Battery {}
         Volume {}
         Workspaces {}
         Network {}
         Clock {}
+      }
+
+      // placeholder for expanded control center content
+      Item {
+        anchors.fill: parent
+        anchors.margins: 16
+        opacity: box.expanded ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.InOutQuad } }
+        visible: opacity > 0
+
+        // Widgets addition later to add from here
       }
 
       SystemClock {
