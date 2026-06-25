@@ -10,6 +10,9 @@ ShellRoot {
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
   property int avatarSize: 48
+  property int buttonSize: 20
+  property string buttonFg: "#353535"
+  property int buttonctlRadius: 6
 
   PanelWindow {
 
@@ -174,6 +177,86 @@ ShellRoot {
           anchors.rightMargin: 12
         }
 
+        // rectangle where poweroff, sleep etc. buttons placed
+        Rectangle {
+          color: "#212121"
+          implicitWidth: 15
+          implicitHeight: 30
+          radius: 8
+
+          anchors.top: parent.top
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.topMargin: 60
+
+
+          RowLayout {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
+            spacing: 8
+
+            // lock
+            Rectangle {
+              width: buttonSize; height: buttonSize
+              radius: buttonctlRadius; color: buttonFg
+              Layout.alignment: Qt.AlignVCenter
+              Text { anchors.centerIn: parent; text: ""; color: Theme.fg; font.pixelSize: 8 }
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: { lockProc.running = false; lockProc.running = true }
+              }
+              Process { id: lockProc; command: ["bash", "-c", "hyprlock"]; running: false }
+            }
+
+            // sleep
+            Rectangle {
+              width: buttonSize; height: buttonSize
+              radius: buttonctlRadius; color: buttonFg
+              Layout.alignment: Qt.AlignVCenter
+              Text { anchors.centerIn: parent; text: "󰤄"; color: Theme.fg; font.pixelSize: 9 }
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: { sleepProc.running = false; sleepProc.running = true }
+              }
+              Process { id: sleepProc; command: ["bash", "-c", "systemctl suspend"]; running: false }
+            }
+
+            Item { Layout.fillWidth: true }
+
+            // reboot
+            Rectangle {
+              width: buttonSize; height: buttonSize
+              radius: buttonctlRadius; color: buttonFg
+              Layout.alignment: Qt.AlignVCenter
+              Text { anchors.centerIn: parent; text: ""; color: Theme.fg; font.pixelSize: 9; }
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: { rebootProc.running = false; rebootProc.running = true }
+              }
+              Process { id: rebootProc; command: ["bash", "-c", "systemctl reboot"]; running: false }
+            }
+
+            // shutdown
+            Rectangle {
+              width: buttonSize; height: buttonSize
+              radius: buttonctlRadius; color: buttonFg
+              Layout.alignment: Qt.AlignVCenter
+              Text { anchors.centerIn: parent; text: "󰐥"; color: Theme.fg; font.pixelSize: 12; }
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: { shutdownProc.running = false; shutdownProc.running = true }
+              }
+              Process { id: shutdownProc; command: ["bash", "-c", "systemctl poweroff"]; running: false }
+            }
+          }
+        }
       }
       SystemClock {
         id: clock
