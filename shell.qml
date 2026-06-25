@@ -11,7 +11,9 @@ ShellRoot {
   property string fontFamily: Theme.fontFamily
   property int avatarSize: 48
   property int buttonSize: 20
-  property string buttonFg: "#353535"
+  property string buttonBg: "#353535"
+  property string buttonHoverBg: "#bababa"
+  property int buttonHoverSpeed: 120
   property int buttonctlRadius: 6
 
   PanelWindow {
@@ -213,27 +215,46 @@ ShellRoot {
             // lock
             Rectangle {
               width: buttonSize; height: buttonSize
-              radius: buttonctlRadius; color: buttonFg
+              radius: buttonctlRadius; color: buttonBg
               Layout.alignment: Qt.AlignVCenter
-              Text { anchors.centerIn: parent; text: ""; color: Theme.fg; font.pixelSize: 8 }
+              Text {
+                anchors.centerIn: parent;
+                text: "";
+                color: lockHover.containsMouse ? buttonHoverBg : Theme.fg;
+                font.pixelSize: 8
+
+                Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
+              }
               MouseArea {
+                id: lockHover
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: { lockProc.running = false; lockProc.running = true }
+                hoverEnabled: true
               }
+
               Process { id: lockProc; command: ["bash", "-c", "hyprlock"]; running: false }
             }
 
             // sleep
             Rectangle {
               width: buttonSize; height: buttonSize
-              radius: buttonctlRadius; color: buttonFg
+              radius: buttonctlRadius; color: buttonBg
               Layout.alignment: Qt.AlignVCenter
-              Text { anchors.centerIn: parent; text: "󰤄"; color: Theme.fg; font.pixelSize: 9 }
+              Text {
+                anchors.centerIn: parent;
+                text: "󰤄";
+                color: sleepHover.containsMouse ? buttonHoverBg : Theme.fg;
+                font.pixelSize: 9
+
+                Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
+              }
               MouseArea {
+                id: sleepHover
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: { sleepProc.running = false; sleepProc.running = true }
+                hoverEnabled: true
               }
               Process { id: sleepProc; command: ["bash", "-c", "systemctl suspend"]; running: false }
             }
@@ -247,13 +268,22 @@ ShellRoot {
             // reboot
             Rectangle {
               width: buttonSize; height: buttonSize
-              radius: buttonctlRadius; color: buttonFg
+              radius: buttonctlRadius; color: buttonBg
               Layout.alignment: Qt.AlignVCenter
-              Text { anchors.centerIn: parent; text: ""; color: Theme.fg; font.pixelSize: 9; }
+              Text {
+                anchors.centerIn: parent;
+                text: "";
+                color: rebootHover.containsMouse ? buttonHoverBg : Theme.fg;
+                font.pixelSize: 9;
+
+                Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
+              }
               MouseArea {
+                id: rebootHover
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: { rebootProc.running = false; rebootProc.running = true }
+                hoverEnabled: true
               }
               Process { id: rebootProc; command: ["bash", "-c", "systemctl reboot"]; running: false }
             }
@@ -261,13 +291,22 @@ ShellRoot {
             // shutdown
             Rectangle {
               width: buttonSize; height: buttonSize
-              radius: buttonctlRadius; color: buttonFg
+              radius: buttonctlRadius; color: buttonBg
               Layout.alignment: Qt.AlignVCenter
-              Text { anchors.centerIn: parent; text: "󰐥"; color: Theme.fg; font.pixelSize: 12; }
+              Text {
+                anchors.centerIn: parent;
+                text: "󰐥";
+                color: shutdownHover.containsMouse ? buttonHoverBg : Theme.fg;
+                font.pixelSize: 12;
+
+                Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
+              }
               MouseArea {
+                id: shutdownHover
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: { shutdownProc.running = false; shutdownProc.running = true }
+                hoverEnabled: true
               }
               Process { id: shutdownProc; command: ["bash", "-c", "systemctl poweroff"]; running: false }
             }
