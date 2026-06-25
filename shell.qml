@@ -147,6 +147,18 @@ ShellRoot {
             }
           }
 
+          // uptime refresh every 60 sec
+          Timer {
+            interval: 60000
+            running: box.expanded
+            repeat: true
+            triggeredOnStart: true
+            onTriggered: {
+              uptimeProc.running = false
+              uptimeProc.running = true
+            }
+          }
+
           // username + uptime stacked
           ColumnLayout {
             spacing: 2
