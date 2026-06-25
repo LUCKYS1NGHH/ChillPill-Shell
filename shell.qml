@@ -228,7 +228,7 @@ ShellRoot {
 
             Item { Layout.fillWidth: true }
 
-            Datetime {}
+            Datetime { id: datetimeItem; anchors.centerIn: parent; dateFg: "#aaaaaa"; }
 
             Item { Layout.fillWidth: true }
 
