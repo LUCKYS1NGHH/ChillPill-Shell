@@ -228,6 +228,10 @@ ShellRoot {
 
             Item { Layout.fillWidth: true }
 
+            Datetime {}
+
+            Item { Layout.fillWidth: true }
+
             // reboot
             Rectangle {
               width: buttonSize; height: buttonSize
