@@ -18,7 +18,7 @@ ShellRoot {
 
   PanelWindow {
 
-    implicitHeight: box.implicitHeight + margins.top
+    implicitHeight: 500// box.implicitHeight + margins.top
 
     anchors {
       top: true
@@ -51,10 +51,14 @@ ShellRoot {
       property bool expanded: false
 
       implicitWidth: expanded ? 420 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: expanded ? 420 : row.implicitHeight + (hovered ? 10 : 10)
+      implicitHeight: expanded ? 120 : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: 20
       color: bg
+
+      onExpandedChanged: {
+        if (!expanded) calendarPopup.shown = false
+      }
 
       Behavior on implicitWidth {
         NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
@@ -66,9 +70,19 @@ ShellRoot {
       MouseArea {
         anchors.fill: parent
         hoverEnabled: true
+
+        acceptedButtons: Qt.LeftButton | Qt.RightButton 
+
         onEntered: box.hovered = true
+
         onExited: box.hovered = false
-        onClicked: box.expanded = !box.expanded
+
+        onClicked: (mouse) => {
+          if (mouse.button === Qt.RightButton) {
+              console.log("Right click detected, opening mini dashboard")
+              box.expanded = !box.expanded
+          }
+        }
       }
 
       RowLayout {
@@ -318,5 +332,101 @@ ShellRoot {
         precision: SystemClock.Minutes
       }
     }
+
+    Rectangle {
+      id: calendarPopup
+      property bool shown: false
+      visible: shown
+      opacity: shown ? 1 : 0
+      width: 235
+      height: 195
+      x: (parent.width - calendarPopup.width) / 2
+      y: box.y + box.height + 6
+      color: "#1e1e1e"
+      radius: 15
+
+      Behavior on opacity {
+        NumberAnimation { duration: 200; easing.type: Easing.OutExpo }
+      }
+
+      RowLayout {
+        id: calHeader
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 12
+        anchors.topMargin: 10
+        height: 24
+
+        Item { Layout.fillWidth: true }
+ 
+        Text {
+          text: datetimeItem.monthNames[datetimeItem.viewMonth] + " " + datetimeItem.viewYear
+          color: Theme.fg
+          font { family: Theme.fontFamily; pixelSize: 11; weight: 600 }
+        }
+
+        Item { Layout.fillWidth: true }
+
+        }
+
+      Grid {
+        id: dayHeaders
+        columns: 7
+        anchors.top: calHeader.bottom
+        anchors.topMargin: 6
+        anchors.horizontalCenter: parent.horizontalCenter
+        columnSpacing: 4
+        Repeater {
+          model: datetimeItem.dayNames
+          Text {
+            width: 25; text: modelData; color: "#666"
+            font { family: Theme.fontFamily; pixelSize: 8; weight: 600 }
+            horizontalAlignment: Text.AlignHCenter
+          }
+        }
+      }
+
+      Grid {
+        columns: 7
+        anchors.top: dayHeaders.bottom
+        anchors.topMargin: 4
+        anchors.horizontalCenter: parent.horizontalCenter
+        columnSpacing: 4; rowSpacing: 2
+
+        Repeater {
+          model: datetimeItem.firstDayOfMonth(datetimeItem.viewYear, datetimeItem.viewMonth)
+          Item { width: 26; height: 22 }
+        }
+        Repeater {
+          model: datetimeItem.daysInMonth(datetimeItem.viewYear, datetimeItem.viewMonth)
+          delegate: Rectangle {
+            width: 26; height: 22; radius: 6
+            property bool isToday: {
+              var today = new Date()
+              return index + 1 === today.getDate()
+                && datetimeItem.viewMonth === today.getMonth()
+                && datetimeItem.viewYear === today.getFullYear()
+            }
+            color: isToday ? "#e83131" : "transparent"
+            Text {
+              anchors.centerIn: parent
+              text: index + 1
+              color: isToday ? "#1e1e1e" : Theme.fg
+              font { family: Theme.fontFamily; pixelSize: 9; weight: isToday ? 700 : 400 }
+            }
+          }
+        }
+      }
+    }
+
+    Connections {
+      target: datetimeItem
+      function onToggleCalendar() {
+        console.log("toggleCalendar launched, current opacity:", calendarPopup.opacity)
+        calendarPopup.shown = !calendarPopup.shown
+      }
+    }
+
   }
 }
