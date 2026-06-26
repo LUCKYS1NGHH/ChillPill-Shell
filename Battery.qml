@@ -14,16 +14,9 @@ RowLayout {
   readonly property int level: Math.round(battery.percentage * 100)
 
   readonly property string icon: {
-    var base = ""
-    if (level >= 95) base = String.fromCodePoint(0xf0079) 
-    else if (level >= 70) base = String.fromCodePoint(0xf0082)
-    else if (level >= 40) base = String.fromCodePoint(0xf007e)
-    else if (level >= 35) base = String.fromCodePoint(0xf007c)
-    else if (level >= 10) base = String.fromCodePoint(0xf007a)
-    else base = String.fromCodePoint(0xf0083)
-
-    if (charging) base += String.fromCodePoint(0xf140b)
-    return base
+    const icons = [0xf0083, 0xf007a, 0xf007d, 0xf007c, 0xf007d, 0xf007e, 0xf007f, 0xf0082, 0xf0081, 0xf0079]
+    const base = String.fromCodePoint(icons[Math.min(Math.floor(level / 10), 9)])
+    return charging ? base + String.fromCodePoint(0xf140b) : base
   }
 
   Text {
