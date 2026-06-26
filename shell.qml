@@ -18,7 +18,7 @@ ShellRoot {
 
   PanelWindow {
 
-    implicitHeight: 500// box.implicitHeight + margins.top
+    implicitHeight: 325
 
     anchors {
       top: true
@@ -35,18 +35,22 @@ ShellRoot {
     mask: Region {
       Region {
         intersection: Intersection.Combine
-        x: Math.floor(box.x)
-        y: Math.floor(box.y)
-        width: Math.ceil(box.width)
-        height: Math.ceil(box.height)
+        x: Math.floor(box.x); y: Math.floor(box.y)
+        width: Math.ceil(box.width); height: Math.ceil(box.height)
+      }
+      Region {
+        intersection: Intersection.Combine
+        x: Math.floor(calendarPopup.x); y: Math.floor(calendarPopup.y)
+        width: calendarPopup.shown ? Math.ceil(calendarPopup.width) : 0
+        height: calendarPopup.shown ? Math.ceil(calendarPopup.height) : 0
       }
     }
 
     Rectangle {
       id: box
-      //anchors.centerIn: parent
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
+
       property bool hovered: false
       property bool expanded: false
 
@@ -74,7 +78,6 @@ ShellRoot {
         acceptedButtons: Qt.LeftButton | Qt.RightButton 
 
         onEntered: box.hovered = true
-
         onExited: box.hovered = false
 
         onClicked: (mouse) => {
@@ -92,6 +95,7 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         opacity: box.expanded ? 0 : 1
+
         Behavior on opacity { NumberAnimation { duration: 150 } }
 
         Battery {}
@@ -107,6 +111,7 @@ ShellRoot {
         width: box.implicitWidth - 30
         height: box.expanded ? box.implicitHeight - 30 : 0  // don't fight the animation
         opacity: box.expanded ? 1 : 0
+
         Behavior on opacity {
           SequentialAnimation {
             PauseAnimation { duration: box.expanded ? 20 : 0 }
@@ -149,7 +154,7 @@ ShellRoot {
             command: ["sh", "-c", 'whoami']
             running: true
             stdout: StdioCollector {
-              onStreamFinished: whoamiText.text = this.text.trim()
+              onStreamFinished: { whoamiText.text = this.text.trim(); whoamiProc.running = false }
             }
           }
 
@@ -338,15 +343,15 @@ ShellRoot {
       property bool shown: false
       visible: shown
       opacity: shown ? 1 : 0
-      width: 235
-      height: 195
+      width: 225
+      height: 187
       x: (parent.width - calendarPopup.width) / 2
-      y: box.y + box.height + 6
+      y: box.y + box.height + 5
       color: "#1e1e1e"
       radius: 15
 
       Behavior on opacity {
-        NumberAnimation { duration: 200; easing.type: Easing.OutExpo }
+        NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
       }
 
       RowLayout {
@@ -355,8 +360,8 @@ ShellRoot {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 12
-        anchors.topMargin: 10
-        height: 24
+        anchors.topMargin: 8
+        height: 25
 
         Item { Layout.fillWidth: true }
  
