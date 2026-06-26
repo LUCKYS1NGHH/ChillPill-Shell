@@ -40,14 +40,13 @@ RowLayout {
     text: {
       if (!Networking.wifiEnabled) return "off"
       if (!root.active) return "N/A"
-
       return root.active.name
     }
 
-    color: "#dadada"
+    color: Theme.fg
 
     font {
-      family: "Monocraft"
+      family: Theme.fontFamily
       pixelSize: 10
       weight: 500
     }

@@ -6,7 +6,7 @@ import QtQuick.Layouts
 RowLayout {
   id: root
 
-  property string fg: "#dadada"
+  property string fg: Theme.fg
   property string mutedFg: "#fd2222"
 
   property var sink: Pipewire.defaultAudioSink
@@ -25,6 +25,7 @@ RowLayout {
     return String.fromCodePoint(0xf057e)
   }
 
+  // icon
   Text {
     text: root.icon
 
@@ -36,10 +37,8 @@ RowLayout {
       return root.fg
     }
 
-    font {
-      family: "JetBrainsMono Nerd Font"
-      pixelSize: 10
-    }
+    font.family: "JetBrainsMono Nerd Font"
+    font.pixelSize: 10
   }
 
   MouseArea {
@@ -50,6 +49,7 @@ RowLayout {
     hoverEnabled: true
   }
 
+  // percentage
   Text {
     text: {
       if (!root.ready) return "-"
@@ -57,7 +57,6 @@ RowLayout {
 
       return root.vol + "%"
     }
-
     color: fg
 
     font {

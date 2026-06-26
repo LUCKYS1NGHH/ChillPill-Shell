@@ -3,10 +3,10 @@ import QtQuick
 
 Text {
 
-  property string fontFamily: "Monocraft"
+  property string fontFamily: Theme.fontFamily
 
   text: Qt.formatDateTime(clock.date, "hh:mm")
-  color: "#dadada"
+  color: Theme.fg
 
   font {
     family: Theme.fontFamily

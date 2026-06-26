@@ -4,6 +4,6 @@ import QtQuick
 
 Singleton {
     property string bg: "#171717"
-    property string fg: "#eeeeee"
+    property string fg: "#dadada"
     property string fontFamily: "Monocraft"
 }

@@ -4,14 +4,13 @@ import QtQuick
 import QtQuick.Layouts
 
 RowLayout {
-  //spacing: 5
 
   anchors {
     centerIn: parent
   }
 
   Repeater {
-    model: 5
+    model: 5 // max workspace buttons/texts to show
 
     delegate: Rectangle {
       id: wsButton
@@ -27,9 +26,8 @@ RowLayout {
       radius: 8
       color: isActive ? activeBg : (ws ? inactiveBg : "transparent")
 
-      Behavior on color {
-        ColorAnimation { duration: 120 }
-      }
+      // animate color transition on workspace switch
+      Behavior on color { ColorAnimation { duration: 120 } }
 
       Text {
         anchors.centerIn: parent
@@ -42,6 +40,7 @@ RowLayout {
         }
       }
 
+      // clickable text buttons
       MouseArea {
         anchors.fill: parent
         onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + (wsButton.index + 1 + "})"))
