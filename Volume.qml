@@ -5,6 +5,11 @@ import QtQuick.Layouts
 
 RowLayout {
   id: root
+  signal volumeChanged  // signal to bubble up
+
+  onVolChanged: {
+    root.volumeChanged()
+  }
 
   property string fg: Theme.fg
   property string mutedFg: "#fd2222"

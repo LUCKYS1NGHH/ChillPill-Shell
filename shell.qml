@@ -57,9 +57,17 @@ ShellRoot {
 
       property bool hovered: false
       property bool expanded: false
+      property bool volumeActive: False
 
-      implicitWidth: expanded ? 420 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: expanded ? 120 : row.implicitHeight + (hovered ? 10 : 10)
+      // how long the volume adjust show
+      Timer {
+        id: volumeHideTimer
+        interval: 850
+        onTriggered: box.volumeActive = false
+      }
+
+      implicitWidth: expanded ? 420 : volumeActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
+      implicitHeight: expanded ? 120 : volumeActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: 20
       color: bg
@@ -95,15 +103,61 @@ ShellRoot {
         anchors.centerIn: parent
         anchors.leftMargin: 28
         anchors.rightMargin: 28
-        opacity: box.expanded ? 0 : 1
+        opacity: box.expanded ? 0 : box.volumeActive ? 0 : 1
 
-        Behavior on opacity { NumberAnimation { duration: 150 } }
-
+        Behavior on opacity { NumberAnimation { duration: 100 } }
         Battery {}
-        Volume {}
+
+        Volume {
+          id: volumeModule
+          onVolumeChanged: {
+            box.volumeActive = true
+            volumeHideTimer.restart()
+            }
+          }
+
         Workspaces {}
         Network {}
         Clock {}
+      }
+
+      // volume takeover
+      Item {
+        anchors.centerIn: parent
+        opacity: !box.expanded && box.volumeActive ? 1 : 0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 150 } }
+
+        RowLayout {
+          anchors.centerIn: parent
+          spacing: 10
+
+          Text {
+            text: volumeModule.icon
+            color: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
+            font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
+          }
+
+          Rectangle {
+            width: 120; height: 3.7
+            radius: 2
+            color: "#333"
+
+            Rectangle {
+              width: parent.width * (volumeModule.vol / 100)
+              height: parent.height
+              radius: 2
+              color: Theme.fg
+              Behavior on width { NumberAnimation { duration: 60 } }
+            }
+          }
+
+          Text {
+            text: volumeModule.muted ? "muted" : volumeModule.vol + "%"
+            color: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
+            font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+          }
+        }
       }
 
       // mini dashboard opens on right click
