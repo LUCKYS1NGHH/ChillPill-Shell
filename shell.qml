@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
 ShellRoot {
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
@@ -25,9 +26,11 @@ ShellRoot {
       left: true
       right: true
     }
+
     margins {
       top: 9
     }
+
     exclusiveZone: 26 // fixed strut, never changes
     color: "transparent"
 
@@ -46,6 +49,7 @@ ShellRoot {
       }
     }
 
+    // main box
     Rectangle {
       id: box
       anchors.top: parent.top
@@ -64,12 +68,8 @@ ShellRoot {
         if (!expanded) calendarPopup.shown = false
       }
 
-      Behavior on implicitWidth {
-        NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
-      }
-      Behavior on implicitHeight {
-        NumberAnimation { duration: 550; easing.type: Easing.OutExpo }
-      }
+      Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
+      Behavior on implicitHeight { NumberAnimation { duration: 550; easing.type: Easing.OutExpo } }
 
       MouseArea {
         anchors.fill: parent
@@ -88,6 +88,7 @@ ShellRoot {
         }
       }
 
+      // modulues in bar
       RowLayout {
         id: row
         spacing: 15
@@ -105,7 +106,7 @@ ShellRoot {
         Clock {}
       }
 
-      // placeholder for expanded control center content
+      // mini dashboard opens on right click
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
@@ -202,6 +203,7 @@ ShellRoot {
           }
         }
 
+        // show battery in mini dashboard too
         Battery {
           fontSize: 14
           anchors.top: parent.top
@@ -222,7 +224,6 @@ ShellRoot {
           anchors.right: parent.right
           anchors.topMargin: 60
 
-
           RowLayout {
             anchors.left: parent.left
             anchors.right: parent.right
@@ -241,9 +242,9 @@ ShellRoot {
                 text: "";
                 color: lockHover.containsMouse ? buttonHoverBg : Theme.fg;
                 font.pixelSize: 8
-
                 Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
               }
+
               MouseArea {
                 id: lockHover
                 anchors.fill: parent
@@ -265,9 +266,9 @@ ShellRoot {
                 text: "󰤄";
                 color: sleepHover.containsMouse ? buttonHoverBg : Theme.fg;
                 font.pixelSize: 9
-
                 Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
               }
+
               MouseArea {
                 id: sleepHover
                 anchors.fill: parent
@@ -294,9 +295,9 @@ ShellRoot {
                 text: "";
                 color: rebootHover.containsMouse ? buttonHoverBg : Theme.fg;
                 font.pixelSize: 9;
-
                 Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
               }
+
               MouseArea {
                 id: rebootHover
                 anchors.fill: parent
@@ -317,9 +318,9 @@ ShellRoot {
                 text: "󰐥";
                 color: shutdownHover.containsMouse ? buttonHoverBg : Theme.fg;
                 font.pixelSize: 12;
-
                 Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
               }
+
               MouseArea {
                 id: shutdownHover
                 anchors.fill: parent
@@ -338,6 +339,7 @@ ShellRoot {
       }
     }
 
+    // calendar popup box
     Rectangle {
       id: calendarPopup
       property bool shown: false
@@ -350,9 +352,7 @@ ShellRoot {
       color: "#1e1e1e"
       radius: 15
 
-      Behavior on opacity {
-        NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
-      }
+      Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutExpo } }
 
       RowLayout {
         id: calHeader
@@ -425,6 +425,7 @@ ShellRoot {
       }
     }
 
+    // open calendar when click on date in mini dashboard
     Connections {
       target: datetimeItem
       function onToggleCalendar() {
