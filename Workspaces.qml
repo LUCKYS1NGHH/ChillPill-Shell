@@ -5,9 +5,7 @@ import QtQuick.Layouts
 
 RowLayout {
 
-  anchors {
-    centerIn: parent
-  }
+  Layout.fillWidth: false
 
   Repeater {
     model: 5 // max workspace buttons/texts to show

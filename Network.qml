@@ -15,7 +15,7 @@ RowLayout {
   readonly property real signal: active ? active.signalStrength : 0
 
   readonly property string icon: {
-    if (!Networking.wifiEnabled) return String.fromCodePoint(0xf0925)
+    if (!Networking.wifiEnabled) return String.fromCodePoint(0xf092d)
     if (!active) return String.fromCodePoint(0xf092d)
 
     let tier = signal >= 0.75 ? 4
@@ -37,18 +37,14 @@ RowLayout {
   }
 
   Text {
-    text: {
-      if (!Networking.wifiEnabled) return "off"
-      if (!root.active) return "N/A"
-      return root.active.name
-    }
-
-    color: Theme.fg
-
-    font {
-      family: Theme.fontFamily
-      pixelSize: 10
-      weight: 500
-    }
+      text: {
+          if (!Networking.wifiEnabled) return "disconnected"
+          if (!root.active) return "N/A"
+          return root.active.name
+      }
+      color: Theme.fg
+      font { family: Theme.fontFamily; pixelSize: 10; weight: 500 }
+      elide: Text.ElideRight
+      Layout.maximumWidth: 90
   }
 }
