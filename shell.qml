@@ -56,8 +56,9 @@ ShellRoot {
       anchors.horizontalCenter: parent.horizontalCenter
 
       property bool hovered: false
-      property bool expanded: false
-      property bool volumeActive: False
+      property bool miniDashboard: false
+      property bool volumeActive: false
+      property bool controlCenter: false
 
       // how long the volume adjust show
       Timer {
@@ -66,14 +67,14 @@ ShellRoot {
         onTriggered: box.volumeActive = false
       }
 
-      implicitWidth: expanded ? 420 : volumeActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: expanded ? 120 : volumeActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      implicitWidth: controlCenter ? 400 : miniDashboard ? 420 : volumeActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
+      implicitHeight: controlCenter ? 200 : miniDashboard ? 120 : volumeActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: 20
       color: bg
 
-      onExpandedChanged: {
-        if (!expanded) calendarPopup.shown = false
+      onMiniDashboardChanged: {
+        if (!miniDashboard) calendarPopup.shown = false
       }
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
@@ -89,9 +90,14 @@ ShellRoot {
         onExited: box.hovered = false
 
         onClicked: (mouse) => {
+          if (mouse.button === Qt.LeftButton) {
+            console.log("Left click detected, opening control center")
+            box.controlCenter = !box.controlCenter
+          }
+
           if (mouse.button === Qt.RightButton) {
               console.log("Right click detected, opening mini dashboard")
-              box.expanded = !box.expanded
+              box.miniDashboard = !box.miniDashboard
           }
         }
       }
@@ -103,7 +109,7 @@ ShellRoot {
         anchors.centerIn: parent
         anchors.leftMargin: 28
         anchors.rightMargin: 28
-        opacity: box.expanded ? 0 : box.volumeActive ? 0 : 1
+        opacity: box.controlCenter ? 0 : box.miniDashboard ? 0 : box.volumeActive ? 0 : 1
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
         Battery {}
@@ -164,15 +170,25 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
-        height: box.expanded ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.expanded ? 1 : 0
+        height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
+        opacity: box.miniDashboard ? 1 : 0
 
         Behavior on opacity {
           SequentialAnimation {
-            PauseAnimation { duration: box.expanded ? 20 : 0 }
+            PauseAnimation { duration: box.miniDashboard ? 20 : 0 }
             NumberAnimation { duration: 100; easing.type: Easing.OutExpo }
           }
         }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: (mouse) => {
+                if (mouse.button === Qt.RightButton)
+                    box.miniDashboard = !box.miniDashboard
+            }
+        }
+
         visible: opacity > 0
 
         RowLayout {
