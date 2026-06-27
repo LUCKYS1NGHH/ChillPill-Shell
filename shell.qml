@@ -58,17 +58,23 @@ ShellRoot {
       property bool hovered: false
       property bool miniDashboard: false
       property bool volumeActive: false
+      property bool brightnessActive: false
       property bool controlCenter: false
 
-      // how long the volume adjust show
       Timer {
         id: volumeHideTimer
         interval: 850
         onTriggered: box.volumeActive = false
       }
 
-      implicitWidth: controlCenter ? 400 : miniDashboard ? 420 : volumeActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: controlCenter ? 200 : miniDashboard ? 120 : volumeActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      Timer {
+          id: brightnessHideTimer
+          interval: 850
+          onTriggered: box.brightnessActive = false
+      }
+
+      implicitWidth: controlCenter ? 400 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
+      implicitHeight: controlCenter ? 200 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: 20
       color: bg
@@ -102,6 +108,15 @@ ShellRoot {
         }
       }
 
+      Brightness {
+          id: brightnessModule
+          visible: false
+          onBrightnessUpdated: {
+              box.brightnessActive = true
+              brightnessHideTimer.restart()
+          }
+      }
+
       // modulues in bar
       RowLayout {
         id: row
@@ -109,9 +124,10 @@ ShellRoot {
         anchors.centerIn: parent
         anchors.leftMargin: 28
         anchors.rightMargin: 28
-        opacity: box.controlCenter ? 0 : box.miniDashboard ? 0 : box.volumeActive ? 0 : 1
+        opacity: box.controlCenter ? 0 : box.miniDashboard ? 0 : box.volumeActive ? 0 : box.brightnessActive ? 0 : 1
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
+
         Battery {}
 
         Volume {
@@ -130,7 +146,7 @@ ShellRoot {
       // volume takeover
       Item {
         anchors.centerIn: parent
-        opacity: !box.expanded && box.volumeActive ? 1 : 0
+        opacity: box.volumeActive ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 150 } }
 
@@ -164,6 +180,45 @@ ShellRoot {
             font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
           }
         }
+      }
+
+      // brightness takeover
+      Item {
+          anchors.centerIn: parent
+          opacity: box.brightnessActive && !box.volumeActive ? 1 : 0
+          visible: opacity > 0
+          Behavior on opacity { NumberAnimation { duration: 150 } }
+
+          RowLayout {
+              anchors.centerIn: parent
+              spacing: 10
+
+              Text {
+                  text: brightnessModule.icon
+                  color: Theme.fg
+                  font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
+              }
+
+              Rectangle {
+                  width: 120; height: 3.7
+                  radius: 2
+                  color: "#333"
+
+                  Rectangle {
+                      width: parent.width * brightnessModule.percent
+                      height: parent.height
+                      radius: 2
+                      color: Theme.fg
+                      Behavior on width { NumberAnimation { duration: 60 } }
+                  }
+              }
+
+              Text {
+                  text: Math.round(brightnessModule.percent * 100) + "%"
+                  color: Theme.fg
+                  font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+              }
+          }
       }
 
       // mini dashboard opens on right click
@@ -506,3 +561,5 @@ ShellRoot {
 
   }
 }
+
+
