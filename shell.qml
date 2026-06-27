@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
+import IslandBackend
 
 ShellRoot {
 
@@ -67,6 +68,14 @@ ShellRoot {
       property bool brightnessActive: false
       property bool controlCenter: false
 
+      property bool wifiPanelOpen: false
+      onControlCenterChanged: if (!controlCenter) wifiPanelOpen = false
+
+      // control center UI
+      property int ccButtonWidth: 95
+      property int ccButtonHeight: 55
+      property int ccButtonRadius: 10
+
       Timer {
         id: volumeHideTimer
         interval: 850
@@ -95,7 +104,6 @@ ShellRoot {
       MouseArea {
         anchors.fill: parent
         hoverEnabled: true
-
         acceptedButtons: Qt.LeftButton | Qt.RightButton 
 
         onEntered: box.hovered = true
@@ -223,6 +231,86 @@ ShellRoot {
                   font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
               }
           }
+      }
+
+      // control center
+      Item {
+        anchors.centerIn: parent
+        width: box.implicitWidth - 30
+        opacity: box.controlCenter ? 1 : 0
+        visible: opacity > 0
+        height: box.controlCenter ? box.implicitHeight - 40 : 0
+
+        Behavior on opacity {
+          SequentialAnimation {
+            PauseAnimation { duration: box.controlCenter ? 20 : 0 }
+            NumberAnimation { duration: 100; easing.type: Easing.OutExpo }
+          }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: (mouse) => {
+                if (mouse.button === Qt.LeftButton)
+                    box.controlCenter = !box.controlCenter
+            }
+        }
+
+        RowLayout {
+          anchors.top: parent.top
+          anchors.left: parent.left
+          anchors.topMargin: 10
+          anchors.leftMargin: 8
+          spacing: 8
+
+          // wifi button
+          Rectangle {
+            width: box.ccButtonWidth; height: box.ccButtonHeight; radius: box.ccButtonRadius
+            color: WifiController.enabled ? "#507dba" : "#3b3b3b"
+
+            MouseArea {
+              anchors.fill: parent
+              acceptedButtons: Qt.LeftButton | Qt.RightButton
+              cursorShape: Qt.PointingHandCursor 
+              onClicked: function(mouse) {
+                if (mouse.button === Qt.RightButton)
+                  box.wifiPanelOpen = !box.wifiPanelOpen
+                else
+                  WifiController.setEnabled(!WifiController.enabled)
+              }
+            }
+
+            Column {
+              anchors.centerIn: parent
+              spacing: 4
+
+              Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: {
+                  if (!WifiController.enabled) return String.fromCodePoint(0xf0925)
+                  if (!WifiController.currentSsid) return String.fromCodePoint(0x5092d)
+                  return "\uf1eb"
+                }
+                font.family: "FiraCode Nerd Font Propo"
+                font.pixelSize: 18
+                color: "white"
+              }
+
+              Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: {
+                  if (!WifiController.enabled) return "OFF"
+                  if (WifiController.busy) return "..."
+                  return WifiController.currentSsid.length > 0 ? WifiController.currentSsid : "N/A"
+                }
+                color: "white"
+                font.pixelSize: 10
+                font.family: fontFamily
+              }
+            }
+          }
+        }
       }
 
       // mini dashboard opens on right click
@@ -562,8 +650,11 @@ ShellRoot {
         calendarPopup.shown = !calendarPopup.shown
       }
     }
-
   }
+
+  // wifi controller popup
+  WifiPanel { visible: box.wifiPanelOpen }
+
 }
 
 
