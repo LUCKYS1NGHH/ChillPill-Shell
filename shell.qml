@@ -126,24 +126,22 @@ ShellRoot {
       // modulues in bar
       RowLayout {
         id: row
-        spacing: 15
         anchors.centerIn: parent
         anchors.leftMargin: 28
         anchors.rightMargin: 28
+        spacing: 13
         opacity: box.controlCenter ? 0 : box.miniDashboard ? 0 : box.volumeActive ? 0 : box.brightnessActive ? 0 : 1
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
         Battery {}
-
         Volume {
           id: volumeModule
           onVolumeChanged: {
             box.volumeActive = true
             volumeHideTimer.restart()
             }
-          }
-
+        }
         Workspaces {}
         Network {}
         Clock {}
