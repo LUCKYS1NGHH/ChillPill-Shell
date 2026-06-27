@@ -234,8 +234,8 @@ ShellRoot {
 
         Behavior on opacity {
           SequentialAnimation {
-            PauseAnimation { duration: box.miniDashboard ? 20 : 0 }
-            NumberAnimation { duration: 100; easing.type: Easing.OutExpo }
+            PauseAnimation { duration: box.miniDashboard ? 1 : 0 }
+            NumberAnimation { duration: 300; easing.type: Easing.OutExpo }
           }
         }
 
