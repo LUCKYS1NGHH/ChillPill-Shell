@@ -17,6 +17,12 @@ ShellRoot {
   property int buttonHoverSpeed: 120
   property int buttonctlRadius: 6
 
+  // osd ui
+  property int osdInWidth: 120
+  property real osdInHeight: 3.7
+  property int osdBarRadius: 2
+  property int osdSpeed: 60
+
   PanelWindow {
 
     implicitHeight: 325
@@ -143,7 +149,7 @@ ShellRoot {
         Clock {}
       }
 
-      // volume takeover
+      // volume OSD
       Item {
         anchors.centerIn: parent
         opacity: box.volumeActive ? 1 : 0
@@ -161,8 +167,8 @@ ShellRoot {
           }
 
           Rectangle {
-            width: 120; height: 3.7
-            radius: 2
+            width: osdInWidth; height: osdInHeight
+            radius: osdBarRadius
             color: "#333"
 
             Rectangle {
@@ -170,7 +176,7 @@ ShellRoot {
               height: parent.height
               radius: 2
               color: Theme.fg
-              Behavior on width { NumberAnimation { duration: 60 } }
+              Behavior on width { NumberAnimation { duration: osdSpeed } }
             }
           }
 
@@ -182,7 +188,7 @@ ShellRoot {
         }
       }
 
-      // brightness takeover
+      // brightness OSD
       Item {
           anchors.centerIn: parent
           opacity: box.brightnessActive && !box.volumeActive ? 1 : 0
@@ -200,8 +206,8 @@ ShellRoot {
               }
 
               Rectangle {
-                  width: 120; height: 3.7
-                  radius: 2
+                  width: osdInWidth; height: osdInHeight
+                  radius: osdBarRadius
                   color: "#333"
 
                   Rectangle {
@@ -209,7 +215,7 @@ ShellRoot {
                       height: parent.height
                       radius: 2
                       color: Theme.fg
-                      Behavior on width { NumberAnimation { duration: 60 } }
+                      Behavior on width { NumberAnimation { duration: osdSpeed } }
                   }
               }
 
