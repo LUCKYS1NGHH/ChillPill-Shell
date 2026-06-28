@@ -24,6 +24,9 @@ ShellRoot {
   property int osdBarRadius: 2
   property int osdSpeed: 60
 
+  // media player related
+  property bool mediaAutoOpened: false
+
   PanelWindow {
 
     implicitHeight: 325
@@ -70,8 +73,6 @@ ShellRoot {
 
       property string accent: Theme.accent
 
-      //Mpris { id: mprisModule; visible: false }
-
       // control center UI
       property int ccButtonWidth: 95
       property int ccButtonHeight: 55
@@ -104,10 +105,17 @@ ShellRoot {
         repeat: false
       }
 
-      implicitWidth: controlCenter ? 390 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: controlCenter && mprisModule.hasPlayer ? 210 : controlCenter ? 79 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      onImplicitHeightChanged: {
+          heightAnim.stop()
+          heightAnim.to = implicitHeight
+          heightAnim.duration = mediaAutoOpened ? 650 : 550
+          heightAnim.start()
+      }
 
-      radius: controlCenter ? 18 : controlCenter && mprisModule.hasPlayer ? 25 : 20
+      implicitWidth: controlCenter ? 390 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
+      implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 145 : controlCenter && mprisModule.hasPlayer ? 210 : controlCenter ? 79 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+
+      radius: controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
       color: bg
 
       onMiniDashboardChanged: {
@@ -115,7 +123,7 @@ ShellRoot {
       }
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
-      Behavior on implicitHeight { NumberAnimation { duration: 550; easing.type: Easing.OutExpo } }
+      NumberAnimation { id: heightAnim; target: box; property: "height"; easing.type: Easing.OutExpo }
 
       MouseArea {
         anchors.fill: parent
@@ -135,6 +143,8 @@ ShellRoot {
           if (mouse.button === Qt.LeftButton) {
             console.log("Left click detected, opening control center")
             box.controlCenter = !box.controlCenter
+            mediaAutoOpened = false
+            mediaPopupHideTimer.stop()
           }
 
           if (mouse.button === Qt.RightButton) {
@@ -276,22 +286,25 @@ ShellRoot {
 
           onClicked: (mouse) => {
               if (mouse.button === Qt.LeftButton)
-                  box.controlCenter = !box.controlCenter
+                box.controlCenter = !box.controlCenter
+                mediaAutoOpened = true
+                mediaPopupHideTimer.stop()
           }
         }
 
         // media player
-        MediaPlayer {}  
+        MediaPlayer { color: box.controlCenter && mediaAutoOpened ? bg : "#111111" }
 
         // sliders
         Column {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 77 : 2
-          anchors.leftMargin: 14
+          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 77 : 4
+          anchors.leftMargin: 15
           anchors.rightMargin: 2
-          spacing: 7
+          spacing: 5
+          visible: !mediaAutoOpened
 
           // volume
           RowLayout {
@@ -738,18 +751,29 @@ ShellRoot {
 
     Connections {
         target: mprisModule
-        function onHasPlayerChanged() {
-            if (mprisModule.hasPlayer)
-                box.controlCenter = true
-            else
-                box.controlCenter = false
+        function onNowPlaying() {
+          if (!box.controlCenter) {
+            mediaAutoOpened  = true
+          }
+          box.controlCenter = true
+          mediaPopupHideTimer.restart()
         }
     }
 
+    Timer {
+        id: mediaPopupHideTimer
+        interval: 2000
+        repeat: false
+        onTriggered: {
+          if (mediaAutoOpened) {
+            box.controlCenter = false
+            mediaAutoOpened = false
+          }
+        }
+    }
+ 
   }
 
   Mpris { id: mprisModule; visible: false }
 
 }
-
-
