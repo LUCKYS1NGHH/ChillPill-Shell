@@ -105,9 +105,9 @@ ShellRoot {
       }
 
       implicitWidth: controlCenter ? 390 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: controlCenter ? 210 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      implicitHeight: controlCenter && mprisModule.hasPlayer ? 210 : controlCenter ? 79 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: 20
+      radius: controlCenter ? 22 : controlCenter && mprisModule.hasPlayer ? 25 : 20
       color: bg
 
       onMiniDashboardChanged: {
@@ -279,7 +279,7 @@ ShellRoot {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 118
+            height: mprisModule.hasPlayer ? 118 : 0
             radius: 8
             color: "#1f1f1f"
             visible: mprisModule.hasPlayer
@@ -493,7 +493,7 @@ ShellRoot {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: box.ccButtonHeight + 77
+          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 77 : 2
           anchors.leftMargin: 14
           anchors.rightMargin: 2
           spacing: 7
