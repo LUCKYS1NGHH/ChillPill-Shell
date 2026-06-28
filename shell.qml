@@ -70,12 +70,16 @@ ShellRoot {
 
       property string accent: Theme.accent
 
+      Mpris { id: mprisModule; visible: false }
+
       // control center UI
       property int ccButtonWidth: 95
       property int ccButtonHeight: 55
       property int ccButtonRadius: 10
-      property int sliderHeight: 6
-      property int sliderRadius: 5
+      property int sliderHeight: 4
+      property int sliderRadius: 4
+      property string sliderColor: "#c9c9c9"
+      property int mprisControlsIconSize: 20
 
       Timer {
         id: volumeHideTimer
@@ -100,8 +104,8 @@ ShellRoot {
         repeat: false
       }
 
-      implicitWidth: controlCenter ? 400 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: controlCenter ? 175 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      implicitWidth: controlCenter ? 390 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
+      implicitHeight: controlCenter ? 210 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: 20
       color: bg
@@ -251,12 +255,12 @@ ShellRoot {
         width: box.implicitWidth - 30
         opacity: box.controlCenter ? 1 : 0
         visible: opacity > 0
-        height: box.controlCenter ? box.implicitHeight - 40 : 0
+        height: box.controlCenter ? box.implicitHeight - 32 : 0
 
         Behavior on opacity {
           SequentialAnimation {
-            PauseAnimation { duration: box.controlCenter ? 20 : 0 }
-            NumberAnimation { duration: 100; easing.type: Easing.OutExpo }
+            PauseAnimation { duration: box.controlCenter ? 15 : 0 }
+            NumberAnimation { duration: 120; easing.type: Easing.OutExpo }
           }
         }
 
@@ -269,12 +273,227 @@ ShellRoot {
             }
         }
 
+        // media player
+        Rectangle {
+            id: mediaCard
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 118
+            radius: 8
+            color: "#1f1f1f"
+            visible: mprisModule.hasPlayer
+            clip: true
+
+            property real mprisProgress: 0
+            property string mprisTimePlayed: "0:00"
+            property string mprisTimeTotal: "0:00"
+
+            function formatMprisTime(val) {
+                let n = Number(val)
+                if (isNaN(n) || n <= 0) return "0:00"
+                let m = Math.floor(n / 60)
+                let s = Math.floor(n % 60)
+                return m + ":" + (s < 10 ? "0" : "") + s
+            }
+
+            // interpolate every second
+            Timer {
+                id: progressPoller
+                interval: 1000
+                running: mprisModule.hasPlayer
+                repeat: true
+                triggeredOnStart: true
+                onTriggered: {
+                    mediaCard.mprisProgress = mprisModule.progress
+                    mediaCard.mprisTimePlayed = mediaCard.formatMprisTime(mprisModule.polledPosition)
+                    mediaCard.mprisTimeTotal = mediaCard.formatMprisTime(mprisModule.polledLength)
+                }
+            }
+
+             Column {
+                anchors.fill: parent
+                anchors.margins: 18
+                spacing: 17
+
+                // top row -> art + info + controls
+                Row {
+                    width: parent.width
+                    height: 48
+                    spacing: 15
+
+                    // album art
+                    Rectangle {
+                        width: 47; height: 47
+                        radius: 8
+                        color: "#2a2a2a"
+                        anchors.verticalCenter: parent.verticalCenter
+                        clip: true
+
+                        Image {
+                            anchors.fill: parent
+                            source: mprisModule.artUrl
+                            fillMode: Image.PreserveAspectCrop
+                            visible: mprisModule.artUrl !== ""
+                            layer.enabled: true
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            visible: mprisModule.artUrl === ""
+                            text: "\uf001"
+                            font.family: "FiraCode Nerd Font Propo"
+                            font.pixelSize: 18
+                            color: "#555"
+                        }
+                    }
+
+                    // track + artist
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - 46 - 90 - 24
+                        spacing: 5
+
+                        Text {
+                            width: parent.width
+                            text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
+                            color: "#e8e8e8"
+                            font.pixelSize: 11
+                            font.bold: true
+                            font.family: Theme.fontFamily
+                            elide: Text.ElideRight
+                        }
+
+                        Text {
+                            width: parent.width
+                            text: mprisModule.artist
+                            color: "#777"
+                            font.pixelSize: 9
+                            font.family: Theme.fontFamily
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    // controls
+                    Row {
+                        anchors.rightMargin: 45
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 15
+
+                        Text {
+                            text: "⏮"
+                            font.family: "FiraCode Nerd Font Propo"
+                            font.pixelSize: 22 
+                            color: prevHover.containsMouse ? "#ffffff" : "#848484"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            MouseArea {
+                                id: prevHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: { mprisModule.prev() }
+                            }
+                        }
+
+                        Text {
+                            text: mprisModule.playing ? "󰏤" : "󰐊"
+                            font.family: "FiraCode Nerd Font Propo"
+                            font.pixelSize: 26
+                            color: playHover.containsMouse ? "#ffffff" : "#b3b3b3"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            MouseArea {
+                                id: playHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: mprisModule.playPause()
+                            }
+                        }
+
+                        Text {
+                            text: "⏭"
+                            font.family: "FiraCode Nerd Font Propo"
+                            font.pixelSize: 22
+                            color: nextHover.containsMouse ? "#ffffff" : "#848484"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            MouseArea {
+                                id: nextHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: mprisModule.next()
+                            }
+                        }
+                    }
+                }
+
+                // progress bar + time
+                Column {
+                    width: parent.width
+                    spacing: 8
+
+                    Rectangle {
+                        width: parent.width
+                        height: 3
+                        radius: 8
+                        color: "#4d4d4d"
+
+                        Rectangle {
+                            width: parent.width * mediaCard.mprisProgress
+                            height: parent.height
+                            radius: 5
+                            color: fg
+                            Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.Linear } }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: (mouse) => {
+                                let p = mprisModule.activePlayer
+                                if (!p || !p.length) return
+                                let ratio = mouse.x / width
+                                let len = Number(p.length) || 0
+                                if (len <= 0 && p.metadata && p.metadata["mpris:length"])
+                                    len = Number(p.metadata["mpris:length"])
+                                if (len > 0) p.position = ratio * len
+                            }
+                        }
+                    }
+
+                    Item {
+                        width: parent.width
+                        height: 10
+
+                        Text {
+                            anchors.left: parent.left
+                            text: mediaCard.mprisTimePlayed
+                            color: "#626262"
+                            font.pixelSize: 10
+                            font.family: Theme.fontFamily
+                        }
+
+                        Text {
+                            anchors.right: parent.right
+                            text: mediaCard.mprisTimeTotal
+                            color: "#626262"
+                            font.pixelSize: 10
+                            font.family: Theme.fontFamily
+                        }
+                    }
+                }
+            }
+        }
+
         // sliders
         Column {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: box.ccButtonHeight + 35
+          anchors.topMargin: box.ccButtonHeight + 77
           anchors.leftMargin: 14
           anchors.rightMargin: 2
           spacing: 7
@@ -302,7 +521,7 @@ ShellRoot {
                 width: parent.width * (volumeModule.vol / 100)
                 height: parent.height
                 radius: box.sliderRadius
-                color: box.accent
+                color: box.sliderColor
                 Behavior on width { NumberAnimation { duration: 60 } }
               }
 
@@ -349,7 +568,7 @@ ShellRoot {
                 width: parent.width * brightnessModule.percent
                 height: parent.height
                 radius: box.sliderRadius
-                color: box.accent
+                color: box.sliderColor
                 Behavior on width { NumberAnimation { duration: 60 } }
               }
 
