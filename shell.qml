@@ -107,7 +107,7 @@ ShellRoot {
       implicitWidth: controlCenter ? 390 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
       implicitHeight: controlCenter && mprisModule.hasPlayer ? 210 : controlCenter ? 79 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: controlCenter ? 22 : controlCenter && mprisModule.hasPlayer ? 25 : 20
+      radius: controlCenter ? 18 : controlCenter && mprisModule.hasPlayer ? 25 : 20
       color: bg
 
       onMiniDashboardChanged: {
@@ -126,6 +126,12 @@ ShellRoot {
         onExited: box.hovered = false
 
         onClicked: (mouse) => {
+          if (box.controlCenter) {
+            if (mouse.button === Qt.LeftButton)
+              box.controlCenter = false
+            return
+          }
+
           if (mouse.button === Qt.LeftButton) {
             console.log("Left click detected, opening control center")
             box.controlCenter = !box.controlCenter
@@ -265,12 +271,13 @@ ShellRoot {
         }
 
         MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: (mouse) => {
-                if (mouse.button === Qt.LeftButton)
-                    box.controlCenter = !box.controlCenter
-            }
+          anchors.fill: parent
+          acceptedButtons: Qt.LeftButton
+
+          onClicked: (mouse) => {
+              if (mouse.button === Qt.LeftButton)
+                  box.controlCenter = !box.controlCenter
+          }
         }
 
         // media player
