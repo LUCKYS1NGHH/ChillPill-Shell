@@ -20,7 +20,11 @@ Item {
     }
     readonly property string artUrl: activePlayer ? (activePlayer.trackArtUrl || activePlayer.artUrl || "") : ""
     readonly property bool playing: activePlayer ? activePlayer.playbackState === MprisPlaybackState.Playing : false
-    readonly property bool hasPlayer: activePlayer !== null
+
+    readonly property bool hasPlayer: activePlayer !== null && (
+        activePlayer.playbackState === MprisPlaybackState.Playing ||
+        activePlayer.playbackState === MprisPlaybackState.Paused
+    )
 
     property real polledPosition: 0
     property real polledLength: 0
