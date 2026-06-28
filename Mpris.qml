@@ -6,6 +6,16 @@ import QtQuick.Layouts
 Item {
     id: root
 
+    signal nowPlaying()
+
+    property bool _wasPlaying: false
+
+    onPlayingChanged: {
+        if (playing && !_wasPlaying)
+            nowPlaying()
+        _wasPlaying = playing
+    }
+
     property var playersList: Mpris.players.values !== undefined ? Mpris.players.values : Mpris.players
     property var activePlayer: resolveActivePlayer()
     property string lastActivePlayerDbusName: ""
