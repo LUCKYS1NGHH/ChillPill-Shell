@@ -68,10 +68,7 @@ ShellRoot {
       property bool brightnessActive: false
       property bool controlCenter: false
 
-      property bool wifiPanelOpen: false
       property string accent: Theme.accent
-
-      onControlCenterChanged: if (!controlCenter) wifiPanelOpen = false
 
       // control center UI
       property int ccButtonWidth: 95
@@ -270,61 +267,6 @@ ShellRoot {
                 if (mouse.button === Qt.LeftButton)
                     box.controlCenter = !box.controlCenter
             }
-        }
-
-        // wifi buttons row
-        RowLayout {
-          anchors.top: parent.top
-          anchors.left: parent.left
-          anchors.right: parent.right
-          anchors.topMargin: 10
-          anchors.leftMargin: 8
-          anchors.rightMargin: 8
-          spacing: 8
-
-          Rectangle {
-            width: box.ccButtonWidth; height: box.ccButtonHeight; radius: box.ccButtonRadius
-            color: WifiController.enabled ? box.accent : "#3b3b3b"
-
-            MouseArea {
-              anchors.fill: parent
-              acceptedButtons: Qt.LeftButton | Qt.RightButton
-              cursorShape: Qt.PointingHandCursor
-              onClicked: function(mouse) {
-                if (mouse.button === Qt.RightButton)
-                  box.wifiPanelOpen = !box.wifiPanelOpen
-                else
-                  WifiController.setEnabled(!WifiController.enabled)
-              }
-            }
-
-            Column {
-              anchors.centerIn: parent
-              spacing: 4
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: {
-                  if (!WifiController.enabled) return String.fromCodePoint(0xf0925)
-                  if (!WifiController.currentSsid) return String.fromCodePoint(0xf092d)
-                  return "\uf1eb"
-                }
-                font.family: "FiraCode Nerd Font Propo"
-                font.pixelSize: 18
-                color: fg
-              }
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: {
-                  if (!WifiController.enabled) return "OFF"
-                  if (WifiController.busy) return "..."
-                  return WifiController.currentSsid.length > 0 ? WifiController.currentSsid : "N/A"
-                }
-                color: fg
-                font.pixelSize: 10
-                font.family: fontFamily
-              }
-            }
-          }
         }
 
         // sliders
@@ -780,10 +722,6 @@ ShellRoot {
       }
     }
   }
-
-  // wifi controller popup
-  WifiPanel { visible: box.wifiPanelOpen }
-
 }
 
 
