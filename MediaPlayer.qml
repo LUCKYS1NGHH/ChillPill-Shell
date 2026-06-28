@@ -8,8 +8,8 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
     height: mprisModule.hasPlayer ? 118 : 0
-    radius: 8
-    color: "#1f1f1f"
+    radius: 10
+    color: "#212121"
     visible: mprisModule.hasPlayer
     clip: true
 
@@ -41,8 +41,8 @@ Rectangle {
 
      Column {
         anchors.fill: parent
-        anchors.margins: 18
-        spacing: 17
+        anchors.margins: 20
+        spacing: 15
 
         // top row -> art + info + controls
         Row {
@@ -104,9 +104,8 @@ Rectangle {
 
             // controls
             Row {
-                anchors.rightMargin: 45
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 15
+                spacing: 14
 
                 Text {
                     text: "⏮"

@@ -258,10 +258,10 @@ ShellRoot {
       // control center
       Item {
         anchors.centerIn: parent
-        width: box.implicitWidth - 30
+        width: box.implicitWidth - 24
         opacity: box.controlCenter ? 1 : 0
         visible: opacity > 0
-        height: box.controlCenter ? box.implicitHeight - 32 : 0
+        height: box.controlCenter ? box.implicitHeight - 25 : 0
 
         Behavior on opacity {
           SequentialAnimation {
