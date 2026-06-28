@@ -301,7 +301,7 @@ ShellRoot {
           // uptime refresh every 60 sec
           Timer {
             interval: 60000
-            running: box.expanded
+            running: box.miniDashboard
             repeat: true
             triggeredOnStart: true
             onTriggered: {
