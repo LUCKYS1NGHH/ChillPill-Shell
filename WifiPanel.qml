@@ -11,7 +11,7 @@ PanelWindow {
 
   property string fontFamily: Theme.fontFamily
   property string bg: Theme.bg
-  property string accent: "#507dba"
+  property string accent: Theme.accent
 
   exclusionMode: ExclusionMode.Ignore
   width: 275

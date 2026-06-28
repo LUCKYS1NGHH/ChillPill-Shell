@@ -69,12 +69,16 @@ ShellRoot {
       property bool controlCenter: false
 
       property bool wifiPanelOpen: false
+      property string accent: Theme.accent
+
       onControlCenterChanged: if (!controlCenter) wifiPanelOpen = false
 
       // control center UI
       property int ccButtonWidth: 95
       property int ccButtonHeight: 55
       property int ccButtonRadius: 10
+      property int sliderHeight: 6
+      property int sliderRadius: 5
 
       Timer {
         id: volumeHideTimer
@@ -88,8 +92,19 @@ ShellRoot {
           onTriggered: box.brightnessActive = false
       }
 
+      Process {
+        id: brightnessSetProc
+        running: false
+      }
+
+      Timer {
+        id: brightnessThrottle
+        interval: 80
+        repeat: false
+      }
+
       implicitWidth: controlCenter ? 400 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: controlCenter ? 200 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      implicitHeight: controlCenter ? 175 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: 20
       color: bg
@@ -158,7 +173,7 @@ ShellRoot {
       // volume OSD
       Item {
         anchors.centerIn: parent
-        opacity: box.volumeActive ? 1 : 0
+        opacity: box.volumeActive && !box.controlCenter ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 150 } }
 
@@ -196,41 +211,41 @@ ShellRoot {
 
       // brightness OSD
       Item {
+        anchors.centerIn: parent
+        opacity: box.brightnessActive && !box.volumeActive && !box.controlCenter ? 1 : 0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 150 } }
+
+        RowLayout {
           anchors.centerIn: parent
-          opacity: box.brightnessActive && !box.volumeActive ? 1 : 0
-          visible: opacity > 0
-          Behavior on opacity { NumberAnimation { duration: 150 } }
+          spacing: 10
 
-          RowLayout {
-              anchors.centerIn: parent
-              spacing: 10
+          Text {
+              text: brightnessModule.icon
+              color: Theme.fg
+              font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
+          }
 
-              Text {
-                  text: brightnessModule.icon
-                  color: Theme.fg
-                  font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
-              }
+          Rectangle {
+              width: osdInWidth; height: osdInHeight
+              radius: osdBarRadius
+              color: "#333"
 
               Rectangle {
-                  width: osdInWidth; height: osdInHeight
-                  radius: osdBarRadius
-                  color: "#333"
-
-                  Rectangle {
-                      width: parent.width * brightnessModule.percent
-                      height: parent.height
-                      radius: 2
-                      color: Theme.fg
-                      Behavior on width { NumberAnimation { duration: osdSpeed } }
-                  }
-              }
-
-              Text {
-                  text: Math.round(brightnessModule.percent * 100) + "%"
+                  width: parent.width * brightnessModule.percent
+                  height: parent.height
+                  radius: 2
                   color: Theme.fg
-                  font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+                  Behavior on width { NumberAnimation { duration: osdSpeed } }
               }
           }
+
+          Text {
+              text: Math.round(brightnessModule.percent * 100) + "%"
+              color: Theme.fg
+              font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+          }
+        }
       }
 
       // control center
@@ -257,22 +272,24 @@ ShellRoot {
             }
         }
 
+        // wifi buttons row
         RowLayout {
           anchors.top: parent.top
           anchors.left: parent.left
+          anchors.right: parent.right
           anchors.topMargin: 10
           anchors.leftMargin: 8
+          anchors.rightMargin: 8
           spacing: 8
 
-          // wifi button
           Rectangle {
             width: box.ccButtonWidth; height: box.ccButtonHeight; radius: box.ccButtonRadius
-            color: WifiController.enabled ? "#507dba" : "#3b3b3b"
+            color: WifiController.enabled ? box.accent : "#3b3b3b"
 
             MouseArea {
               anchors.fill: parent
               acceptedButtons: Qt.LeftButton | Qt.RightButton
-              cursorShape: Qt.PointingHandCursor 
+              cursorShape: Qt.PointingHandCursor
               onClicked: function(mouse) {
                 if (mouse.button === Qt.RightButton)
                   box.wifiPanelOpen = !box.wifiPanelOpen
@@ -284,19 +301,17 @@ ShellRoot {
             Column {
               anchors.centerIn: parent
               spacing: 4
-
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: {
                   if (!WifiController.enabled) return String.fromCodePoint(0xf0925)
-                  if (!WifiController.currentSsid) return String.fromCodePoint(0x5092d)
+                  if (!WifiController.currentSsid) return String.fromCodePoint(0xf092d)
                   return "\uf1eb"
                 }
                 font.family: "FiraCode Nerd Font Propo"
                 font.pixelSize: 18
-                color: "white"
+                color: fg
               }
-
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: {
@@ -304,13 +319,127 @@ ShellRoot {
                   if (WifiController.busy) return "..."
                   return WifiController.currentSsid.length > 0 ? WifiController.currentSsid : "N/A"
                 }
-                color: "white"
+                color: fg
                 font.pixelSize: 10
                 font.family: fontFamily
               }
             }
           }
         }
+
+        // sliders
+        Column {
+          anchors.top: parent.top
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.topMargin: box.ccButtonHeight + 35
+          anchors.leftMargin: 14
+          anchors.rightMargin: 2
+          spacing: 7
+
+          // volume
+          RowLayout {
+            width: parent.width
+            spacing: 14
+
+            Text {
+              text: volumeModule.icon
+              color: volumeModule.muted ? "#fd2222" : Theme.fg
+              font.family: "JetBrainsMono Nerd Font"
+              font.pixelSize: 13
+              anchors.leftMargin: 10
+            }
+
+            Rectangle {
+              Layout.fillWidth: true
+              height: box.sliderHeight
+              radius: box.sliderRadius
+              color: "#3a3a3a"
+
+              Rectangle {
+                width: parent.width * (volumeModule.vol / 100)
+                height: parent.height
+                radius: box.sliderRadius
+                color: box.accent
+                Behavior on width { NumberAnimation { duration: 60 } }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                onClicked: (mouse) => {
+                  volumeModule.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width))
+                }
+                onPositionChanged: (mouse) => {
+                  if (pressed)
+                    volumeModule.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width))
+                }
+              }
+            }
+
+            Text {
+              text: volumeModule.muted ? "muted" : volumeModule.vol + "%"
+              color: Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: 10
+              Layout.minimumWidth: 35
+            }
+          }
+
+          // brightness
+          RowLayout {
+            width: parent.width
+            spacing: 14
+
+            Text {
+              text: brightnessModule.icon
+              color: Theme.fg
+              font.family: "JetBrainsMono Nerd Font"
+              font.pixelSize: 13
+            }
+
+            Rectangle {
+              Layout.fillWidth: true
+              height: box.sliderHeight
+              radius: box.sliderRadius
+              color: "#3a3a3a"
+
+              Rectangle {
+                width: parent.width * brightnessModule.percent
+                height: parent.height
+                radius: box.sliderRadius
+                color: box.accent
+                Behavior on width { NumberAnimation { duration: 60 } }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                onClicked: (mouse) => {
+                  let pct = Math.round(Math.max(0, Math.min(1, mouse.x / width)) * 100)
+                  brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
+                  brightnessSetProc.running = false
+                  brightnessSetProc.running = true
+                }
+                onPositionChanged: (mouse) => {
+                  if (pressed && !brightnessThrottle.running) {
+                    let pct = Math.round(Math.max(0, Math.min(1, mouse.x / width)) * 100)
+                    brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
+                    brightnessSetProc.running = false
+                    brightnessSetProc.running = true
+                    brightnessThrottle.start()
+                  }
+                }
+              }
+            }
+
+            Text {
+              text: Math.round(brightnessModule.percent * 100) + "%"
+              color: Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: 10
+              Layout.minimumWidth: 35
+            }
+          }
+        } 
       }
 
       // mini dashboard opens on right click
