@@ -12,6 +12,8 @@ Rectangle {
     color: "#212121"
     visible: mprisModule.hasPlayer
     clip: true
+    border.color: "#1d1d1d"
+    border.width: 2
 
     property real mprisProgress: 0
     property string mprisTimePlayed: "0:00"
