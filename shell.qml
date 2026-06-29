@@ -112,11 +112,23 @@ ShellRoot {
           heightAnim.start()
       }
 
-      implicitWidth: controlCenter ? 390 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 145 : controlCenter && mprisModule.hasPlayer ? 210 : controlCenter ? 79 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      implicitWidth: controlCenter && mediaAutoOpened ? 350
+                     : controlCenter ? 390
+                     : miniDashboard ? 420
+                     : volumeActive ? 220
+                     : brightnessActive ? 220
+                     : row.implicitWidth + (hovered ? 68 : 56)
 
-      radius: controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
-      color: bg
+      implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 138
+                      : controlCenter && mprisModule.hasPlayer ? 202
+                      : controlCenter ? 74
+                      : miniDashboard ? 120
+                      : volumeActive ? 40
+                      : brightnessActive ? 40
+                      : row.implicitHeight + (hovered ? 10 : 10)
+
+      radius: controlCenter && mprisModule.hasPlayer ? 28 : controlCenter ? 12 : 20
+      color: controlCenter && mprisModule.hasPlayer ? "#141414" : bg
 
       onMiniDashboardChanged: {
         if (!miniDashboard) calendarPopup.shown = false
@@ -293,7 +305,7 @@ ShellRoot {
         }
 
         // media player
-        MediaPlayer { color: box.controlCenter && mediaAutoOpened ? bg : "#111111" }
+        MediaPlayer { color: box.controlCenter && mediaAutoOpened ? "#141414" : "#151515" }
 
         // sliders
         Column {
