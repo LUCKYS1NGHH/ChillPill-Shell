@@ -115,17 +115,17 @@ ShellRoot {
 
       implicitWidth: controlCenter && mediaAutoOpened ? 375
                      : controlCenter ? 390
-                     : miniDashboard ? 420
                      : volumeActive ? 220
                      : brightnessActive ? 220
+                     : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
       implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 138
                       : controlCenter && mprisModule.hasPlayer ? 202
                       : controlCenter ? 74
-                      : miniDashboard ? 120
                       : volumeActive ? 40
                       : brightnessActive ? 40
+                      : miniDashboard ? 120
                       : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: controlCenter && mprisModule.hasPlayer ? 25 : controlCenter ? 12 : 20
@@ -162,6 +162,7 @@ ShellRoot {
 
           if (mouse.button === Qt.RightButton) {
               console.log("Right click detected, opening mini dashboard")
+              mediaAutoOpened = false
               box.miniDashboard = !box.miniDashboard
           }
         }
@@ -433,7 +434,7 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard ? 1 : 0
+        opacity: box.miniDashboard && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive ? 1 : 0
 
         Behavior on opacity {
           SequentialAnimation {
