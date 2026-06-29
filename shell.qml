@@ -305,7 +305,11 @@ ShellRoot {
         }
 
         // media player
-        MediaPlayer { color: box.controlCenter && mediaAutoOpened ? "#141414" : "#151515" }
+        MediaPlayer {
+          color: box.controlCenter && mediaAutoOpened ? "#141414" : "#151515"
+          radius: box.controlCenter && mprisModule.hasPlayer ? 18 : 10
+          border.width: box.controlCenter && mediaAutoOpened ? 0 : 2
+        }
 
         // sliders
         Column {
