@@ -64,6 +64,7 @@ ShellRoot {
       id: box
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
+      clip: true
 
       property bool hovered: false
       property bool miniDashboard: false
@@ -112,7 +113,7 @@ ShellRoot {
           heightAnim.start()
       }
 
-      implicitWidth: controlCenter && mediaAutoOpened ? 350
+      implicitWidth: controlCenter && mediaAutoOpened ? 375
                      : controlCenter ? 390
                      : miniDashboard ? 420
                      : volumeActive ? 220
@@ -127,8 +128,8 @@ ShellRoot {
                       : brightnessActive ? 40
                       : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: controlCenter && mprisModule.hasPlayer ? 28 : controlCenter ? 12 : 20
-      color: controlCenter && mprisModule.hasPlayer ? "#141414" : bg
+      radius: controlCenter && mprisModule.hasPlayer ? 25 : controlCenter ? 12 : 20
+      color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
         if (!miniDashboard) calendarPopup.shown = false
@@ -288,7 +289,7 @@ ShellRoot {
         Behavior on opacity {
           SequentialAnimation {
             PauseAnimation { duration: box.controlCenter ? 15 : 0 }
-            NumberAnimation { duration: 120; easing.type: Easing.OutExpo }
+            NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
           }
         }
 
@@ -306,8 +307,8 @@ ShellRoot {
 
         // media player
         MediaPlayer {
-          color: box.controlCenter && mediaAutoOpened ? "#141414" : "#151515"
-          radius: box.controlCenter && mprisModule.hasPlayer ? 18 : 10
+          color: box.controlCenter && mediaAutoOpened ? "#1a1a1a" : "#151515"
+          radius: box.controlCenter && mprisModule.hasPlayer ? 16 : 10
           border.width: box.controlCenter && mediaAutoOpened ? 0 : 2
         }
 
