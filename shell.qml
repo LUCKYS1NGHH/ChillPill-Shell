@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
+import IslandBackend
 
 ShellRoot {
 
@@ -22,6 +23,9 @@ ShellRoot {
   property real osdInHeight: 3.7
   property int osdBarRadius: 2
   property int osdSpeed: 60
+
+  // media player related
+  property bool mediaAutoOpened: false
 
   PanelWindow {
 
@@ -67,6 +71,17 @@ ShellRoot {
       property bool brightnessActive: false
       property bool controlCenter: false
 
+      property string accent: Theme.accent
+
+      // control center UI
+      property int ccButtonWidth: 95
+      property int ccButtonHeight: 55
+      property int ccButtonRadius: 10
+      property int sliderHeight: 4
+      property int sliderRadius: 4
+      property string sliderColor: "#c9c9c9"
+      property int mprisControlsIconSize: 20
+
       Timer {
         id: volumeHideTimer
         interval: 850
@@ -79,32 +94,69 @@ ShellRoot {
           onTriggered: box.brightnessActive = false
       }
 
-      implicitWidth: controlCenter ? 400 : miniDashboard ? 420 : volumeActive ? 220 : brightnessActive ? 220 : row.implicitWidth + (hovered ? 68 : 56)
-      implicitHeight: controlCenter ? 200 : miniDashboard ? 120 : volumeActive ? 40 : brightnessActive ? 40 : row.implicitHeight + (hovered ? 10 : 10)
+      Process {
+        id: brightnessSetProc
+        running: false
+      }
 
-      radius: 20
-      color: bg
+      Timer {
+        id: brightnessThrottle
+        interval: 80
+        repeat: false
+      }
+
+      onImplicitHeightChanged: {
+          heightAnim.stop()
+          heightAnim.to = implicitHeight
+          heightAnim.duration = mediaAutoOpened ? 650 : 550
+          heightAnim.start()
+      }
+
+      implicitWidth: controlCenter && mediaAutoOpened ? 350
+                     : controlCenter ? 390
+                     : miniDashboard ? 420
+                     : volumeActive ? 220
+                     : brightnessActive ? 220
+                     : row.implicitWidth + (hovered ? 68 : 56)
+
+      implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 138
+                      : controlCenter && mprisModule.hasPlayer ? 202
+                      : controlCenter ? 74
+                      : miniDashboard ? 120
+                      : volumeActive ? 40
+                      : brightnessActive ? 40
+                      : row.implicitHeight + (hovered ? 10 : 10)
+
+      radius: controlCenter && mprisModule.hasPlayer ? 28 : controlCenter ? 12 : 20
+      color: controlCenter && mprisModule.hasPlayer ? "#141414" : bg
 
       onMiniDashboardChanged: {
         if (!miniDashboard) calendarPopup.shown = false
       }
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
-      Behavior on implicitHeight { NumberAnimation { duration: 550; easing.type: Easing.OutExpo } }
+      NumberAnimation { id: heightAnim; target: box; property: "height"; easing.type: Easing.OutExpo }
 
       MouseArea {
         anchors.fill: parent
         hoverEnabled: true
-
         acceptedButtons: Qt.LeftButton | Qt.RightButton 
 
         onEntered: box.hovered = true
         onExited: box.hovered = false
 
         onClicked: (mouse) => {
+          if (box.controlCenter) {
+            if (mouse.button === Qt.LeftButton)
+              box.controlCenter = false
+            return
+          }
+
           if (mouse.button === Qt.LeftButton) {
             console.log("Left click detected, opening control center")
             box.controlCenter = !box.controlCenter
+            mediaAutoOpened = false
+            mediaPopupHideTimer.stop()
           }
 
           if (mouse.button === Qt.RightButton) {
@@ -150,7 +202,7 @@ ShellRoot {
       // volume OSD
       Item {
         anchors.centerIn: parent
-        opacity: box.volumeActive ? 1 : 0
+        opacity: box.volumeActive && !box.controlCenter ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 150 } }
 
@@ -188,41 +240,187 @@ ShellRoot {
 
       // brightness OSD
       Item {
+        anchors.centerIn: parent
+        opacity: box.brightnessActive && !box.volumeActive && !box.controlCenter ? 1 : 0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 150 } }
+
+        RowLayout {
           anchors.centerIn: parent
-          opacity: box.brightnessActive && !box.volumeActive ? 1 : 0
-          visible: opacity > 0
-          Behavior on opacity { NumberAnimation { duration: 150 } }
+          spacing: 10
 
-          RowLayout {
-              anchors.centerIn: parent
-              spacing: 10
+          Text {
+              text: brightnessModule.icon
+              color: Theme.fg
+              font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
+          }
 
-              Text {
-                  text: brightnessModule.icon
-                  color: Theme.fg
-                  font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
-              }
+          Rectangle {
+              width: osdInWidth; height: osdInHeight
+              radius: osdBarRadius
+              color: "#333"
 
               Rectangle {
-                  width: osdInWidth; height: osdInHeight
-                  radius: osdBarRadius
-                  color: "#333"
-
-                  Rectangle {
-                      width: parent.width * brightnessModule.percent
-                      height: parent.height
-                      radius: 2
-                      color: Theme.fg
-                      Behavior on width { NumberAnimation { duration: osdSpeed } }
-                  }
-              }
-
-              Text {
-                  text: Math.round(brightnessModule.percent * 100) + "%"
+                  width: parent.width * brightnessModule.percent
+                  height: parent.height
+                  radius: 2
                   color: Theme.fg
-                  font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+                  Behavior on width { NumberAnimation { duration: osdSpeed } }
               }
           }
+
+          Text {
+              text: Math.round(brightnessModule.percent * 100) + "%"
+              color: Theme.fg
+              font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+          }
+        }
+      }
+
+      // control center
+      Item {
+        anchors.centerIn: parent
+        width: box.implicitWidth - 24
+        opacity: box.controlCenter ? 1 : 0
+        visible: opacity > 0
+        height: box.controlCenter ? box.implicitHeight - 25 : 0
+
+        Behavior on opacity {
+          SequentialAnimation {
+            PauseAnimation { duration: box.controlCenter ? 15 : 0 }
+            NumberAnimation { duration: 120; easing.type: Easing.OutExpo }
+          }
+        }
+
+        MouseArea {
+          anchors.fill: parent
+          acceptedButtons: Qt.LeftButton
+
+          onClicked: (mouse) => {
+              if (mouse.button === Qt.LeftButton)
+                box.controlCenter = !box.controlCenter
+                mediaAutoOpened = true
+                mediaPopupHideTimer.stop()
+          }
+        }
+
+        // media player
+        MediaPlayer { color: box.controlCenter && mediaAutoOpened ? "#141414" : "#151515" }
+
+        // sliders
+        Column {
+          anchors.top: parent.top
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 77 : 4
+          anchors.leftMargin: 15
+          anchors.rightMargin: 2
+          spacing: 5
+          visible: !mediaAutoOpened
+
+          // volume
+          RowLayout {
+            width: parent.width
+            spacing: 14
+
+            Text {
+              text: volumeModule.icon
+              color: volumeModule.muted ? "#fd2222" : Theme.fg
+              font.family: "JetBrainsMono Nerd Font"
+              font.pixelSize: 13
+              anchors.leftMargin: 10
+            }
+
+            Rectangle {
+              Layout.fillWidth: true
+              height: box.sliderHeight
+              radius: box.sliderRadius
+              color: "#3a3a3a"
+
+              Rectangle {
+                width: parent.width * (volumeModule.vol / 100)
+                height: parent.height
+                radius: box.sliderRadius
+                color: box.sliderColor
+                Behavior on width { NumberAnimation { duration: 60 } }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                onClicked: (mouse) => {
+                  volumeModule.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width))
+                }
+                onPositionChanged: (mouse) => {
+                  if (pressed)
+                    volumeModule.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width))
+                }
+              }
+            }
+
+            Text {
+              text: volumeModule.muted ? "muted" : volumeModule.vol + "%"
+              color: Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: 10
+              Layout.minimumWidth: 35
+            }
+          }
+
+          // brightness
+          RowLayout {
+            width: parent.width
+            spacing: 14
+
+            Text {
+              text: brightnessModule.icon
+              color: Theme.fg
+              font.family: "JetBrainsMono Nerd Font"
+              font.pixelSize: 13
+            }
+
+            Rectangle {
+              Layout.fillWidth: true
+              height: box.sliderHeight
+              radius: box.sliderRadius
+              color: "#3a3a3a"
+
+              Rectangle {
+                width: parent.width * brightnessModule.percent
+                height: parent.height
+                radius: box.sliderRadius
+                color: box.sliderColor
+                Behavior on width { NumberAnimation { duration: 60 } }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                onClicked: (mouse) => {
+                  let pct = Math.round(Math.max(0, Math.min(1, mouse.x / width)) * 100)
+                  brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
+                  brightnessSetProc.running = false
+                  brightnessSetProc.running = true
+                }
+                onPositionChanged: (mouse) => {
+                  if (pressed && !brightnessThrottle.running) {
+                    let pct = Math.round(Math.max(0, Math.min(1, mouse.x / width)) * 100)
+                    brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
+                    brightnessSetProc.running = false
+                    brightnessSetProc.running = true
+                    brightnessThrottle.start()
+                  }
+                }
+              }
+            }
+
+            Text {
+              text: Math.round(brightnessModule.percent * 100) + "%"
+              color: Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: 10
+              Layout.minimumWidth: 35
+            }
+          }
+        } 
       }
 
       // mini dashboard opens on right click
@@ -563,7 +761,31 @@ ShellRoot {
       }
     }
 
+    Connections {
+        target: mprisModule
+        function onNowPlaying() {
+          if (!box.controlCenter) {
+            mediaAutoOpened  = true
+          }
+          box.controlCenter = true
+          mediaPopupHideTimer.restart()
+        }
+    }
+
+    Timer {
+        id: mediaPopupHideTimer
+        interval: 2000
+        repeat: false
+        onTriggered: {
+          if (mediaAutoOpened) {
+            box.controlCenter = false
+            mediaAutoOpened = false
+          }
+        }
+    }
+ 
   }
+
+  Mpris { id: mprisModule; visible: false }
+
 }
-
-
