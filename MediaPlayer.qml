@@ -8,7 +8,7 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
     height: mprisModule.hasPlayer ? 118 : 0
-    radius: 10
+    radius: 12
     color: "#212121"
     visible: mprisModule.hasPlayer
     clip: true
@@ -41,7 +41,7 @@ Rectangle {
 
      Column {
         anchors.fill: parent
-        anchors.margins: 20
+        anchors.margins: 14
         spacing: 15
 
         // top row -> art + info + controls
@@ -80,13 +80,13 @@ Rectangle {
             Column {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - 46 - 90 - 24
-                spacing: 5
+                spacing: 4
 
                 Text {
                     width: parent.width
                     text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
                     color: "#e8e8e8"
-                    font.pixelSize: 11
+                    font.pixelSize: 12
                     font.bold: true
                     font.family: Theme.fontFamily
                     elide: Text.ElideRight
@@ -95,8 +95,9 @@ Rectangle {
                 Text {
                     width: parent.width
                     text: mprisModule.artist
-                    color: "#777"
+                    color: "#656565"
                     font.pixelSize: 9
+                    font.weight: 400
                     font.family: Theme.fontFamily
                     elide: Text.ElideRight
                 }
@@ -110,8 +111,8 @@ Rectangle {
                 Text {
                     text: "⏮"
                     font.family: "FiraCode Nerd Font Propo"
-                    font.pixelSize: 22
-                    color: prevHover.containsMouse ? "#ffffff" : "#848484"
+                    font.pixelSize: 23
+                    color: prevHover.containsMouse ? "#ffffff" : "#aeaeae"
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
@@ -126,8 +127,8 @@ Rectangle {
                 Text {
                     text: mprisModule.playing ? "󰏤" : "󰐊"
                     font.family: "FiraCode Nerd Font Propo"
-                    font.pixelSize: 26
-                    color: playHover.containsMouse ? "#ffffff" : "#b3b3b3"
+                    font.pixelSize: 23
+                    color: playHover.containsMouse ? "#ffffff" : "#cdcdcd"
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
@@ -142,8 +143,8 @@ Rectangle {
                 Text {
                     text: "⏭"
                     font.family: "FiraCode Nerd Font Propo"
-                    font.pixelSize: 22
-                    color: nextHover.containsMouse ? "#ffffff" : "#848484"
+                    font.pixelSize: 23
+                    color: nextHover.containsMouse ? "#ffffff" : "#aeaeae"
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
