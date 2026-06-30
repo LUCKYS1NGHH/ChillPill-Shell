@@ -407,7 +407,7 @@ ShellRoot {
             Image {
               id: avatarImg
               anchors.fill: parent
-              source: "file:///home/xingyun/.pfp.png"
+              source: "file://" + Quickshell.env("HOME") + "/.pfp.png"
               fillMode: Image.PreserveAspectCrop
               asynchronous: false
               visible: false
