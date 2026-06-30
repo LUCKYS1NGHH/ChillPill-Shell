@@ -34,9 +34,22 @@ ShellRoot {
 
       function hide(): void {
           box.controlCenter = false
-      }   
+      }
   }
 
+  IpcHandler {
+      target: "miniDashboard"
+
+      function toggle(): void {
+          box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false }
+
+      function show(): void {
+          box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false }
+
+      function hide(): void {
+        box.miniDashboard = false
+      }
+  }
 
   property string bg: Theme.bg
   property string fg: Theme.fg
