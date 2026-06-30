@@ -194,9 +194,27 @@ ShellRoot {
         onExited: box.hovered = false
 
         onClicked: (mouse) => {
+
+          // restrict control center to only accept left click
           if (box.controlCenter) {
             if (mouse.button === Qt.LeftButton)
               box.controlCenter = false
+            return
+          }
+
+          // same, cliphist accept middle
+          if (box.cliphistOpen) {
+            if (mouse.button === Qt.MiddleButton) {
+              box.cliphistOpen = false
+            }
+            return
+          }
+
+          // last, mini dashboard accept only left
+          if (box.miniDashboard) {
+            if (mouse.button === Qt.RightButton) {
+              box.miniDashboard = false
+            }
             return
           }
 
@@ -208,6 +226,8 @@ ShellRoot {
           }
 
           if (mouse.button === Qt.MiddleButton) {
+            console.log("Middle click detected, opening cliphist")
+            mediaAutoOpened = false
             box.cliphistOpen = !box.cliphistOpen
           }
 
@@ -268,12 +288,13 @@ ShellRoot {
           valueText: Math.round(brightnessModule.percent * 100) + "%"
       }
 
+      // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
         height: box.cliphistOpen ? box.implicitHeight - 25 : 0
-        opacity: box.cliphistOpen ? 1 : 0
-        visible: box.cliphistOpen && opacity > 0
+        opacity: box.cliphistOpen && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.controlCenter ? 1 : 0
+        visible: opacity > 0
 
         Behavior on opacity {
           SequentialAnimation {
@@ -290,12 +311,12 @@ ShellRoot {
         }
       }
 
-      // control center
+      // control center opens on left click
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter ? 1 : 0
-        visible: box.controlCenter && opacity > 0
+        opacity: box.controlCenter && !box.cliphistOpen && !box.miniDashboard && box.controlCenter ? 1 : 0
+        visible: opacity > 0
         height: box.controlCenter ? box.implicitHeight - 25 : 0
 
         Behavior on opacity {
@@ -449,7 +470,7 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive ? 1 : 0
+        opacity: box.miniDashboard && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.cliphistOpen ? 1 : 0
 
         Behavior on opacity {
           SequentialAnimation {
