@@ -10,11 +10,15 @@ Item {
     property bool shown: false
     property int selectedIndex: 0
     property var entries: []   // list of { id, label }
+    property string searchQuery: ""
+    property var filteredEntries: searchQuery.length === 0
+        ? entries
+        : entries.filter(e => e.label.toLowerCase().includes(searchQuery.toLowerCase()))
 
     signal closeRequested()
 
     width: 320
-    height: 180
+    height: 210
     visible: shown
     opacity: shown ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 150 } }
@@ -22,9 +26,15 @@ Item {
     onShownChanged: {
         if (shown) {
             refresh()
+            searchQuery = ""
+            searchInput.text = ""
             selectedIndex = 0
-            forceActiveFocus()
+            searchInput.forceActiveFocus()
         }
+    }
+
+    onFilteredEntriesChanged: {
+        selectedIndex = 0
     }
 
     function refresh() {
@@ -33,8 +43,8 @@ Item {
     }
 
     function copySelected() {
-        if (entries.length === 0) return
-        let entry = entries[selectedIndex]
+        if (filteredEntries.length === 0) return
+        let entry = filteredEntries[selectedIndex]
         copyProc.command = ["sh", "-c", "cliphist decode " + entry.id + " | wl-copy"]
         copyProc.running = false
         copyProc.running = true
@@ -87,12 +97,66 @@ Item {
             anchors.leftMargin: 4
         }
 
+        // search box
+        Rectangle {
+            width: parent.width
+            height: 26
+            radius: 6
+            color: "#252525"
+            border.color: searchInput.activeFocus ? "#555" : "#333"
+            border.width: 1
+
+            TextInput {
+                id: searchInput
+                anchors.fill: parent
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                verticalAlignment: TextInput.AlignVCenter
+                color: Theme.fg
+                font { family: Theme.fontFamily; pixelSize: 10 }
+                clip: true
+
+                onTextChanged: root.searchQuery = text
+
+                Text {
+                    text: "search clips..."
+                    color: "#666"
+                    font: searchInput.font
+                    visible: searchInput.text.length === 0
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Keys.onPressed: (event) => {
+                    if (event.key === Qt.Key_Down) {
+                        if (root.filteredEntries.length > 0) {
+                            root.selectedIndex = (root.selectedIndex + 1) % root.filteredEntries.length
+                        }
+                        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+                        event.accepted = true
+                    } else if (event.key === Qt.Key_Up) {
+                        if (root.filteredEntries.length > 0)
+                            root.selectedIndex = root.selectedIndex <= 0
+                                ? root.filteredEntries.length - 1
+                                : root.selectedIndex - 1
+                        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+                        event.accepted = true
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        root.copySelected()
+                        event.accepted = true
+                    } else if (event.key === Qt.Key_Escape) {
+                        event.accepted = true
+                        root.closeRequested()
+                    }
+                }
+            }
+        }
+
         ListView {
             id: listView
             width: parent.width
-            height: parent.height - 35
+            height: parent.height - 65
             clip: true
-            model: root.entries
+            model: root.filteredEntries
             currentIndex: root.selectedIndex
             highlightMoveDuration: 80
 
@@ -122,38 +186,6 @@ Item {
                     }
                 }
             }
-        }
-    }
-
-    // keyboard navigation
-    focus: shown
-    Keys.onPressed: (event) => {
-        if (!shown) return
-
-        // down
-        if (event.key === Qt.Key_Down) {
-            if (root.entries.length > 0) {
-              root.selectedIndex = (root.selectedIndex + 1) % root.entries.length
-            }
-            listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
-            event.accepted = true
-        // up
-        } else if (event.key === Qt.Key_Up) {
-            if (root.entries.length > 0)
-              root.selectedIndex = root.selectedIndex <= 0
-                ? root.entries.length - 1
-                : root.selectedIndex - 1
-            listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
-            event.accepted = true
-        // enter to copy
-        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-            root.copySelected()
-            event.accepted = true
-            root.closeRequested()
-        // escape to return back
-        } else if (event.key === Qt.Key_Escape) {
-            event.accepted = true
-            root.closeRequested()
         }
     }
 }
