@@ -680,16 +680,16 @@ ShellRoot {
     Rectangle {
       id: calendarPopup
       property bool shown: false
-      visible: shown
+      visible: opacity > 0
       opacity: shown ? 1 : 0
       width: 225
       height: 187
       x: (parent.width - calendarPopup.width) / 2
       y: box.y + box.height + 5
       color: "#1e1e1e"
-      radius: 15
+      radius: 20
 
-      Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutExpo } }
+      Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
 
       RowLayout {
         id: calHeader
