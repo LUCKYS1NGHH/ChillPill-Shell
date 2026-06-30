@@ -132,14 +132,17 @@ Item {
 
         // down
         if (event.key === Qt.Key_Down) {
-            if (root.entries.length > 0)
-                root.selectedIndex = Math.min(root.selectedIndex + 1, root.entries.length - 1)
+            if (root.entries.length > 0) {
+              root.selectedIndex = (root.selectedIndex + 1) % root.entries.length
+            }
             listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
             event.accepted = true
         // up
         } else if (event.key === Qt.Key_Up) {
             if (root.entries.length > 0)
-                root.selectedIndex = Math.max(root.selectedIndex - 1, 0)
+              root.selectedIndex = root.selectedIndex <= 0
+                ? root.entries.length - 1
+                : root.selectedIndex - 1
             listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
             event.accepted = true
         // enter to copy
