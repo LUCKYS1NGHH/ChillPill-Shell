@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
@@ -29,6 +30,7 @@ ShellRoot {
 
   PanelWindow {
 
+    WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     implicitHeight: 325
 
     anchors {
@@ -71,6 +73,7 @@ ShellRoot {
       property bool volumeActive: false
       property bool brightnessActive: false
       property bool controlCenter: false
+      property bool cliphistOpen: false
 
       property string accent: Theme.accent
 
@@ -115,6 +118,7 @@ ShellRoot {
 
       implicitWidth: controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
+                     : cliphistOpen ? 380
                      : volumeActive ? 220
                      : brightnessActive ? 220
                      : miniDashboard ? 420
@@ -123,12 +127,13 @@ ShellRoot {
       implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 124
                       : controlCenter && mprisModule.hasPlayer ? 202
                       : controlCenter ? 74
+                      : cliphistOpen ? 220
                       : volumeActive ? 40
                       : brightnessActive ? 40
                       : miniDashboard ? 120
                       : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
+      radius: cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
@@ -141,7 +146,7 @@ ShellRoot {
       MouseArea {
         anchors.fill: parent
         hoverEnabled: true
-        acceptedButtons: Qt.LeftButton | Qt.RightButton 
+        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 
         onEntered: box.hovered = true
         onExited: box.hovered = false
@@ -158,6 +163,10 @@ ShellRoot {
             box.controlCenter = !box.controlCenter
             mediaAutoOpened = false
             mediaPopupHideTimer.stop()
+          }
+
+          if (mouse.button === Qt.MiddleButton) {
+            box.cliphistOpen = !box.cliphistOpen
           }
 
           if (mouse.button === Qt.RightButton) {
@@ -184,7 +193,7 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         spacing: 13
-        opacity: box.controlCenter ? 0 : box.miniDashboard ? 0 : box.volumeActive ? 0 : box.brightnessActive ? 0 : 1
+        opacity: box.cliphistOpen ? 0 : box.controlCenter ? 0 : box.miniDashboard ? 0 : box.volumeActive ? 0 : box.brightnessActive ? 0 : 1
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -215,6 +224,28 @@ ShellRoot {
           icon: brightnessModule.icon
           percent: brightnessModule.percent
           valueText: Math.round(brightnessModule.percent * 100) + "%"
+      }
+
+      Item {
+        anchors.centerIn: parent
+        width: box.implicitWidth - 24
+        height: box.cliphistOpen ? box.implicitHeight - 25 : 0
+        opacity: box.cliphistOpen ? 1 : 0
+        visible: box.cliphistOpen && opacity > 0
+
+        Behavior on opacity {
+          SequentialAnimation {
+            PauseAnimation { duration: box.cliphistOpen ? 15 : 0 }
+            NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
+          }
+        }
+
+        Cliphist {
+          id: cliphistPanel
+          shown: box.cliphistOpen
+          anchors.fill: parent
+          onCloseRequested: box.cliphistOpen = false
+        }
       }
 
       // control center
