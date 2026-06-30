@@ -113,14 +113,14 @@ ShellRoot {
           heightAnim.start()
       }
 
-      implicitWidth: controlCenter && mediaAutoOpened ? 375
+      implicitWidth: controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? 220
                      : brightnessActive ? 220
                      : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
-      implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 138
+      implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 124
                       : controlCenter && mprisModule.hasPlayer ? 202
                       : controlCenter ? 74
                       : volumeActive ? 40
@@ -128,7 +128,7 @@ ShellRoot {
                       : miniDashboard ? 120
                       : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: controlCenter && mprisModule.hasPlayer ? 25 : controlCenter ? 12 : 20
+      radius: controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
@@ -308,9 +308,13 @@ ShellRoot {
 
         // media player
         MediaPlayer {
+          margin: box.controlCenter && mediaAutoOpened ? 5 : 14
+          artistFontSize: box.controlCenter && mediaAutoOpened ? 10 : 9
+          artistFontWeight: box.controlCenter && mediaAutoOpened ? 500 : 400
+          artistFontColor: box.controlCenter && mediaAutoOpened ? "#9b9b9b" : "#7b7b7b"
           color: box.controlCenter && mediaAutoOpened ? "#1a1a1a" : "#151515"
-          radius: box.controlCenter && mprisModule.hasPlayer ? 16 : 10
-          border.width: box.controlCenter && mediaAutoOpened ? 0 : 2
+          radius: box.controlCenter && mprisModule.hasPlayer ? 16 : 25
+          border.width: box.controlCenter && mediaAutoOpened ? 0 : 1
         }
 
         // sliders

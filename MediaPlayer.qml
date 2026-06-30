@@ -12,8 +12,15 @@ Rectangle {
     color: "#212121"
     visible: mprisModule.hasPlayer
     clip: true
-    border.color: "#1d1d1d"
+    border.color: "#202020"
     border.width: 2
+
+    property int margin: 14
+
+    // artist name adjustments
+    property int artistFontSize: 9
+    property string artistFontColor: "#656565"
+    property int artistFontWeight: 600
 
     property real mprisProgress: 0
     property string mprisTimePlayed: "0:00"
@@ -43,7 +50,7 @@ Rectangle {
 
      Column {
         anchors.fill: parent
-        anchors.margins: 14
+        anchors.margins: margin
         spacing: 15
 
         // top row -> art + info + controls
@@ -97,9 +104,9 @@ Rectangle {
                 Text {
                     width: parent.width
                     text: mprisModule.artist
-                    color: "#656565"
-                    font.pixelSize: 9
-                    font.weight: 400
+                    color: artistFontColor
+                    font.pixelSize: artistFontSize
+                    font.weight: artistFontWeight
                     font.family: Theme.fontFamily
                     elide: Text.ElideRight
                 }
