@@ -160,18 +160,18 @@ ShellRoot {
 
       implicitWidth: controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
-                     : cliphistOpen ? 380
                      : volumeActive ? 220
                      : brightnessActive ? 220
+                     : cliphistOpen ? 380
                      : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
       implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 124
                       : controlCenter && mprisModule.hasPlayer ? 202
                       : controlCenter ? 74
-                      : cliphistOpen ? 220
                       : volumeActive ? 40
                       : brightnessActive ? 40
+                      : cliphistOpen ? 220
                       : miniDashboard ? 120
                       : row.implicitHeight + (hovered ? 10 : 10)
 
