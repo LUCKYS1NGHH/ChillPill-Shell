@@ -9,6 +9,20 @@ import IslandBackend
 
 ShellRoot {
 
+  IpcHandler {
+      target: "cliphist"
+
+      function toggle(): void {
+          box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen }
+
+      function show(): void {
+          box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true }
+
+      function hide(): void {
+          box.cliphistOpen = false
+      }
+  }
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
