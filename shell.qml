@@ -201,82 +201,20 @@ ShellRoot {
         Clock {}
       }
 
-      // volume OSD
-      Item {
-        anchors.centerIn: parent
-        opacity: box.volumeActive && !box.controlCenter ? 1 : 0
-        visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 150 } }
-
-        RowLayout {
-          anchors.centerIn: parent
-          spacing: 10
-
-          Text {
-            text: volumeModule.icon
-            color: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
-            font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
-          }
-
-          Rectangle {
-            width: osdInWidth; height: osdInHeight
-            radius: osdBarRadius
-            color: "#333"
-
-            Rectangle {
-              width: parent.width * (volumeModule.vol / 100)
-              height: parent.height
-              radius: 2
-              color: Theme.fg
-              Behavior on width { NumberAnimation { duration: osdSpeed } }
-            }
-          }
-
-          Text {
-            text: volumeModule.muted ? "muted" : volumeModule.vol + "%"
-            color: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
-            font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
-          }
-        }
+      OsdBar {
+          active: box.volumeActive && !box.controlCenter
+          icon: volumeModule.icon
+          percent: volumeModule.vol / 100
+          muted: volumeModule.muted
+          mutedFg: volumeModule.mutedFg
+          valueText: volumeModule.muted ? "muted" : volumeModule.vol + "%"
       }
 
-      // brightness OSD
-      Item {
-        anchors.centerIn: parent
-        opacity: box.brightnessActive && !box.volumeActive && !box.controlCenter ? 1 : 0
-        visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 150 } }
-
-        RowLayout {
-          anchors.centerIn: parent
-          spacing: 10
-
-          Text {
-              text: brightnessModule.icon
-              color: Theme.fg
-              font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
-          }
-
-          Rectangle {
-              width: osdInWidth; height: osdInHeight
-              radius: osdBarRadius
-              color: "#333"
-
-              Rectangle {
-                  width: parent.width * brightnessModule.percent
-                  height: parent.height
-                  radius: 2
-                  color: Theme.fg
-                  Behavior on width { NumberAnimation { duration: osdSpeed } }
-              }
-          }
-
-          Text {
-              text: Math.round(brightnessModule.percent * 100) + "%"
-              color: Theme.fg
-              font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
-          }
-        }
+      OsdBar {
+          active: box.brightnessActive && !box.volumeActive && !box.controlCenter
+          icon: brightnessModule.icon
+          percent: brightnessModule.percent
+          valueText: Math.round(brightnessModule.percent * 100) + "%"
       }
 
       // control center
