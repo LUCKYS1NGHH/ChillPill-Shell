@@ -23,6 +23,21 @@ ShellRoot {
       }
   }
 
+  IpcHandler {
+      target: "controlCenter"
+
+      function toggle(): void {
+          box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false }
+
+      function show(): void {
+          box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false }
+
+      function hide(): void {
+          box.controlCenter = false
+      }   
+  }
+
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
