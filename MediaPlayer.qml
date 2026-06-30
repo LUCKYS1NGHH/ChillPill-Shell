@@ -31,7 +31,7 @@ Rectangle {
     Timer {
         id: progressPoller
         interval: 1000
-        running: mprisModule.hasPlayer
+        running: box.controlCenter && mprisModule.hasPlayer
         repeat: true
         triggeredOnStart: true
         onTriggered: {

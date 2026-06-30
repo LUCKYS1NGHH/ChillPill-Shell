@@ -284,7 +284,7 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
         opacity: box.controlCenter ? 1 : 0
-        visible: opacity > 0
+        visible: box.controlCenter && opacity > 0
         height: box.controlCenter ? box.implicitHeight - 25 : 0
 
         Behavior on opacity {
