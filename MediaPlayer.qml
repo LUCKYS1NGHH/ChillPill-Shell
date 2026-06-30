@@ -167,21 +167,24 @@ Rectangle {
 
             Rectangle {
                 width: parent.width
-                height: 3
+                height: barHover.containsMouse ? 5 : 3
                 radius: 8
                 color: "#4d4d4d"
+
+                Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
 
                 Rectangle {
                     width: parent.width * mediaCard.mprisProgress
                     height: parent.height
                     radius: 5
-                    color: fg
+                    color: barHover.containsMouse ? "#cdcdcd" : fg
                     Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.Linear } }
                 }
 
                 MouseArea {
+                    id: barHover
                     anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
+                    hoverEnabled: true
                     onClicked: (mouse) => {
                         let p = mprisModule.activePlayer
                         if (!p || !p.length) return
