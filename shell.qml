@@ -162,7 +162,7 @@ ShellRoot {
                      : controlCenter ? 390
                      : volumeActive ? 220
                      : brightnessActive ? 220
-                     : cliphistOpen ? 380
+                     : cliphistOpen ? 450
                      : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
@@ -171,7 +171,7 @@ ShellRoot {
                       : controlCenter ? 74
                       : volumeActive ? 40
                       : brightnessActive ? 40
-                      : cliphistOpen ? 220
+                      : cliphistOpen ? 270
                       : miniDashboard ? 120
                       : row.implicitHeight + (hovered ? 10 : 10)
 
