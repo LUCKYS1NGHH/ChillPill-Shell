@@ -562,6 +562,15 @@ ShellRoot {
           anchors.rightMargin: 12
         }
 
+        // internet protocol information
+        IpStatus {
+          anchors.left: parent.left
+          anchors.leftMargin: 5
+          anchors.bottom: parent.bottom
+          anchors.bottomMargin: 42
+        }
+
+        // bandwidth usage status
         Bandwidth {
           anchors.right: parent.right
           anchors.rightMargin: 4
