@@ -5,50 +5,31 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
-import IslandBackend
 
 ShellRoot {
 
   IpcHandler {
       target: "cliphist"
 
-      function toggle(): void {
-          box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen }
-
-      function show(): void {
-          box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true }
-
-      function hide(): void {
-          box.cliphistOpen = false
-      }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen }
+      function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true }
+      function hide(): void { box.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
 
-      function toggle(): void {
-          box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false }
-
-      function show(): void {
-          box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false }
-
-      function hide(): void {
-          box.controlCenter = false
-      }
+      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false }
+      function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false }
+      function hide(): void { box.controlCenter = false }
   }
 
   IpcHandler {
       target: "miniDashboard"
 
-      function toggle(): void {
-          box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false }
-
-      function show(): void {
-          box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false }
-
-      function hide(): void {
-        box.miniDashboard = false
-      }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false }
+      function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false }
+      function hide(): void { box.miniDashboard = false }
   }
 
   property string bg: Theme.bg
@@ -255,7 +236,7 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         spacing: 13
-        opacity: box.cliphistOpen ? 0 : box.controlCenter ? 0 : box.miniDashboard ? 0 : box.volumeActive ? 0 : box.brightnessActive ? 0 : 1
+        opacity: !box.cliphistOpen && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive ? 1 : 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -315,7 +296,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && !box.cliphistOpen && !box.miniDashboard && box.controlCenter ? 1 : 0
+        opacity: box.controlCenter && !box.cliphistOpen && !box.miniDashboard ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter ? box.implicitHeight - 25 : 0
 
