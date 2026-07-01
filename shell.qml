@@ -153,7 +153,7 @@ ShellRoot {
                       : volumeActive ? 40
                       : brightnessActive ? 40
                       : cliphistOpen ? 270
-                      : miniDashboard ? 120
+                      : miniDashboard ? 157
                       : row.implicitHeight + (hovered ? 10 : 10)
 
       radius: cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
@@ -562,6 +562,13 @@ ShellRoot {
           anchors.rightMargin: 12
         }
 
+        Bandwidth {
+          anchors.right: parent.right
+          anchors.rightMargin: 4
+          anchors.bottom: parent.bottom
+          anchors.bottomMargin: 42
+        }
+
         // rectangle where poweroff, sleep etc. buttons placed
         Rectangle {
           color: "#212121"
@@ -572,7 +579,7 @@ ShellRoot {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: 60
+          anchors.topMargin: 97
 
           RowLayout {
             anchors.left: parent.left
