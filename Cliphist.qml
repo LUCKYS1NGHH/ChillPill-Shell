@@ -162,9 +162,9 @@ Item {
 
             delegate: Rectangle {
                 width: listView.width
-                height: 30
-                radius: 6
-                color: index === root.selectedIndex ? "#353535" : "transparent"
+                height: 28
+                radius: 7
+                color: index === root.selectedIndex ? "#313131" : "transparent"
 
                 Text {
                     anchors.left: parent.left
@@ -174,7 +174,7 @@ Item {
                     anchors.rightMargin: 8
                     text: modelData.label
                     color: Theme.fg
-                    font { family: Theme.fontFamily; pixelSize: 10 }
+                    font { family: Theme.fontFamily; pixelSize: 9 }
                     elide: Text.ElideRight
                 }
 
