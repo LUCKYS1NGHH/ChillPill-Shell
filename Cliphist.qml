@@ -53,17 +53,26 @@ Item {
 
     Process {
         id: listProc
-        command: ["cliphist", "list"]
+        command: ["bash", "-c", "~/.config/quickshell/cliphist-img.sh"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
                 let lines = this.text.split("\n").filter(l => l.length > 0)
                 root.entries = lines.map(line => {
                     let tabIdx = line.indexOf("\t")
-                    return {
-                        id: line.substring(0, tabIdx),
-                        label: line.substring(tabIdx + 1)
+                    let id = line.substring(0, tabIdx)
+                    let rest = line.substring(tabIdx + 1)
+
+                    // rofi format is label\x00icon\x1f/path
+                    let nullIdx = rest.indexOf("\x00")
+                    if (nullIdx !== -1) {
+                        let label = rest.substring(0, nullIdx)
+                        let iconPart = rest.substring(nullIdx + 1)  // "icon\x1f/path"
+                        let imgPath = iconPart.split("\x1f")[1] || ""
+                        return { id, label, imagePath: imgPath }
                     }
+
+                    return { id, label: rest, imagePath: "" }
                 })
             }
         }
@@ -162,10 +171,21 @@ Item {
 
             delegate: Rectangle {
                 width: listView.width
-                height: 28
+                height: modelData.imagePath ? 50 : 28
                 radius: 7
                 color: index === root.selectedIndex ? "#313131" : "transparent"
 
+                // image preview
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    source: modelData.imagePath ? ("file://" + modelData.imagePath) : ""
+                    visible: modelData.imagePath !== ""
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                }
+
+                // text label
                 Text {
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -173,6 +193,7 @@ Item {
                     anchors.leftMargin: 8
                     anchors.rightMargin: 8
                     text: modelData.label
+                    visible: !modelData.imagePath
                     color: Theme.fg
                     font { family: Theme.fontFamily; pixelSize: 9 }
                     elide: Text.ElideRight
