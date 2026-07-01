@@ -296,7 +296,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && !box.cliphistOpen && !box.miniDashboard ? 1 : 0
+        opacity: box.controlCenter ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter ? box.implicitHeight - 25 : 0
 
