@@ -179,7 +179,7 @@ ShellRoot {
           // restrict control center to only accept left click
           if (box.controlCenter) {
             if (mouse.button === Qt.LeftButton)
-              box.controlCenter = false
+                box.controlCenter = false
             return
           }
 
@@ -304,18 +304,6 @@ ShellRoot {
           SequentialAnimation {
             PauseAnimation { duration: box.controlCenter ? 15 : 0 }
             NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
-          }
-        }
-
-        MouseArea {
-          anchors.fill: parent
-          acceptedButtons: Qt.LeftButton
-
-          onClicked: (mouse) => {
-              if (mouse.button === Qt.LeftButton)
-                box.controlCenter = !box.controlCenter
-                mediaAutoOpened = true
-                mediaPopupHideTimer.stop()
           }
         }
 
@@ -720,9 +708,8 @@ ShellRoot {
     Connections {
         target: mprisModule
         function onNowPlaying() {
-          if (!box.controlCenter) {
-            mediaAutoOpened  = true
-          }
+          if (box.cliphistOpen || box.miniDashboard) return
+          if (!box.controlCenter) mediaAutoOpened = true
           box.controlCenter = true
           mediaPopupHideTimer.restart()
         }
