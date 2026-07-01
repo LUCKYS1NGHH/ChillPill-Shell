@@ -54,7 +54,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 325
+    implicitHeight: 350
 
     anchors {
       top: true
