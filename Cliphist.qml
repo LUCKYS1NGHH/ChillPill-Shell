@@ -116,7 +116,8 @@ Item {
           Text {
             id: listCountText
             property int total: 0
-            text: (root.selectedIndex + 1) + " / " + total
+            text: (root.filteredEntries.length === 0 ? 0 : root.selectedIndex + 1)
+                   + " / " + root.filteredEntries.length + " (" + total + ")"
             color: "#999999"
             font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
             anchors.right: parent.right
