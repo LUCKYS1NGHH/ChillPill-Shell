@@ -40,6 +40,8 @@ Item {
     function refresh() {
         listProc.running = false
         listProc.running = true
+        listCountProc.running = false
+        listCountProc.running = true
     }
 
     function copySelected() {
@@ -70,6 +72,17 @@ Item {
     }
 
     Process {
+      id: listCountProc
+      command: ["sh", "-c", "cliphist list | wc -l"]
+      running: false
+      stdout: StdioCollector {
+        onStreamFinished: {
+          listCountText.total = this.text.trim();
+        }
+      }
+    }
+
+    Process {
         id: copyProc
         running: false
     }
@@ -89,12 +102,26 @@ Item {
         spacing: 8
         clip: true
 
-        Text {
-            text: "Clipboard History"
-            color: Theme.fg
-            font { family: Theme.fontFamily; pixelSize: 11; weight: 700 }
-            anchors.left: parent.left
-            anchors.leftMargin: 4
+        RowLayout {
+          width: parent.width
+
+          Text {
+              text: "Clipboard History"
+              color: Theme.fg
+              font { family: Theme.fontFamily; pixelSize: 11; weight: 700 }
+              anchors.left: parent.left
+              anchors.leftMargin: 4
+          }
+
+          Text {
+            id: listCountText
+            property int total: 0
+            text: (root.selectedIndex + 1) + " / " + total
+            color: "#999999"
+            font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
+            anchors.right: parent.right
+            anchors.rightMargin: 6
+          }
         }
 
         // search box
