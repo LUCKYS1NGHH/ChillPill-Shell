@@ -477,6 +477,16 @@ ShellRoot {
             }
           }
 
+          // hostname
+          Process {
+            id: hostnameProc
+            command: ["sh", "-c", "cat /etc/hostname"]
+            running: true
+            stdout: StdioCollector {
+              onStreamFinished: { hostnameText.text = "(" + this.text.trim() + ")"; hostnameProc.running = false }
+            }
+          }
+
           // uptime
           Process {
             id: uptimeProc
@@ -504,11 +514,20 @@ ShellRoot {
             spacing: 2
             Layout.alignment: Qt.AlignVCenter
 
-            Text {
-              id: whoamiText
-              color: Theme.fg
-              Layout.leftMargin: 10
-              font { family: Theme.fontFamily; pixelSize: 13; weight: 600 }
+            RowLayout {
+              Text {
+                id: whoamiText
+                color: Theme.fg
+                Layout.leftMargin: 10
+                font { family: Theme.fontFamily; pixelSize: 13; weight: 600 }
+              }
+
+              Text {
+                id: hostnameText
+                color: "#848484"
+                Layout.topMargin: 2
+                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+              }
             }
 
             Text {
