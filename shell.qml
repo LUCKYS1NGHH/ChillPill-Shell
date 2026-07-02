@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
+import Quickshell.Services.UPower
 
 ShellRoot {
 
@@ -94,6 +95,29 @@ ShellRoot {
       property bool brightnessActive: false
       property bool controlCenter: false
       property bool cliphistOpen: false
+      property bool batteryCharging: false
+
+      property var battery: UPower.displayDevice
+      property bool charging: battery.state === UPowerDeviceState.Charging
+
+      readonly property string batteryIconColor: box.charging || box.batteryLevel > 30 ? "#4bd25c"
+         : box.batteryLevel <= 15 ? "#e22323"
+         : "#eecc47"
+
+      readonly property int batteryLevel: Math.round(battery.percentage * 100)
+
+      // get battery icon according percentage
+      readonly property string batteryIcon: {
+        const icons = [0xf0083, 0xf007a, 0xf007d, 0xf007c, 0xf007d, 0xf007e, 0xf007f, 0xf0082, 0xf0081, 0xf0079]
+        const base = String.fromCodePoint(icons[Math.min(Math.floor(batteryLevel / 10), 9)])
+        return charging ? base + String.fromCodePoint(0xf140b) : base
+      }
+
+      onChargingChanged: {
+        box.batteryCharging = true
+        batteryStatusHideTimer.restart()
+        console.log("charging:", box.charging, "level:", box.batteryLevel)
+      }
 
       property string accent: Theme.accent
 
@@ -108,6 +132,7 @@ ShellRoot {
 
       Timer { id: volumeHideTimer; interval: 850; onTriggered: box.volumeActive = false }
       Timer { id: brightnessHideTimer; interval: 850; onTriggered: box.brightnessActive = false }
+      Timer { id: batteryStatusHideTimer; interval: 850; onTriggered: box.batteryCharging = false }
       Timer { id: brightnessThrottle; interval: 80; repeat: false }
 
       Process { id: brightnessSetProc; running: false }
@@ -119,7 +144,8 @@ ShellRoot {
           heightAnim.start()
       }
 
-      implicitWidth: controlCenter && mediaAutoOpened ? 380
+      implicitWidth: batteryCharging ? 220
+                     : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? 220
                      : brightnessActive ? 220
@@ -128,6 +154,7 @@ ShellRoot {
                      : row.implicitWidth + (hovered ? 68 : 56)
 
       implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 124
+                      : batteryCharging ? 40
                       : controlCenter && mprisModule.hasPlayer ? 202
                       : controlCenter ? 74
                       : volumeActive ? 40
@@ -216,7 +243,7 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         spacing: 13
-        opacity: !box.cliphistOpen && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive ? 1 : 0
+        opacity: !box.cliphistOpen && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging ? 1 : 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -249,12 +276,21 @@ ShellRoot {
           valueText: Math.round(brightnessModule.percent * 100) + "%"
       }
 
+      OsdBar {
+        active: box.batteryCharging && !box.volumeActive
+        icon: box.batteryIcon
+        iconColor: box.batteryIconColor
+        valueText: box.charging ? "Charging" : "Charging stopped"
+        barWidth: 0
+        spacing: 5 // gap between battery icon and text
+      }
+
       // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
         height: box.cliphistOpen ? box.implicitHeight - 25 : 0
-        opacity: box.cliphistOpen && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.controlCenter ? 1 : 0
+        opacity: box.cliphistOpen && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
@@ -276,9 +312,9 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter ? 1 : 0
+        opacity: box.controlCenter && !box.batteryCharging ? 1 : 0
         visible: opacity > 0
-        height: box.controlCenter ? box.implicitHeight - 25 : 0
+        height: box.controlCenter && !box.batteryCharging ? box.implicitHeight - 25 : 0
 
         Behavior on opacity {
           SequentialAnimation {
@@ -419,7 +455,7 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.cliphistOpen ? 1 : 0
+        opacity: box.miniDashboard && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.cliphistOpen ? 1 : 0
 
         Behavior on opacity {
           SequentialAnimation {

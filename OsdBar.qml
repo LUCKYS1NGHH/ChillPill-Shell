@@ -5,13 +5,16 @@ Item {
     id: root
 
     // inputs
+    property string iconColor: ""
     property bool active: false
     property string icon: ""
     property real percent: 0 // 0.0 - 1.0
-    property string valueText: "" // e.g. "muted" or "72%"
+    property string valueText: "" // e.g. "muted" or "72%" or "charging"
     property color fg: Theme.fg
     property color mutedFg: fg
     property bool muted: false
+    property int spacing: 10
+    property int defaultSpacing: spacing !== 0 ? spacing : 10
 
     // bar adjustments
     property int barWidth: osdInWidth
@@ -26,11 +29,11 @@ Item {
 
     RowLayout {
         anchors.centerIn: parent
-        spacing: 10
+        spacing: defaultSpacing
 
         Text {
             text: root.icon
-            color: root.muted ? root.mutedFg : root.fg
+            color: root.iconColor !== "" ? root.iconColor : root.fg
             font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
         }
 

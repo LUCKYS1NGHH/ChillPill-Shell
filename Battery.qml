@@ -1,7 +1,6 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Services.UPower
 
 RowLayout {
   id: root
@@ -9,24 +8,13 @@ RowLayout {
   property string fg: "#dadada"
   property int fontSize: 10
 
-  property var battery: UPower.displayDevice
-  property bool charging: battery.state === UPowerDeviceState.Charging
-  readonly property int level: Math.round(battery.percentage * 100)
-
-  // get battery icon according percentage
-  readonly property string icon: {
-    const icons = [0xf0083, 0xf007a, 0xf007d, 0xf007c, 0xf007d, 0xf007e, 0xf007f, 0xf0082, 0xf0081, 0xf0079]
-    const base = String.fromCodePoint(icons[Math.min(Math.floor(level / 10), 9)])
-    return charging ? base + String.fromCodePoint(0xf140b) : base
-  }
+  property var battery: box.battery
+  property bool charging: box.charging
 
   // icon
   Text {
-    text: root.icon
-    color: root.charging ? "#4bd25c"
-                         : root.level <= 15 ? "#e22323"
-                         : root.level <= 30 ? "#eecc47"
-                         : "#4bd25c"
+    text: box.batteryIcon
+    color: box.batteryIconColor
 
     font {
       family: "JetBrainsMono Nerd Font"
@@ -36,7 +24,7 @@ RowLayout {
 
   // percentage
   Text {
-    text: root.level + "%"
+    text: box.batteryLevel + "%"
     color: fg
 
     font {
