@@ -12,9 +12,9 @@ Rectangle {
   x: (parent.width - calendarPopup.width) / 2
   y: box.y + box.height + 5
   color: "#1e1e1e"
-  radius: 20
+  radius: 18
 
-  Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
+  Behavior on opacity { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
 
   RowLayout {
     id: calHeader
@@ -47,7 +47,7 @@ Rectangle {
     Repeater {
       model: datetimeItem.dayNames
       Text {
-        width: 25; text: modelData; color: "#666"
+        width: 25; text: modelData; color: "#6a6a6a"
         font { family: Theme.fontFamily; pixelSize: 8; weight: 600 }
         horizontalAlignment: Text.AlignHCenter
       }
@@ -75,11 +75,11 @@ Rectangle {
             && datetimeItem.viewMonth === today.getMonth()
             && datetimeItem.viewYear === today.getFullYear()
         }
-        color: isToday ? "#e83131" : "transparent"
+        color: isToday ? "#ec3737" : "transparent"
         Text {
           anchors.centerIn: parent
           text: index + 1
-          color: isToday ? "#1e1e1e" : Theme.fg
+          color: isToday ? "#1c1c1c" : Theme.fg
           font { family: Theme.fontFamily; pixelSize: 9; weight: isToday ? 700 : 400 }
         }
       }
