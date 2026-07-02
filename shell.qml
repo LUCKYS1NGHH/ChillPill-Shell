@@ -10,7 +10,6 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-
       function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen }
       function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true }
       function hide(): void { box.cliphistOpen = false }
@@ -18,7 +17,6 @@ ShellRoot {
 
   IpcHandler {
       target: "controlCenter"
-
       function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false }
       function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false }
       function hide(): void { box.controlCenter = false }
@@ -26,7 +24,6 @@ ShellRoot {
 
   IpcHandler {
       target: "miniDashboard"
-
       function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false }
       function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false }
       function hide(): void { box.miniDashboard = false }
@@ -66,7 +63,7 @@ ShellRoot {
       top: 9
     }
 
-    exclusiveZone: 26 // fixed strut, never changes
+    exclusiveZone: 26 // fixed gap of the active window for the top bar, never changes
     color: "transparent"
 
     // Mask input to only the capsule
@@ -84,7 +81,7 @@ ShellRoot {
       }
     }
 
-    // main box
+    // main box for the dynamic view
     Rectangle {
       id: box
       anchors.top: parent.top
@@ -109,28 +106,11 @@ ShellRoot {
       property string sliderColor: "#c9c9c9"
       property int mprisControlsIconSize: 20
 
-      Timer {
-        id: volumeHideTimer
-        interval: 850
-        onTriggered: box.volumeActive = false
-      }
+      Timer { id: volumeHideTimer; interval: 850; onTriggered: box.volumeActive = false }
+      Timer { id: brightnessHideTimer; interval: 850; onTriggered: box.brightnessActive = false }
+      Timer { id: brightnessThrottle; interval: 80; repeat: false }
 
-      Timer {
-          id: brightnessHideTimer
-          interval: 850
-          onTriggered: box.brightnessActive = false
-      }
-
-      Process {
-        id: brightnessSetProc
-        running: false
-      }
-
-      Timer {
-        id: brightnessThrottle
-        interval: 80
-        repeat: false
-      }
+      Process { id: brightnessSetProc; running: false }
 
       onImplicitHeightChanged: {
           heightAnim.stop()

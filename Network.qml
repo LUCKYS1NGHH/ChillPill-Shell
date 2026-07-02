@@ -6,8 +6,8 @@ import QtQuick.Layouts
 RowLayout {
   id: root
 
-  property string fg: "#6791dc"
-  property string disconFg: "#9ea9bd"
+  property string iconFg: "#6791dc"
+  property string disconIconFg: "#9ea9bd"
 
   property var wifiDevice: Networking.devices.values.find(d => d.type === DeviceType.Wifi)
   property var active: wifiDevice ? wifiDevice.networks.values.find(n => n.connected) : null
@@ -28,7 +28,7 @@ RowLayout {
 
   Text {
     text: root.icon
-    color: Networking.wifiEnabled ? fg : disconFg
+    color: Networking.wifiEnabled ? iconFg : disconIconFg
 
     font {
       family: "FiraCode Nerd Font Propo"
