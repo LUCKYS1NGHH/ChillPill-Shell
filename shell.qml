@@ -260,22 +260,27 @@ ShellRoot {
         Clock {}
       }
 
+      // volume
       OsdBar {
           active: box.volumeActive && !box.controlCenter
           icon: volumeModule.icon
           percent: volumeModule.vol / 100
           muted: volumeModule.muted
           mutedFg: volumeModule.mutedFg
+          barWidth: volumeModule.mutedFg ? 90 : 110
           valueText: volumeModule.muted ? "muted" : volumeModule.vol + "%"
       }
 
+      // brightness
       OsdBar {
           active: box.brightnessActive && !box.volumeActive && !box.controlCenter
           icon: brightnessModule.icon
           percent: brightnessModule.percent
           valueText: Math.round(brightnessModule.percent * 100) + "%"
+          barWidth: 100
       }
 
+      // battery
       OsdBar {
         active: box.batteryCharging && !box.volumeActive
         icon: box.batteryIcon
