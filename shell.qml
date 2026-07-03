@@ -6,6 +6,7 @@ import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import Quickshell.Services.UPower
+import Quickshell.Services.Notifications
 
 ShellRoot {
 
@@ -145,6 +146,7 @@ ShellRoot {
       }
 
       implicitWidth: batteryCharging ? 220
+                     : notificationModule.active ? 280
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? 220
@@ -154,6 +156,7 @@ ShellRoot {
                      : row.implicitWidth + (hovered ? 68 : 56)
 
       implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 124
+                      : notificationModule.active ? 50
                       : batteryCharging ? 40
                       : controlCenter && mprisModule.hasPlayer ? 202
                       : controlCenter ? 74
@@ -163,7 +166,7 @@ ShellRoot {
                       : miniDashboard ? 157
                       : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
+      radius: notificationModule.active ? 99 : cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
@@ -243,7 +246,7 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         spacing: 13
-        opacity: !box.cliphistOpen && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging ? 1 : 0
+        opacity: !box.cliphistOpen && !notificationModule.active && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging ? 1 : 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -290,12 +293,18 @@ ShellRoot {
         spacing: 5 // gap between battery icon and text
       }
 
+      // notification
+      NotificationPopup {
+        active: notificationModule.active
+        notif: notificationModule.current
+      }
+
       // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
         height: box.cliphistOpen ? box.implicitHeight - 25 : 0
-        opacity: box.cliphistOpen && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
+        opacity: box.cliphistOpen && !notificationModule.active && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
@@ -317,7 +326,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && !box.batteryCharging ? 1 : 0
+        opacity: box.controlCenter && !box.batteryCharging && !notificationModule.active ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter && !box.batteryCharging ? box.implicitHeight - 25 : 0
 
@@ -460,7 +469,7 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.cliphistOpen ? 1 : 0
+        opacity: box.miniDashboard && !mediaAutoOpened && !notificationModule.active && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.cliphistOpen ? 1 : 0
 
         Behavior on opacity {
           SequentialAnimation {
@@ -770,5 +779,16 @@ ShellRoot {
   }
 
   Mpris { id: mprisModule; visible: false }
+
+  NotificationServer {
+    id: notifServer
+    keepOnReload: true
+    onNotification: notif => {
+      notif.tracked = true
+      notificationModule.enqueue(notif)
+    }
+  }
+
+  NotificationModule { id: notificationModule; visible: false }
 
 }
