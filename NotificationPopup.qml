@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 
 Item {
   id: root
@@ -19,6 +20,25 @@ Item {
       text: String.fromCodePoint(0xf0f3)
       color: Theme.fg
       font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+      visible: notifIcon.status !== Image.Ready
+    }
+
+    Image {
+      id: notifIcon
+      width: 22
+      height: 22
+      fillMode: Image.PreserveAspectCrop
+      source: {
+        if (root.notif && root.notif.image) return root.notif.image
+        if (root.notif && root.notif.appIcon) {
+          return root.notif.appIcon.startsWith("/") 
+            ? "file://" + root.notif.appIcon 
+            : "image://icon/" + root.notif.appIcon
+        }
+        return ""
+      }
+      sourceSize: Qt.size(22, 22)
+      visible: status === Image.Ready
     }
 
     ColumnLayout {
@@ -30,6 +50,7 @@ Item {
         elide: Text.ElideRight
         Layout.maximumWidth: 220
       }
+
       Text {
         text: root.notif ? root.notif.body : ""
         color: "#9b9b9b"
