@@ -166,7 +166,7 @@ ShellRoot {
                       : miniDashboard ? 157
                       : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: notificationModule.active ? 99 : cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
+      radius: notificationModule.active ? 99 : cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 15 : 20
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
