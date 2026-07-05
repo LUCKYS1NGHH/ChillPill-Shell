@@ -4,16 +4,16 @@ import QtMultimedia
 
 Item {
   id: root
+
+  // toast state
   property var queue: []
   property var current: null
   readonly property bool active: current !== null
   property int displayTime: 3000
 
-  function trigger() {
-      if (notifySound.status === SoundEffect.Ready) {
-          notifySound.play()
-      }
-  }
+  // data list for control center — just the array, you build the view
+  property var notifications: []
+  property int maxStored: 20
 
   SoundEffect {
     id: notifySound
@@ -21,16 +21,22 @@ Item {
     volume: 1
   }
 
-  function enqueue(notif) {
-    if (notif.lastGeneration) {
-        queue.push(notif)
-        if (!current) advance()
-        return
-    }
+  function trigger() {
+    if (notifySound.status === SoundEffect.Ready) notifySound.play()
+  }
 
+  function enqueue(notif) {
     queue.push(notif)
-    trigger() // only play sound for new notifications
+    trigger()
     if (!current) advance()
+
+    notif.receivedTime = new Date() // add time
+    notifications.push(notif)
+    if (notifications.length > maxStored) {
+      let old = notifications.shift()
+      old.tracked = false
+    }
+    notificationsChanged()
   }
 
   function advance() {
@@ -39,12 +45,17 @@ Item {
     hideTimer.restart()
   }
 
+  function dismiss(notif) {
+    const idx = notifications.indexOf(notif)
+    if (idx === -1) return
+    notifications.splice(idx, 1)
+    notif.tracked = false
+    notificationsChanged()
+  }
+
   Timer {
     id: hideTimer
     interval: root.displayTime
-    onTriggered: {
-      if (root.current) root.current.tracked = false
-      root.advance()
-    }
+    onTriggered: root.advance()
   }
 }
