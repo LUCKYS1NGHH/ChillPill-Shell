@@ -161,7 +161,7 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 25, 170) : 0))
+                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 22, 170) : 0))
                   : controlCenter
                       ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 21, 170) : 0))
                   : volumeActive ? 40
@@ -480,6 +480,8 @@ ShellRoot {
         color: "#202020"
         visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
         clip: true
+        border.width: 1
+        border.color: "#2b2b2b"
 
         Behavior on height { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
 
