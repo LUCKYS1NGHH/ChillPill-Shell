@@ -161,9 +161,9 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 22, 170) : 0))
+                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 47, 191) : 0))
                   : controlCenter
-                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 21, 170) : 0))
+                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 47, 191) : 0))
                   : volumeActive ? 40
                   : brightnessActive ? 40
                   : cliphistOpen ? 270
@@ -468,20 +468,48 @@ ShellRoot {
           }
         } 
 
+      Rectangle {
+        id: headerBar
+        anchors.top: notifBox.top
+        anchors.topMargin: -20
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - 10
+        height: 30
+        topLeftRadius: 13
+        topRightRadius: 13
+        bottomLeftRadius: 0
+        bottomRightRadius: 0
+        color: "#313131"
+        visible: notifBox.visible
+        z: 0
+
+        Text {
+          text: "Notifications"
+          color: "#bebebe"
+          font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
+          anchors.left: parent.left
+          anchors.leftMargin: 16
+          anchors.top: parent.top
+          anchors.topMargin: 3
+        }
+      }
+
       // notification list stack
       Rectangle {
+        id: notifBox
         anchors.top: sliderColumn.bottom
-        anchors.topMargin: 12
+        anchors.topMargin: 32
         anchors.bottomMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
-        height: Math.min(notifList.contentHeight + 7, 157)
+        height: Math.min(notifList.contentHeight + 14, 157)
         radius: 13
         color: "#202020"
         visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
         clip: true
         border.width: 1
         border.color: "#2b2b2b"
+        z: 1
 
         Behavior on height { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
 
@@ -490,18 +518,18 @@ ShellRoot {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.margins: 5
+          anchors.topMargin: 8
+          anchors.leftMargin: 5
+          anchors.rightMargin: 5
           height: Math.min(contentHeight, 160)
           spacing: 6
           model: notificationModule.notifications.slice().reverse()
           clip: true
           interactive: contentHeight > height
-
           flickDeceleration: 3000
           maximumFlickVelocity: 2500
           boundsBehavior: Flickable.StopAtBounds
 
-          // scroll bar for notifications
           ScrollBar.vertical: ScrollBar {
             id: notifScrollBar
             policy: ScrollBar.AlwaysOff
@@ -509,7 +537,6 @@ ShellRoot {
             width: 10
             anchors.rightMargin: 10
             z: 20
-
             contentItem: Rectangle {
               implicitWidth: 8
               radius: 10
@@ -517,7 +544,6 @@ ShellRoot {
                    : scrollHover.hovered ? "#6f6f6f"
                    : "#3a3a3a"
               Behavior on color { ColorAnimation { duration: 100 } }
-
               HoverHandler { id: scrollHover }
             }
           }
