@@ -480,7 +480,7 @@ ShellRoot {
         topRightRadius: 13
         bottomLeftRadius: 0
         bottomRightRadius: 0
-        color: "#2d2d2d"
+        color: "#393939"
         visible: notifBox.visible
         z: 0
 
@@ -490,8 +490,8 @@ ShellRoot {
 
           Text {
             text: "Notifications (" + notificationModule.notifications.length + ")"
-            color: "#d0d0d0"
-            font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+            color: "#d9d9d9"
+            font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.leftMargin: 16
@@ -503,7 +503,7 @@ ShellRoot {
             width: 60
             height: 16
             radius: 10
-            color: clearAllHover.containsMouse ? "#292929" : "#252525"
+            color: clearAllHover.containsMouse ? "#1f1f1f" : "#252525"
             Behavior on color { ColorAnimation { duration: 100 } }
             anchors.top: parent.top
             anchors.right: parent.right
@@ -512,7 +512,7 @@ ShellRoot {
 
             Text {
               text: "Clear all"
-              color: "#dddddd"
+              color: "#dedede"
               font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
               anchors.centerIn: parent
             }
@@ -538,11 +538,11 @@ ShellRoot {
         width: parent.width - 10
         height: Math.min(notifList.contentHeight + 7, 157)
         radius: 13
-        color: "#212121"
+        color: "#151515"
         visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
         clip: true
         border.width: 1
-        border.color: "#2b2b2b"
+        border.color: "#393939"
         z: 1
 
         Behavior on height { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
