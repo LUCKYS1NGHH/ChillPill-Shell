@@ -161,9 +161,9 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 47, 191) : 0))
+                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 52, 191) : 0))
                   : controlCenter
-                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 47, 191) : 0))
+                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 52, 191) : 0))
                   : volumeActive ? 40
                   : brightnessActive ? 40
                   : cliphistOpen ? 270
@@ -472,7 +472,7 @@ ShellRoot {
       Rectangle {
         id: headerBar
         anchors.top: notifBox.top
-        anchors.topMargin: -20
+        anchors.topMargin: -22
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
         height: 30
@@ -480,7 +480,7 @@ ShellRoot {
         topRightRadius: 13
         bottomLeftRadius: 0
         bottomRightRadius: 0
-        color: "#313131"
+        color: "#2d2d2d"
         visible: notifBox.visible
         z: 0
 
@@ -490,30 +490,30 @@ ShellRoot {
 
           Text {
             text: "Notifications (" + notificationModule.notifications.length + ")"
-            color: "#bebebe"
-            font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
+            color: "#d0d0d0"
+            font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.leftMargin: 16
-            anchors.topMargin: 3
+            anchors.topMargin: 4
             anchors.verticalCenter: parent.verticalCenter
           }
 
           Rectangle {
-            width: 58
+            width: 60
             height: 16
-            radius: 5
-            color: clearAllHover.containsMouse ? "#323232" : "#282828"
+            radius: 10
+            color: clearAllHover.containsMouse ? "#292929" : "#252525"
             Behavior on color { ColorAnimation { duration: 100 } }
             anchors.top: parent.top
             anchors.right: parent.right
-            anchors.topMargin: 2
+            anchors.topMargin: 3
             anchors.rightMargin: -345
 
             Text {
               text: "Clear all"
-              color: "#d8d8d8"
-              font { family: Theme.fontFamily; pixelSize: 7; weight: 400 }
+              color: "#dddddd"
+              font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
               anchors.centerIn: parent
             }
 
@@ -532,13 +532,13 @@ ShellRoot {
       Rectangle {
         id: notifBox
         anchors.top: sliderColumn.bottom
-        anchors.topMargin: 32
+        anchors.topMargin: 36
         anchors.bottomMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
         height: Math.min(notifList.contentHeight + 14, 157)
         radius: 13
-        color: "#202020"
+        color: "#212121"
         visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
         clip: true
         border.width: 1
