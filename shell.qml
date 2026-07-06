@@ -4,8 +4,10 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import Quickshell.Services.UPower
+import Quickshell.Services.Notifications
 
 ShellRoot {
 
@@ -52,7 +54,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 350
+    implicitHeight: 400
 
     anchors {
       top: true
@@ -145,6 +147,7 @@ ShellRoot {
       }
 
       implicitWidth: batteryCharging ? 220
+                     : notificationModule.active ? 280
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? 220
@@ -153,17 +156,21 @@ ShellRoot {
                      : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
-      implicitHeight: controlCenter && mprisModule.hasPlayer && mediaAutoOpened ? 124
-                      : batteryCharging ? 40
-                      : controlCenter && mprisModule.hasPlayer ? 202
-                      : controlCenter ? 74
-                      : volumeActive ? 40
-                      : brightnessActive ? 40
-                      : cliphistOpen ? 270
-                      : miniDashboard ? 157
-                      : row.implicitHeight + (hovered ? 10 : 10)
+    implicitHeight: notificationModule.active ? 50
+                  : batteryCharging ? 40
+                  : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
+                      ? 124
+                  : controlCenter && mprisModule.hasPlayer
+                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 44, 195) : 0))
+                  : controlCenter
+                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 44, 195) : 0))
+                  : volumeActive ? 40
+                  : brightnessActive ? 40
+                  : cliphistOpen ? 270
+                  : miniDashboard ? 157
+                  : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter ? 12 : 20
+      radius: notificationModule.active ? 99 : cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter && (notificationModule.notifications.length > 0) ? 25 : controlCenter ? 15 : 20
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
@@ -243,7 +250,7 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         spacing: 13
-        opacity: !box.cliphistOpen && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging ? 1 : 0
+        opacity: !box.cliphistOpen && !notificationModule.active && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging ? 1 : 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -290,12 +297,18 @@ ShellRoot {
         spacing: 5 // gap between battery icon and text
       }
 
+      // notification
+      NotificationPopup {
+        active: notificationModule.active
+        notif: notificationModule.current
+      }
+
       // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
         height: box.cliphistOpen ? box.implicitHeight - 25 : 0
-        opacity: box.cliphistOpen && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
+        opacity: box.cliphistOpen && !notificationModule.active && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
@@ -317,7 +330,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && !box.batteryCharging ? 1 : 0
+        opacity: box.controlCenter && !box.batteryCharging && !notificationModule.active ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter && !box.batteryCharging ? box.implicitHeight - 25 : 0
 
@@ -341,6 +354,7 @@ ShellRoot {
 
         // sliders
         Column {
+          id: sliderColumn
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
@@ -453,6 +467,238 @@ ShellRoot {
             }
           }
         } 
+
+      // notifications stack popped header
+      Rectangle {
+        id: headerBar
+        anchors.top: notifBox.top
+        anchors.topMargin: -21
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - 10
+        height: 35
+        topLeftRadius: 13
+        topRightRadius: 13
+        bottomLeftRadius: 0
+        bottomRightRadius: 0
+        color: "#2d2d2d"
+        visible: notifBox.visible
+        z: 0
+
+        Item {
+          Layout.fillWidth: true
+          height: 16
+
+          Text {
+            text: "Notifications (" + notificationModule.notifications.length + ")"
+            color: "#d0d0d0"
+            font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.leftMargin: 16
+            anchors.topMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
+          Rectangle {
+            width: 60
+            height: 16
+            radius: 10
+            color: clearAllHover.containsMouse ? "#292929" : "#252525"
+            Behavior on color { ColorAnimation { duration: 100 } }
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 3
+            anchors.rightMargin: -345
+
+            Text {
+              text: "Clear all"
+              color: "#dddddd"
+              font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
+              anchors.centerIn: parent
+            }
+
+            MouseArea {
+              id: clearAllHover
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: notificationModule.clearAll()
+            }
+          }
+        }
+      }
+
+      // notification list stack
+      Rectangle {
+        id: notifBox
+        anchors.top: sliderColumn.bottom
+        anchors.topMargin: 36
+        anchors.bottomMargin: 12
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - 10
+        height: Math.min(notifList.contentHeight + 7, 157)
+        radius: 13
+        color: "#212121"
+        visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
+        clip: true
+        border.width: 1
+        border.color: "#2b2b2b"
+        z: 1
+
+        Behavior on height { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
+
+        ListView {
+          id: notifList
+          anchors.top: parent.top
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.topMargin: 5
+          anchors.leftMargin: 5
+          anchors.rightMargin: 5
+          height: Math.min(contentHeight, 160)
+          spacing: 6
+          model: notificationModule.notifications.slice().reverse()
+          clip: true
+          interactive: contentHeight > height
+          flickDeceleration: 3000
+          maximumFlickVelocity: 2500
+          boundsBehavior: Flickable.StopAtBounds
+
+          ScrollBar.vertical: ScrollBar {
+            id: notifScrollBar
+            policy: ScrollBar.AlwaysOff
+            visible: notifList.contentHeight > notifList.height
+            width: 10
+            anchors.rightMargin: 10
+            z: 20
+            contentItem: Rectangle {
+              implicitWidth: 8
+              radius: 10
+              color: notifScrollBar.pressed ? "#888"
+                   : scrollHover.hovered ? "#6f6f6f"
+                   : "#3a3a3a"
+              Behavior on color { ColorAnimation { duration: 100 } }
+              HoverHandler { id: scrollHover }
+            }
+          }
+
+          // add/append notifications in the stack
+          delegate: Item {
+            width: ListView.view.width
+            height: contentColumn.implicitHeight + 7
+
+            // glyph (nerd font) bell icon
+            Text {
+              id: bellIcon
+              text: String.fromCodePoint(0xf0f3)
+              color: Theme.fg
+              font { family: "JetBrainsMono Nerd Font"; pixelSize: 16 }
+              visible: notifIcon.status !== Image.Ready
+              anchors.left: parent.left
+              anchors.top: parent.top
+              anchors.topMargin: 10
+              anchors.leftMargin: 16
+            }
+
+            // custom appicon
+            Image {
+              id: notifIcon
+              width: 20
+              height: 20
+              fillMode: Image.PreserveAspectFit
+              source: {
+                if (modelData.image) return modelData.image
+                if (modelData.appIcon) {
+                  return modelData.appIcon.startsWith("/")
+                    ? "file://" + modelData.appIcon
+                    : "image://icon/" + modelData.appIcon
+                }
+                return ""
+              }
+              sourceSize: Qt.size(20, 20)
+              visible: status === Image.Ready
+              anchors.top: parent.top
+              anchors.left: parent.left
+              anchors.topMargin: 10
+              anchors.leftMargin: 15
+            }
+
+            ColumnLayout {
+              id: contentColumn
+              anchors.fill: parent
+              anchors.leftMargin: 50
+              anchors.rightMargin: 3
+              anchors.bottomMargin: 20
+              spacing: 1
+
+              // heading / summary
+              RowLayout {
+                Layout.fillWidth: true
+
+                Text {
+                  text: modelData.summary
+                  color: Theme.fg
+                  font { family: Theme.fontFamily; pixelSize: 11; weight: 600 }
+                  elide: Text.ElideRight
+                  Layout.fillWidth: true
+                }
+
+                Text {
+                  text: modelData.receivedTime ? Qt.formatTime(modelData.receivedTime, "hh:mm") : ""
+                  color: "#858585"
+                  font { family: Theme.fontFamily; pixelSize: 8 }
+                  Layout.bottomMargin: 5
+                }
+
+                // close button
+                Rectangle {
+                  Layout.preferredWidth: 22
+                  Layout.preferredHeight: 22
+                  radius: 99
+                  color: dismissHover.containsMouse ? "#3a3a3a" : "transparent"
+                  Behavior on color { ColorAnimation { duration: 100 } }
+
+                  Text {
+                    text: ""
+                    color: dismissHover.containsMouse ? "#ddd" : "#777"
+                    anchors.centerIn: parent
+                    font.pixelSize: 11
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                  }
+
+                  MouseArea {
+                    id: dismissHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: notificationModule.dismiss(modelData)
+                  }
+                }
+              }
+
+              // description / body
+              Text {
+                text: modelData.body
+                color: "#9f9f9f"
+                font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.bottomMargin: 2
+                visible: text !== ""
+              }
+            }
+
+            // divider
+            Rectangle {
+              anchors.bottom: parent.bottom
+              width: parent.width
+              height: 1
+              color: "#333"
+              visible: index < notificationModule.notifications.length - 1
+            }
+          }
+        }
+      }
       }
 
       // mini dashboard opens on right click
@@ -460,7 +706,7 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.cliphistOpen ? 1 : 0
+        opacity: box.miniDashboard && !mediaAutoOpened && !notificationModule.active && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.cliphistOpen ? 1 : 0
 
         Behavior on opacity {
           SequentialAnimation {
@@ -770,5 +1016,16 @@ ShellRoot {
   }
 
   Mpris { id: mprisModule; visible: false }
+
+  NotificationServer {
+    id: notifServer
+    keepOnReload: false
+    onNotification: notif => {
+      notif.tracked = true
+      notificationModule.enqueue(notif)
+    }
+  }
+
+  NotificationModule { id: notificationModule; visible: false }
 
 }
