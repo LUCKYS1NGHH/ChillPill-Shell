@@ -484,7 +484,7 @@ ShellRoot {
         z: 0
 
         Text {
-          text: "Notifications"
+          text: "Notifications " + "(" + notificationModule.notifications.length + ")"
           color: "#bebebe"
           font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
           anchors.left: parent.left
