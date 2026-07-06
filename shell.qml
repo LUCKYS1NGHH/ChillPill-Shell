@@ -54,7 +54,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 390
+    implicitHeight: 400
 
     anchors {
       top: true
@@ -161,9 +161,9 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 52, 191) : 0))
+                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 44, 195) : 0))
                   : controlCenter
-                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 52, 191) : 0))
+                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 44, 195) : 0))
                   : volumeActive ? 40
                   : brightnessActive ? 40
                   : cliphistOpen ? 270
@@ -472,10 +472,10 @@ ShellRoot {
       Rectangle {
         id: headerBar
         anchors.top: notifBox.top
-        anchors.topMargin: -22
+        anchors.topMargin: -21
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
-        height: 30
+        height: 35
         topLeftRadius: 13
         topRightRadius: 13
         bottomLeftRadius: 0
@@ -536,7 +536,7 @@ ShellRoot {
         anchors.bottomMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
-        height: Math.min(notifList.contentHeight + 14, 157)
+        height: Math.min(notifList.contentHeight + 7, 157)
         radius: 13
         color: "#212121"
         visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
@@ -552,7 +552,7 @@ ShellRoot {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: 8
+          anchors.topMargin: 5
           anchors.leftMargin: 5
           anchors.rightMargin: 5
           height: Math.min(contentHeight, 160)
@@ -582,10 +582,12 @@ ShellRoot {
             }
           }
 
+          // add/append notifications in the stack
           delegate: Item {
             width: ListView.view.width
-            height: contentColumn.implicitHeight + 12
+            height: contentColumn.implicitHeight + 7
 
+            // glyph (nerd font) bell icon
             Text {
               id: bellIcon
               text: String.fromCodePoint(0xf0f3)
@@ -593,10 +595,12 @@ ShellRoot {
               font { family: "JetBrainsMono Nerd Font"; pixelSize: 16 }
               visible: notifIcon.status !== Image.Ready
               anchors.left: parent.left
-              anchors.verticalCenter: parent.verticalCenter
+              anchors.top: parent.top
+              anchors.topMargin: 10
               anchors.leftMargin: 16
             }
 
+            // custom appicon
             Image {
               id: notifIcon
               width: 20
@@ -613,9 +617,10 @@ ShellRoot {
               }
               sourceSize: Qt.size(20, 20)
               visible: status === Image.Ready
+              anchors.top: parent.top
               anchors.left: parent.left
-              anchors.leftMargin: 17
-              anchors.verticalCenter: parent.verticalCenter
+              anchors.topMargin: 10
+              anchors.leftMargin: 15
             }
 
             ColumnLayout {
@@ -623,9 +628,10 @@ ShellRoot {
               anchors.fill: parent
               anchors.leftMargin: 50
               anchors.rightMargin: 3
-              anchors.bottomMargin: 10
-              spacing: 2
+              anchors.bottomMargin: 20
+              spacing: 1
 
+              // heading / summary
               RowLayout {
                 Layout.fillWidth: true
 
@@ -644,6 +650,7 @@ ShellRoot {
                   Layout.bottomMargin: 5
                 }
 
+                // close button
                 Rectangle {
                   Layout.preferredWidth: 22
                   Layout.preferredHeight: 22
@@ -669,16 +676,19 @@ ShellRoot {
                 }
               }
 
+              // description / body
               Text {
                 text: modelData.body
                 color: "#9f9f9f"
-                font { family: Theme.fontFamily; pixelSize: 8 }
+                font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
+                Layout.bottomMargin: 2
                 visible: text !== ""
               }
             }
 
+            // divider
             Rectangle {
               anchors.bottom: parent.bottom
               width: parent.width
