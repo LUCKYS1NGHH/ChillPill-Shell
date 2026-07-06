@@ -54,7 +54,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 380
+    implicitHeight: 390
 
     anchors {
       top: true
@@ -468,6 +468,7 @@ ShellRoot {
           }
         } 
 
+      // notifications stack popped header
       Rectangle {
         id: headerBar
         anchors.top: notifBox.top
@@ -483,14 +484,47 @@ ShellRoot {
         visible: notifBox.visible
         z: 0
 
-        Text {
-          text: "Notifications " + "(" + notificationModule.notifications.length + ")"
-          color: "#bebebe"
-          font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
-          anchors.left: parent.left
-          anchors.leftMargin: 16
-          anchors.top: parent.top
-          anchors.topMargin: 3
+        Item {
+          Layout.fillWidth: true
+          height: 16
+
+          Text {
+            text: "Notifications (" + notificationModule.notifications.length + ")"
+            color: "#bebebe"
+            font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.leftMargin: 16
+            anchors.topMargin: 3
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
+          Rectangle {
+            width: 58
+            height: 16
+            radius: 5
+            color: clearAllHover.containsMouse ? "#323232" : "#282828"
+            Behavior on color { ColorAnimation { duration: 100 } }
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 2
+            anchors.rightMargin: -345
+
+            Text {
+              text: "Clear all"
+              color: "#d8d8d8"
+              font { family: Theme.fontFamily; pixelSize: 7; weight: 400 }
+              anchors.centerIn: parent
+            }
+
+            MouseArea {
+              id: clearAllHover
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: notificationModule.clearAll()
+            }
+          }
         }
       }
 
