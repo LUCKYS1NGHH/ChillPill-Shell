@@ -53,6 +53,12 @@ Item {
     notificationsChanged()
   }
 
+  function clearAll() {
+    notifications.forEach(n => n.tracked = false)
+    notifications = []
+    notificationsChanged()
+  }
+
   Timer {
     id: hideTimer
     interval: root.displayTime
