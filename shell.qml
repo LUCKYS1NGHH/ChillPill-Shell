@@ -54,7 +54,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 400
+    implicitHeight: 450
 
     anchors {
       top: true
@@ -124,9 +124,11 @@ ShellRoot {
       property string accent: Theme.accent
 
       // control center UI
-      property int ccButtonWidth: 95
-      property int ccButtonHeight: 55
+      property int ccButtonWidth: 100
+      property int ccButtonHeight: 40
       property int ccButtonRadius: 10
+      property string ccButtonBgOff: "#2c2c2c"
+      property string ccButtonFgOff: "#747474"
       property int sliderHeight: 4
       property int sliderRadius: 4
       property string sliderColor: "#c9c9c9"
@@ -161,16 +163,16 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (200 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 44, 195) : 0))
+                      ? (255 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 43, 195) : 0))
                   : controlCenter
-                      ? (72 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 44, 195) : 0))
+                      ? (125 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 45, 195) : 0))
                   : volumeActive ? 40
                   : brightnessActive ? 40
                   : cliphistOpen ? 270
                   : miniDashboard ? 157
                   : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: notificationModule.active ? 99 : cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter && (notificationModule.notifications.length > 0) ? 25 : controlCenter ? 15 : 20
+      radius: notificationModule.active ? 99 : cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter && (notificationModule.notifications.length > 0) ? 25 : 20
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
@@ -352,13 +354,41 @@ ShellRoot {
           border.width: box.controlCenter && mediaAutoOpened ? 0 : 1
         }
 
+        // few buttons in control center
+        // silent notifications
+        Rectangle {
+          anchors.top: parent.top
+          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 92 : 5
+          anchors.left: parent.left
+          anchors.leftMargin: 5
+          width: box.ccButtonWidth
+          height: box.ccButtonHeight
+          radius: box.ccButtonRadius
+          visible: box.controlCenter && mediaAutoOpened ? 0 : 1
+          color: notificationModule.dndEnabled ? "#a9904c" : box.ccButtonBgOff
+          Behavior on color { ColorAnimation { duration: 150 } }
+
+          Text {
+            text: String.fromCodePoint(0xf1f6) // bell off (silent) icon
+            color: notificationModule.dndEnabled ? "#e0ded9" : box.ccButtonFgOff
+            anchors.centerIn: parent
+            font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+          }
+
+          MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: notificationModule.dndEnabled = !notificationModule.dndEnabled
+          }
+        }
+
         // sliders
         Column {
           id: sliderColumn
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 77 : 4
+          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 145 : 57
           anchors.leftMargin: 15
           anchors.rightMargin: 2
           spacing: 5
