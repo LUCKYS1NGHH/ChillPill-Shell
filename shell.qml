@@ -354,97 +354,18 @@ ShellRoot {
           border.width: box.controlCenter && mediaAutoOpened ? 0 : 1
         }
 
-        // few buttons in control center
-        RowLayout {
-          anchors.top: parent.top
-          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 92 : 5
-          anchors.left: parent.left
-          anchors.right: parent.right
-          anchors.leftMargin: 5
-          anchors.rightMargin: 5
-
-          // silent notifications
-          Rectangle {
-            width: box.ccButtonWidth
-            height: box.ccButtonHeight
-            radius: box.ccButtonRadius
-            visible: box.controlCenter && !mediaAutoOpened
-            color: notificationModule.dndEnabled ? "#2e2c28" : box.ccButtonBgOff
-            Behavior on color { ColorAnimation { duration: 150 } }
-
-            Text {
-              text: String.fromCodePoint(0xf1f6)
-              color: notificationModule.dndEnabled ? "#fbf5e8" : box.ccButtonFgOff
-              anchors.centerIn: parent
-              font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
-            }
-
-            MouseArea {
-              anchors.fill: parent
-              cursorShape: Qt.PointingHandCursor
-              onClicked: notificationModule.dndEnabled = !notificationModule.dndEnabled
-            }
-          }
-
-          Item { Layout.fillWidth: true }
-
-          // timer / countdown
-          Rectangle {
-            id: timerBtn
-            width: box.ccButtonWidth
-            height: box.ccButtonHeight
-            radius: box.ccButtonRadius
-            color: countdownModule.running ? "#25282c" : box.ccButtonBgOff
-            Behavior on color { ColorAnimation { duration: 150 } }
-            property int selectedMinutes: 1
-
-            RowLayout {
-              anchors.centerIn: parent
-              spacing: 5
-
-              Text {
-                text: {
-                  if (countdownModule.running) return String.fromCodePoint(0xf1ade) // pause icon
-                  if (countdownModule.remainingSeconds > 0) return String.fromCodePoint(0xf1ae0) // play icon paused state
-                  return String.fromCodePoint(0xf13ab) // idle clock icon
-                }
-                color: countdownModule.running ? "#3978c7" : box.ccButtonFgOff
-                font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
-              }
-
-              Text {
-                text: countdownModule.running || countdownModule.remainingSeconds > 0
-                    ? countdownModule.formatted() : timerBtn.selectedMinutes + "m"
-                color: countdownModule.running ? "#dedede" : box.ccButtonFgOff
-                font { family: Theme.fontFamily; pixelSize: 12; weight: 400 }
-              }
-            }
-
-            MouseArea {
-              anchors.fill: parent
-              acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-              cursorShape: Qt.PointingHandCursor
-              onClicked: (mouse) => {
-                if (mouse.button === Qt.MiddleButton) {
-                  countdownModule.reset()
-                  return
-                }
-                if (mouse.button === Qt.RightButton) {
-                  if (countdownModule.running || countdownModule.remainingSeconds > 0) return // restrict the preset-cycle mess while timer active
-                  const presets = [5, 10, 15, 20, 25, 30]
-                  const idx = presets.indexOf(timerBtn.selectedMinutes)
-                  timerBtn.selectedMinutes = presets[(idx + 1) % presets.length]
-                  return
-                }
-
-                // left click
-                if (countdownModule.running) { countdownModule.pause(); return }
-                if (countdownModule.remainingSeconds > 0) { countdownModule.resume(); return }
-                countdownModule.start(timerBtn.selectedMinutes)
-              }
-            }
-          }
-        }
+        // control center buttons
+        CcButtons {
+          buttonWidth: box.ccButtonWidth
+          buttonHeight: box.ccButtonHeight
+          buttonRadius: box.ccButtonRadius
+          buttonBgOff: box.ccButtonBgOff
+          buttonFgOff: box.ccButtonFgOff
+          controlCenterOpen: box.controlCenter
+          mediaAutoOpened: mediaAutoOpened
+          hasPlayer: mprisModule.hasPlayer
+          playerHeight: box.ccButtonHeight
+        } 
 
         // sliders
         Column {
