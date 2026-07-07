@@ -390,26 +390,57 @@ ShellRoot {
 
           // timer / countdown
           Rectangle {
+            id: timerBtn
             width: box.ccButtonWidth
             height: box.ccButtonHeight
             radius: box.ccButtonRadius
-            color: box.ccButtonBgOff
+            color: countdownModule.running ? "#4c7a9c" : box.ccButtonBgOff
+            Behavior on color { ColorAnimation { duration: 150 } }
+            property int selectedMinutes: 1
 
-            Text {
-              text: countdownModule.running || countdownModule.remainingSeconds > 0
-                  ? countdownModule.formatted() : "󱎫"
-              color: countdownModule.running ? "#dedede" : box.ccButtonFgOff
+            RowLayout {
               anchors.centerIn: parent
-              font { family: Theme.fontFamily; pixelSize: 18; weight: 400 }
+              spacing: 5
+
+              Text {
+                text: {
+                  if (countdownModule.running) return String.fromCodePoint(0xf1ade) // pause icon
+                  if (countdownModule.remainingSeconds > 0) return String.fromCodePoint(0xf1ae0) // play icon paused state
+                  return String.fromCodePoint(0xf13ab) // idle clock icon
+                }
+                color: countdownModule.running ? "#dedede" : box.ccButtonFgOff
+                font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+              }
+
+              Text {
+                text: countdownModule.running || countdownModule.remainingSeconds > 0
+                    ? countdownModule.formatted() : timerBtn.selectedMinutes + "m"
+                color: countdownModule.running ? "#dedede" : box.ccButtonFgOff
+                font { family: Theme.fontFamily; pixelSize: 12; weight: 400 }
+              }
             }
 
             MouseArea {
               anchors.fill: parent
+              acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
               cursorShape: Qt.PointingHandCursor
-              onClicked: {
-                if (countdownModule.running) countdownModule.pause()
-                else if (countdownModule.remainingSeconds > 0) countdownModule.resume()
-                else countdownModule.start(5) // 5 min dfault
+              onClicked: (mouse) => {
+                if (mouse.button === Qt.MiddleButton) {
+                  countdownModule.reset()
+                  return
+                }
+                if (mouse.button === Qt.RightButton) {
+                  if (countdownModule.running || countdownModule.remainingSeconds > 0) return // restrict the preset-cycle mess while timer active
+                  const presets = [5, 10, 15, 20, 25, 30]
+                  const idx = presets.indexOf(timerBtn.selectedMinutes)
+                  timerBtn.selectedMinutes = presets[(idx + 1) % presets.length]
+                  return
+                }
+
+                // left click
+                if (countdownModule.running) { countdownModule.pause(); return }
+                if (countdownModule.remainingSeconds > 0) { countdownModule.resume(); return }
+                countdownModule.start(timerBtn.selectedMinutes)
               }
             }
           }
@@ -1074,8 +1105,7 @@ ShellRoot {
             mediaAutoOpened = false
           }
         }
-    }
- 
+    } 
   }
 
   Mpris { id: mprisModule; visible: false }
