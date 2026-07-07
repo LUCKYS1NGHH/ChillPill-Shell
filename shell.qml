@@ -380,8 +380,8 @@ ShellRoot {
           buttonWidth: box.ccButtonWidth
           buttonHeight: box.ccButtonHeight
           buttonRadius: box.ccButtonRadius
-          buttonBgOff: box.ccButtonBgOff
-          buttonFgOff: box.ccButtonFgOff
+          buttonBgOff: box.controlCenter && !mprisModule.hasPlayer ? "#222222" : box.ccButtonBgOff
+          buttonFgOff: box.controlCenter && !mprisModule.hasPlayer ? "#999999" : box.ccButtonFgOff
           controlCenterOpen: box.controlCenter
           mediaAutoOpened: mediaAutoOpened
           hasPlayer: mprisModule.hasPlayer
