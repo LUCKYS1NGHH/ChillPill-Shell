@@ -152,6 +152,9 @@ ShellRoot {
           heightAnim.start()
       }
 
+      readonly property int notifBump: notificationModule.notifications.length > 0
+        ? Math.min(notifList.contentHeight + 44, 195) : 0
+
       implicitWidth: batteryCharging ? 220
                      : box.timerDone ? 220
                      : notificationModule.active ? 280
@@ -169,9 +172,9 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (249 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 43, 195) : 0))
+                      ? (249 + notifBump)
                   : controlCenter
-                      ? (123 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 45, 195) : 0))
+                      ? (123 + notifBump)
                   : volumeActive ? 40
                   : brightnessActive ? 40
                   : cliphistOpen ? 270
