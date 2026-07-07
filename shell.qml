@@ -125,7 +125,7 @@ ShellRoot {
 
       // control center UI
       property int ccButtonWidth: 100
-      property int ccButtonHeight: 40
+      property int ccButtonHeight: 38
       property int ccButtonRadius: 10
       property string ccButtonBgOff: "#2c2c2c"
       property string ccButtonFgOff: "#747474"
@@ -163,9 +163,9 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (255 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 43, 195) : 0))
+                      ? (249 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 43, 195) : 0))
                   : controlCenter
-                      ? (125 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 45, 195) : 0))
+                      ? (123 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 45, 195) : 0))
                   : volumeActive ? 40
                   : brightnessActive ? 40
                   : cliphistOpen ? 270
@@ -388,7 +388,7 @@ ShellRoot {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 145 : 57
+          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 141 : 54
           anchors.leftMargin: 15
           anchors.rightMargin: 2
           spacing: 5
