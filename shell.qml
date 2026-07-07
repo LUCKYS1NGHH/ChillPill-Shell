@@ -355,30 +355,57 @@ ShellRoot {
         }
 
         // few buttons in control center
-        // silent notifications
-        Rectangle {
+        RowLayout {
           anchors.top: parent.top
           anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 92 : 5
-          anchors.left: parent.left
-          anchors.leftMargin: 5
-          width: box.ccButtonWidth
-          height: box.ccButtonHeight
-          radius: box.ccButtonRadius
-          visible: box.controlCenter && mediaAutoOpened ? 0 : 1
-          color: notificationModule.dndEnabled ? "#a9904c" : box.ccButtonBgOff
-          Behavior on color { ColorAnimation { duration: 150 } }
 
-          Text {
-            text: String.fromCodePoint(0xf1f6) // bell off (silent) icon
-            color: notificationModule.dndEnabled ? "#e0ded9" : box.ccButtonFgOff
-            anchors.centerIn: parent
-            font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+          // silent notifications
+          Rectangle {
+            width: box.ccButtonWidth
+            height: box.ccButtonHeight
+            radius: box.ccButtonRadius
+            visible: box.controlCenter && mediaAutoOpened ? 0 : 1
+            color: notificationModule.dndEnabled ? "#a9904c" : box.ccButtonBgOff
+            Behavior on color { ColorAnimation { duration: 150 } }
+
+            Text {
+              text: String.fromCodePoint(0xf1f6) // bell off (silent) icon
+              color: notificationModule.dndEnabled ? "#e0ded9" : box.ccButtonFgOff
+              anchors.centerIn: parent
+              font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
+              onClicked: notificationModule.dndEnabled = !notificationModule.dndEnabled
+            }
           }
 
-          MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: notificationModule.dndEnabled = !notificationModule.dndEnabled
+          // timer / countdown
+          Rectangle {
+            width: box.ccButtonWidth
+            height: box.ccButtonHeight
+            radius: box.ccButtonRadius
+            color: box.ccButtonBgOff
+
+            Text {
+              text: countdownModule.running || countdownModule.remainingSeconds > 0
+                  ? countdownModule.formatted() : "󱎫"
+              color: countdownModule.running ? "#dedede" : box.ccButtonFgOff
+              anchors.centerIn: parent
+              font { family: Theme.fontFamily; pixelSize: 18; weight: 400 }
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
+              onClicked: {
+                if (countdownModule.running) countdownModule.pause()
+                else if (countdownModule.remainingSeconds > 0) countdownModule.resume()
+                else countdownModule.start(5) // 5 min dfault
+              }
+            }
           }
         }
 
@@ -1046,6 +1073,8 @@ ShellRoot {
   }
 
   Mpris { id: mprisModule; visible: false }
+
+  CountdownModule { id: countdownModule; visible: false }
 
   NotificationServer {
     id: notifServer
