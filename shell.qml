@@ -127,8 +127,8 @@ ShellRoot {
       property int ccButtonWidth: 100
       property int ccButtonHeight: 38
       property int ccButtonRadius: 10
-      property string ccButtonBgOff: "#2c2c2c"
-      property string ccButtonFgOff: "#747474"
+      property string ccButtonBgOff: "#272727"
+      property string ccButtonFgOff: "#888888"
       property int sliderHeight: 4
       property int sliderRadius: 4
       property string sliderColor: "#c9c9c9"
@@ -369,12 +369,12 @@ ShellRoot {
             height: box.ccButtonHeight
             radius: box.ccButtonRadius
             visible: box.controlCenter && !mediaAutoOpened
-            color: notificationModule.dndEnabled ? "#a9904c" : box.ccButtonBgOff
+            color: notificationModule.dndEnabled ? "#2e2c28" : box.ccButtonBgOff
             Behavior on color { ColorAnimation { duration: 150 } }
 
             Text {
               text: String.fromCodePoint(0xf1f6)
-              color: notificationModule.dndEnabled ? "#e0ded9" : box.ccButtonFgOff
+              color: notificationModule.dndEnabled ? "#fbf5e8" : box.ccButtonFgOff
               anchors.centerIn: parent
               font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
             }
@@ -394,7 +394,7 @@ ShellRoot {
             width: box.ccButtonWidth
             height: box.ccButtonHeight
             radius: box.ccButtonRadius
-            color: countdownModule.running ? "#4c7a9c" : box.ccButtonBgOff
+            color: countdownModule.running ? "#25282c" : box.ccButtonBgOff
             Behavior on color { ColorAnimation { duration: 150 } }
             property int selectedMinutes: 1
 
@@ -408,7 +408,7 @@ ShellRoot {
                   if (countdownModule.remainingSeconds > 0) return String.fromCodePoint(0xf1ae0) // play icon paused state
                   return String.fromCodePoint(0xf13ab) // idle clock icon
                 }
-                color: countdownModule.running ? "#dedede" : box.ccButtonFgOff
+                color: countdownModule.running ? "#3978c7" : box.ccButtonFgOff
                 font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
               }
 
