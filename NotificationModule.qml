@@ -11,7 +11,7 @@ Item {
   readonly property bool active: current !== null
   property int displayTime: 3000
 
-  // data list for control center — just the array, you build the view
+  property bool dndEnabled: false
   property var notifications: []
   property int maxStored: 20
 
@@ -26,10 +26,6 @@ Item {
   }
 
   function enqueue(notif) {
-    queue.push(notif)
-    trigger()
-    if (!current) advance()
-
     notif.receivedTime = new Date() // add time
     notifications.push(notif)
     if (notifications.length > maxStored) {
@@ -37,6 +33,12 @@ Item {
       old.tracked = false
     }
     notificationsChanged()
+
+    if (dndEnabled) return   // skip popup and sound
+
+    queue.push(notif)
+    trigger()
+    if (!current) advance()
   }
 
   function advance() {
@@ -65,3 +67,5 @@ Item {
     onTriggered: root.advance()
   }
 }
+
+
