@@ -358,18 +358,22 @@ ShellRoot {
         RowLayout {
           anchors.top: parent.top
           anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 92 : 5
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.leftMargin: 5
+          anchors.rightMargin: 5
 
           // silent notifications
           Rectangle {
             width: box.ccButtonWidth
             height: box.ccButtonHeight
             radius: box.ccButtonRadius
-            visible: box.controlCenter && mediaAutoOpened ? 0 : 1
+            visible: box.controlCenter && !mediaAutoOpened
             color: notificationModule.dndEnabled ? "#a9904c" : box.ccButtonBgOff
             Behavior on color { ColorAnimation { duration: 150 } }
 
             Text {
-              text: String.fromCodePoint(0xf1f6) // bell off (silent) icon
+              text: String.fromCodePoint(0xf1f6)
               color: notificationModule.dndEnabled ? "#e0ded9" : box.ccButtonFgOff
               anchors.centerIn: parent
               font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
@@ -381,6 +385,8 @@ ShellRoot {
               onClicked: notificationModule.dndEnabled = !notificationModule.dndEnabled
             }
           }
+
+          Item { Layout.fillWidth: true }
 
           // timer / countdown
           Rectangle {
