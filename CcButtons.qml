@@ -24,12 +24,15 @@ RowLayout {
 
   // silent notifications
   Rectangle {
+    id: dndBtn
     width: root.buttonWidth
     height: root.buttonHeight
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
-    color: notificationModule.dndEnabled ? "#2e2c28" : root.buttonBgOff
+    color: notificationModule.dndEnabled ? "#2e2c28" : (dndHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    scale: dndMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
+    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
 
     Text {
       text: String.fromCodePoint(0xf1f6)
@@ -37,7 +40,9 @@ RowLayout {
       anchors.centerIn: parent
       font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
     }
+    HoverHandler { id: dndHover }
     MouseArea {
+      id: dndMouse
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor
       onClicked: notificationModule.dndEnabled = !notificationModule.dndEnabled
@@ -52,8 +57,10 @@ RowLayout {
     width: root.buttonWidth
     height: root.buttonHeight
     radius: root.buttonRadius
-    color: countdownModule.running ? "#25282c" : root.buttonBgOff
+    color: countdownModule.running ? "#25282c" : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    scale: timerMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
+    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
     property int selectedMinutes: 1
 
     RowLayout {
@@ -76,7 +83,9 @@ RowLayout {
       }
     }
 
+    HoverHandler { id: timerHover }
     MouseArea {
+      id: timerMouse
       anchors.fill: parent
       acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
       cursorShape: Qt.PointingHandCursor
@@ -95,4 +104,5 @@ RowLayout {
       }
     }
   }
+
 }
