@@ -125,11 +125,13 @@ ShellRoot {
       property string accent: Theme.accent
 
       // control center UI
-      property int ccButtonWidth: 100
+      property real ccButtonBorderWidth: 1
+      property string ccButtonBorderColor: "#202020"
+      property int ccButtonWidth: 112
       property int ccButtonHeight: 38
       property int ccButtonRadius: 10
-      property string ccButtonBgOff: "#272727"
-      property string ccButtonFgOff: "#888888"
+      property string ccButtonBgOff: "#151515"
+      property string ccButtonFgOff: "#a4a4a4"
       property int sliderHeight: 4
       property int sliderRadius: 4
       property string sliderColor: "#c9c9c9"
@@ -370,6 +372,8 @@ ShellRoot {
 
         // control center buttons
         CcButtons {
+          buttonBorderColor: box.ccButtonBorderColor
+          buttonBorderWidth: box.ccButtonBorderWidth
           buttonWidth: box.ccButtonWidth
           buttonHeight: box.ccButtonHeight
           buttonRadius: box.ccButtonRadius

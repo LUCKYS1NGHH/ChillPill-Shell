@@ -4,6 +4,8 @@ import QtQuick.Layouts
 RowLayout {
   id: root
 
+  property real buttonBorderWidth
+  property string buttonBorderColor
   property real buttonWidth
   property real buttonHeight
   property real buttonRadius
@@ -30,6 +32,8 @@ RowLayout {
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
     color: notificationModule.dndEnabled ? "#2e2c28" : (dndHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    border.width: buttonBorderWidth
+    border.color: buttonBorderColor
     scale: dndMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
@@ -51,6 +55,19 @@ RowLayout {
 
   Item { Layout.fillWidth: true }
 
+  // temporary empty button (middle empty space doesn't look YOU KNOWW...)
+  Rectangle {
+    id: noneBtn
+    width: root.buttonWidth
+    height: root.buttonHeight
+    radius: root.buttonRadius
+    color: root.buttonBgOff
+    border.width: buttonBorderWidth
+    border.color: buttonBorderColor
+  }
+
+  Item { Layout.fillWidth: true }
+
   // timer / countdown
   Rectangle {
     id: timerBtn
@@ -58,6 +75,8 @@ RowLayout {
     height: root.buttonHeight
     radius: root.buttonRadius
     color: countdownModule.running ? "#25282c" : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    border.width: buttonBorderWidth
+    border.color: buttonBorderColor
     scale: timerMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
@@ -104,5 +123,4 @@ RowLayout {
       }
     }
   }
-
 }
