@@ -149,17 +149,16 @@ ShellRoot {
       }
 
       implicitWidth: batteryCharging ? 220
-                     : notificationModule.active ? 280
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? 220
                      : brightnessActive ? 220
+                     : notificationModule.active ? 280
                      : cliphistOpen ? 450
                      : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
-    implicitHeight: notificationModule.active ? 50
-                  : batteryCharging ? 40
+    implicitHeight: batteryCharging ? 40
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
@@ -168,6 +167,7 @@ ShellRoot {
                       ? (123 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 45, 195) : 0))
                   : volumeActive ? 40
                   : brightnessActive ? 40
+                  : notificationModule.active ? 50
                   : cliphistOpen ? 270
                   : miniDashboard ? 157
                   : row.implicitHeight + (hovered ? 10 : 10)
@@ -301,7 +301,7 @@ ShellRoot {
 
       // notification
       NotificationPopup {
-        active: notificationModule.active
+        active: notificationModule.active && !box.volumeActive && !box.batteryCharging
         notif: notificationModule.current
       }
 
