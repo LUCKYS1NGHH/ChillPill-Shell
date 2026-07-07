@@ -1,8 +1,9 @@
 import QtQuick
-import QtMultimedia
 
 Item {
   id: root
+
+  signal timerFinished
 
   property int totalSeconds: 0
   property int remainingSeconds: 0
@@ -25,11 +26,6 @@ Item {
     return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s
   }
 
-  SoundEffect {
-    id: doneSound
-    source: "file:///" + Quickshell.env("HOME") + "/.config/quickshell/notification.wav"
-  }
-
   Timer {
     id: timerTick
     interval: 1000
@@ -39,7 +35,7 @@ Item {
       if (remainingSeconds <= 0) {
         running = false
         stop()
-        doneSound.play()
+        root.timerFinished()
       }
     }
   }

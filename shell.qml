@@ -98,6 +98,7 @@ ShellRoot {
       property bool controlCenter: false
       property bool cliphistOpen: false
       property bool batteryCharging: false
+      property bool timerDone: false
 
       property var battery: UPower.displayDevice
       property bool charging: battery.state === UPowerDeviceState.Charging
@@ -134,6 +135,7 @@ ShellRoot {
       property string sliderColor: "#c9c9c9"
       property int mprisControlsIconSize: 20
 
+      Timer { id: timerDoneHideTimer; interval: 2500; onTriggered: box.timerDone = false }
       Timer { id: volumeHideTimer; interval: 850; onTriggered: box.volumeActive = false }
       Timer { id: brightnessHideTimer; interval: 850; onTriggered: box.brightnessActive = false }
       Timer { id: batteryStatusHideTimer; interval: 850; onTriggered: box.batteryCharging = false }
@@ -149,16 +151,19 @@ ShellRoot {
       }
 
       implicitWidth: batteryCharging ? 220
+                     : box.timerDone ? 220
+                     : notificationModule.active ? 280
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? 220
                      : brightnessActive ? 220
-                     : notificationModule.active ? 280
                      : cliphistOpen ? 450
                      : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
-    implicitHeight: batteryCharging ? 40
+      implicitHeight: batteryCharging ? 40
+                  : box.timerDone ? 40
+                  : notificationModule.active ? 50
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
@@ -167,7 +172,6 @@ ShellRoot {
                       ? (123 + (notificationModule.notifications.length > 0 ? Math.min(notifList.contentHeight + 45, 195) : 0))
                   : volumeActive ? 40
                   : brightnessActive ? 40
-                  : notificationModule.active ? 50
                   : cliphistOpen ? 270
                   : miniDashboard ? 157
                   : row.implicitHeight + (hovered ? 10 : 10)
@@ -252,7 +256,7 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         spacing: 13
-        opacity: !box.cliphistOpen && !notificationModule.active && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging ? 1 : 0
+        opacity: !box.cliphistOpen && !notificationModule.active && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.timerDone ? 1 : 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -271,7 +275,7 @@ ShellRoot {
 
       // volume
       OsdBar {
-          active: box.volumeActive && !box.controlCenter
+          active: box.volumeActive && !box.controlCenter && !box.timerDone
           icon: volumeModule.icon
           percent: volumeModule.vol / 100
           muted: volumeModule.muted
@@ -291,7 +295,7 @@ ShellRoot {
 
       // battery
       OsdBar {
-        active: box.batteryCharging && !box.volumeActive
+        active: box.batteryCharging && !box.volumeActive && !box.brightnessActive && !box.timerDone
         icon: box.batteryIcon
         iconColor: box.batteryIconColor
         valueText: box.charging ? "Charging" : "Charging stopped"
@@ -299,9 +303,19 @@ ShellRoot {
         spacing: 5 // gap between battery icon and text
       }
 
+      // timer end
+      OsdBar {
+        active: box.timerDone
+        icon: String.fromCodePoint(0xf1ad1)
+        iconColor: "#5892f3"
+        valueText: "Timer finished"
+        barWidth: 0
+        spacing: 5
+      }
+
       // notification
       NotificationPopup {
-        active: notificationModule.active && !box.volumeActive && !box.batteryCharging
+        active: notificationModule.active && !box.volumeActive && !box.batteryCharging && !box.timerDone && !box.brightnessActive
         notif: notificationModule.current
       }
 
@@ -332,7 +346,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && !box.batteryCharging && !notificationModule.active ? 1 : 0
+        opacity: box.controlCenter && !box.batteryCharging && !notificationModule.active && !box.timerDone ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter && !box.batteryCharging ? box.implicitHeight - 25 : 0
 
@@ -1026,7 +1040,15 @@ ShellRoot {
             mediaAutoOpened = false
           }
         }
-    } 
+    }
+
+    Connections {
+      target: countdownModule
+      function onTimerFinished() {
+        box.timerDone = true
+        timerDoneHideTimer.restart()
+      }
+    }
   }
 
   Mpris { id: mprisModule; visible: false }
