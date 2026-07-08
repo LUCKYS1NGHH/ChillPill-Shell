@@ -132,7 +132,7 @@ ShellRoot {
       property real ccButtonBorderWidth: 1
       property string ccButtonBorderColor: "#202020"
       property int ccButtonWidth: 112
-      property int ccButtonHeight: 38
+      property int ccButtonHeight: 35
       property int ccButtonRadius: 10
       property string ccButtonBgOff: "#151515"
       property string ccButtonFgOff: "#a4a4a4"
@@ -157,7 +157,7 @@ ShellRoot {
       }
 
       readonly property int notifBump: notificationModule.notifications.length > 0
-        ? Math.min(notifList.contentHeight + 43, 134) : 0
+        ? Math.min(notifList.contentHeight + 44, 135) : 0
 
       implicitWidth: batteryCharging ? osdWidth
                      : box.timerDone ? osdWidth
@@ -176,9 +176,9 @@ ShellRoot {
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
-                      ? (249 + notifBump)
+                      ? (240 + notifBump)
                   : controlCenter
-                      ? (123 + notifBump)
+                      ? (118 + notifBump)
                   : volumeActive ? osdHeight
                   : brightnessActive ? osdHeight
                   : cliphistOpen ? 270
@@ -398,7 +398,7 @@ ShellRoot {
           anchors.top: parent.top
           anchors.left: parent.left
           anchors.right: parent.right
-          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 141 : 54
+          anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 137 : 50
           anchors.leftMargin: 15
           anchors.rightMargin: 2
           spacing: 5
