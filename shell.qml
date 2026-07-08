@@ -597,12 +597,16 @@ ShellRoot {
           anchors.rightMargin: 5
           height: Math.min(contentHeight, notifMaxHeight)
           spacing: 6
-          model: notificationModule.notifications.slice().reverse()
+          model: notificationModule.notificationsReversed
           clip: true
           interactive: contentHeight > height
           flickDeceleration: 3000
           maximumFlickVelocity: 2500
           boundsBehavior: Flickable.StopAtBounds
+
+          // cache delegates instead of recreating on scroll
+          cacheBuffer: 200
+          reuseItems: true
 
           ScrollBar.vertical: ScrollBar {
             id: notifScrollBar
@@ -624,6 +628,7 @@ ShellRoot {
 
           // add/append notifications in the stack
           delegate: Item {
+            id: notifDelegate
             width: ListView.view.width
             height: contentColumn.implicitHeight + 7
 
@@ -646,6 +651,7 @@ ShellRoot {
               width: 20
               height: 20
               fillMode: Image.PreserveAspectFit
+              asynchronous: true
               source: {
                 if (modelData.image) return modelData.image
                 if (modelData.appIcon) {
@@ -695,12 +701,12 @@ ShellRoot {
                   Layout.preferredWidth: 22
                   Layout.preferredHeight: 22
                   radius: 99
-                  color: dismissHover.containsMouse ? "#3a3a3a" : "transparent"
+                  color: dismissHover.containsMouse ? "#333333" : "transparent"
                   Behavior on color { ColorAnimation { duration: 100 } }
 
                   Text {
                     text: ""
-                    color: dismissHover.containsMouse ? "#ddd" : "#777"
+                    color: dismissHover.containsMouse ? "#bebebe" : "#404040"
                     anchors.centerIn: parent
                     font.pixelSize: 11
                     Behavior on color { ColorAnimation { duration: 150 } }
