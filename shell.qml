@@ -157,7 +157,7 @@ ShellRoot {
       }
 
       readonly property int notifBump: notificationModule.notifications.length > 0
-        ? Math.min(notifList.contentHeight + 44, 135) : 0
+        ? Math.min(notifList.contentHeight + 40, 130) : 0
 
       implicitWidth: batteryCharging ? osdWidth
                      : box.timerDone ? osdWidth
@@ -572,12 +572,15 @@ ShellRoot {
       Rectangle {
         id: notifBox
         anchors.top: sliderColumn.bottom
-        anchors.topMargin: 36
+        anchors.topMargin: 32
         anchors.bottomMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
         height: Math.min(notifList.contentHeight + 7, notifMaxHeight)
-        radius: 13
+        topLeftRadius: 0
+        topRightRadius: 0
+        bottomLeftRadius: 13
+        bottomRightRadius: 13
         color: "#161616"
         visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
         clip: true
