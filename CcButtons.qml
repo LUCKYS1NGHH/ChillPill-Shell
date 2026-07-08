@@ -74,7 +74,7 @@ RowLayout {
     width: root.buttonWidth
     height: root.buttonHeight
     radius: root.buttonRadius
-    color: countdownModule.running ? "#25282c" : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    color: countdownModule.running ? "#25282c" : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.6) : root.buttonBgOff)
     border.width: buttonBorderWidth
     border.color: buttonBorderColor
     scale: timerMouse.pressed ? 0.93 : 1.0
@@ -112,7 +112,7 @@ RowLayout {
         if (mouse.button === Qt.MiddleButton) { countdownModule.reset(); return }
         if (mouse.button === Qt.RightButton) {
           if (countdownModule.running || countdownModule.remainingSeconds > 0) return
-          const presets = [5, 10, 15, 20, 25, 30]
+          const presets = [1, 5, 10, 15, 20, 25, 30]
           const idx = presets.indexOf(timerBtn.selectedMinutes)
           timerBtn.selectedMinutes = presets[(idx + 1) % presets.length]
           return
