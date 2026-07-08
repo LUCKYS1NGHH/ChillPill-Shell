@@ -47,6 +47,8 @@ ShellRoot {
   property real osdInHeight: 3.7
   property int osdBarRadius: 2
   property int osdSpeed: 60
+  property int osdWidth: 220
+  property int osdHeight: 40
 
   // media player related
   property bool mediaAutoOpened: false
@@ -155,19 +157,19 @@ ShellRoot {
       readonly property int notifBump: notificationModule.notifications.length > 0
         ? Math.min(notifList.contentHeight + 44, 195) : 0
 
-      implicitWidth: batteryCharging ? 220
-                     : box.timerDone ? 220
+      implicitWidth: batteryCharging ? osdWidth
+                     : box.timerDone ? osdWidth
                      : notificationModule.active ? 280
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
-                     : volumeActive ? 220
-                     : brightnessActive ? 220
+                     : volumeActive ? osdWidth
+                     : brightnessActive ? osdWidth
                      : cliphistOpen ? 450
                      : miniDashboard ? 420
                      : row.implicitWidth + (hovered ? 68 : 56)
 
-      implicitHeight: batteryCharging ? 40
-                  : box.timerDone ? 40
+      implicitHeight: batteryCharging ? osdHeight
+                  : box.timerDone ? osdHeight
                   : notificationModule.active ? 50
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
@@ -175,8 +177,8 @@ ShellRoot {
                       ? (249 + notifBump)
                   : controlCenter
                       ? (123 + notifBump)
-                  : volumeActive ? 40
-                  : brightnessActive ? 40
+                  : volumeActive ? osdHeight
+                  : brightnessActive ? osdHeight
                   : cliphistOpen ? 270
                   : miniDashboard ? 157
                   : row.implicitHeight + (hovered ? 10 : 10)
