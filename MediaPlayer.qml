@@ -121,7 +121,7 @@ Rectangle {
                     text: "⏮"
                     font.family: "FiraCode Nerd Font Propo"
                     font.pixelSize: 23
-                    color: prevHover.containsMouse ? "#ffffff" : "#aeaeae"
+                    color: prevHover.containsMouse ? "#ffffff" : "#cfcfcf"
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
@@ -153,7 +153,7 @@ Rectangle {
                     text: "⏭"
                     font.family: "FiraCode Nerd Font Propo"
                     font.pixelSize: 23
-                    color: nextHover.containsMouse ? "#ffffff" : "#aeaeae"
+                    color: nextHover.containsMouse ? "#ffffff" : "#b3b3b3"
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
@@ -178,14 +178,14 @@ Rectangle {
                 radius: 8
                 color: "#4d4d4d"
 
-                Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
+                Behavior on height { NumberAnimation { duration: 380; easing.type: Easing.OutExpo } }
 
                 Rectangle {
                     width: parent.width * mediaCard.mprisProgress
                     height: parent.height
                     radius: 5
                     color: barHover.containsMouse ? "#cdcdcd" : fg
-                    Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.Linear } }
+                    Behavior on width { NumberAnimation { duration: 510; easing.type: Easing.Linear } }
                 }
 
                 MouseArea {
