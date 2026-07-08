@@ -50,6 +50,8 @@ ShellRoot {
   property int osdWidth: 220
   property int osdHeight: 40
 
+  readonly property int notifMaxHeight: 97
+
   // media player related
   property bool mediaAutoOpened: false
 
@@ -155,7 +157,7 @@ ShellRoot {
       }
 
       readonly property int notifBump: notificationModule.notifications.length > 0
-        ? Math.min(notifList.contentHeight + 44, 195) : 0
+        ? Math.min(notifList.contentHeight + 43, 134) : 0
 
       implicitWidth: batteryCharging ? osdWidth
                      : box.timerDone ? osdWidth
@@ -574,7 +576,7 @@ ShellRoot {
         anchors.bottomMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
-        height: Math.min(notifList.contentHeight + 7, 157)
+        height: Math.min(notifList.contentHeight + 7, notifMaxHeight)
         radius: 13
         color: "#151515"
         visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
@@ -593,7 +595,7 @@ ShellRoot {
           anchors.topMargin: 5
           anchors.leftMargin: 5
           anchors.rightMargin: 5
-          height: Math.min(contentHeight, 160)
+          height: Math.min(contentHeight, notifMaxHeight)
           spacing: 6
           model: notificationModule.notifications.slice().reverse()
           clip: true
