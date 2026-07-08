@@ -677,6 +677,12 @@ ShellRoot {
               anchors.bottomMargin: 20
               spacing: 1
 
+              Item {
+                Layout.fillHeight: true
+                Layout.topMargin: 8
+                visible: !bodyText.visible
+              }
+
               // heading / summary
               RowLayout {
                 Layout.fillWidth: true
@@ -724,6 +730,7 @@ ShellRoot {
 
               // description / body
               Text {
+                id: bodyText
                 text: modelData.body
                 color: "#9f9f9f"
                 font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
@@ -731,6 +738,12 @@ ShellRoot {
                 Layout.fillWidth: true
                 Layout.bottomMargin: 2
                 visible: text !== ""
+              }
+
+              Item {
+                Layout.fillHeight: true
+                Layout.bottomMargin: 6
+                visible: !bodyText.visible
               }
             }
 
