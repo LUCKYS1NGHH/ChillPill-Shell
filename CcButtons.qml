@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import IslandBackend
 
 RowLayout {
   id: root
@@ -14,6 +15,7 @@ RowLayout {
 
   property bool controlCenterOpen: false
   property bool mediaAutoOpened: false
+  property bool wifiPanelOpened: false
   property bool hasPlayer: false
   property real playerHeight: 0
 
@@ -23,6 +25,68 @@ RowLayout {
   anchors.right: parent.right
   anchors.leftMargin: 5
   anchors.rightMargin: 5
+
+  onControlCenterOpenChanged: {
+    if (!controlCenterOpen) root.wifiPanelOpened = false
+  }
+
+  // wifi
+  Rectangle {
+    id: wifiBtn
+    width: root.buttonWidth
+    height: root.buttonHeight
+    radius: root.buttonRadius
+    visible: root.controlCenterOpen && !root.mediaAutoOpened
+    color: WifiController.enabled ? "#212529" : (wifiHover.hovered ? Qt.lighter(root.buttonBgOff, 1.5) : root.buttonBgOff)
+    border.width: buttonBorderWidth
+    border.color: buttonBorderColor
+    scale: wifiMouse.pressed ? 0.93 : 1.0
+    Behavior on color { ColorAnimation { duration: 150 } }
+    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
+
+    RowLayout {
+      anchors.centerIn: parent
+      spacing: 5
+      Text {
+        text: "\uf1eb" // wifi glyph
+        color: WifiController.enabled ? "#3f7de0" : root.buttonFgOff
+        font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+      }
+      Text {
+        text: !WifiController.enabled ? "Off"
+            : WifiController.currentSsid.length > 0 ? WifiController.currentSsid
+            : (WifiController.statusText.length > 0 ? WifiController.statusText : "Not connected")
+        color: WifiController.enabled ? "#dedede" : root.buttonFgOff
+        font { family: Theme.fontFamily; pixelSize: 12; weight: 400 }
+        elide: Text.ElideRight
+        Layout.maximumWidth: 90
+      }
+    }
+
+    HoverHandler { id: wifiHover }
+    MouseArea {
+      id: wifiMouse
+      anchors.fill: parent
+      acceptedButtons: Qt.LeftButton | Qt.RightButton
+      cursorShape: Qt.PointingHandCursor
+      onClicked: (mouse) => {
+        if (mouse.button === Qt.RightButton) {
+          root.wifiPanelOpened = !root.wifiPanelOpened
+          if (root.wifiPanelOpened && WifiController.enabled) WifiController.refreshNetworks(true)
+          return
+        }
+        WifiController.setEnabled(!WifiController.enabled)
+      }
+    }
+  }
+
+  WifiPanel {
+    visible: root.wifiPanelOpened
+    anchorX: wifiBtn.mapToGlobal(0, 0).x - width  // sit left of the wifi button
+    anchorY: wifiBtn.mapToGlobal(0, 0).y
+  }
+
+  Item { Layout.fillWidth: true }
 
   // silent notifications
   Rectangle {
@@ -51,19 +115,6 @@ RowLayout {
       cursorShape: Qt.PointingHandCursor
       onClicked: notificationModule.dndEnabled = !notificationModule.dndEnabled
     }
-  }
-
-  Item { Layout.fillWidth: true }
-
-  // temporary empty button (middle empty space doesn't look YOU KNOWW...)
-  Rectangle {
-    id: noneBtn
-    width: root.buttonWidth
-    height: root.buttonHeight
-    radius: root.buttonRadius
-    color: root.buttonBgOff
-    border.width: buttonBorderWidth
-    border.color: buttonBorderColor
   }
 
   Item { Layout.fillWidth: true }
