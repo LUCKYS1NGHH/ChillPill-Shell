@@ -32,9 +32,8 @@ Item {
         }
     }
 
-    // refresh every 5 minutes
     Timer {
-        interval: 300000
+        interval: Config.bandwidthRefreshInterval
         running: box.miniDashboard
         repeat: true
         triggeredOnStart: true

@@ -41,7 +41,7 @@ RowLayout {
       return root.fg
     }
 
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Theme.nerdFontFamily
     font.pixelSize: 10
   }
 

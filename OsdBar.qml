@@ -34,7 +34,7 @@ Item {
         Text {
             text: root.icon
             color: root.iconColor !== "" ? root.iconColor : root.fg
-            font { family: "JetBrainsMono Nerd Font"; pixelSize: 15 }
+            font { family: Theme.nerdFontFamily; pixelSize: 15 }
         }
 
         Rectangle {

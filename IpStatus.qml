@@ -58,7 +58,7 @@ Item {
             Text {
                 text: root.vpn ? "󰦝" : "󰩟"
                 color: root.vpn ? "#64d667" : "#6496dd"
-                font { family: "JetBrainsMono Nerd Font"; pixelSize: 11 }
+                font { family: Theme.nerdFontFamily; pixelSize: 11 }
             }
 
             Text {

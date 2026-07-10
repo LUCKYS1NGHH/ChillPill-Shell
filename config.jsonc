@@ -1,0 +1,16 @@
+{
+  "displayPicture": "/home/xingyun/.pfp.png",
+  "clockFormat": "hh:mm",
+  "pillTopMargin": 9,
+  "pillBottomMargin": 26,
+  "textFontFamily": "Monocraft",
+  "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
+  "timerPresets": [1, 5, 10, 15, 30],
+  "mediaAutoOpenDuration": 2000,
+  "maxWorkspaces": 5,
+  "notificationDisplayTime": 3000,
+  "maxNotificationsInStack": 20,
+  "bandwidthRefreshInterval": 30000,
+  "screenLockAppCommand": "hyprlock",
+  "osdDuration": 800
+}

@@ -116,7 +116,7 @@ PanelWindow {
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: secure ? "\uf023" : "\uf09c"
-                  font { family: "JetBrainsMono Nerd Font"; pixelSize: 12 }
+                  font { family: Theme.nerdFontFamily; pixelSize: 12 }
                   color: "#bdbdbd"
                 }
 

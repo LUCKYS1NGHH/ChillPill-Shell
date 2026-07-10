@@ -8,7 +8,7 @@ RowLayout {
   Layout.fillWidth: false
 
   Repeater {
-    model: 5 // max workspace buttons/texts to show
+    model: Config.maxWorkspaces // max workspace buttons/texts to show
 
     delegate: Rectangle {
       id: wsButton

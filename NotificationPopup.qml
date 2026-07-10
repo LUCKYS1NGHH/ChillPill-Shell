@@ -19,7 +19,7 @@ Item {
     Text {
       text: String.fromCodePoint(0xf0f3)
       color: Theme.fg
-      font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+      font { family: Theme.nerdFontFamily; pixelSize: 14 }
       visible: notifIcon.status !== Image.Ready
     }
 

@@ -9,12 +9,12 @@ Item {
   property var queue: []
   property var current: null
   readonly property bool active: current !== null
-  property int displayTime: 3000
+  property int displayTime: Config.notificationDisplayTime
 
   property bool dndEnabled: false
   property var notifications: []
   property var notificationsReversed: [] // pre-computed. avoid recomputing per bindig
-  property int maxStored: 20
+  property int maxStored: Config.maxNotificationsInStack
 
   SoundEffect {
     id: notifySound

@@ -50,7 +50,7 @@ RowLayout {
       Text {
         text: "\uf1eb" // wifi glyph
         color: WifiController.enabled ? "#3f7de0" : root.buttonFgOff
-        font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+        font { family: Theme.nerdFontFamily; pixelSize: 14 }
       }
       Text {
         text: !WifiController.enabled ? "Off"
@@ -106,7 +106,7 @@ RowLayout {
       text: String.fromCodePoint(0xf1f6)
       color: notificationModule.dndEnabled ? "#fbf5e8" : root.buttonFgOff
       anchors.centerIn: parent
-      font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+      font { family: Theme.nerdFontFamily; pixelSize: 14 }
     }
     HoverHandler { id: dndHover }
     MouseArea {
@@ -143,7 +143,7 @@ RowLayout {
           return String.fromCodePoint(0xf13ab)
         }
         color: countdownModule.running ? "#3978c7" : root.buttonFgOff
-        font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 }
+        font { family: Theme.nerdFontFamily; pixelSize: 14 }
       }
       Text {
         text: countdownModule.running || countdownModule.remainingSeconds > 0
@@ -163,7 +163,7 @@ RowLayout {
         if (mouse.button === Qt.MiddleButton) { countdownModule.reset(); return }
         if (mouse.button === Qt.RightButton) {
           if (countdownModule.running || countdownModule.remainingSeconds > 0) return
-          const presets = [1, 5, 10, 15, 20, 25, 30]
+          const presets = Config.timerPresets
           const idx = presets.indexOf(timerBtn.selectedMinutes)
           timerBtn.selectedMinutes = presets[(idx + 1) % presets.length]
           return
