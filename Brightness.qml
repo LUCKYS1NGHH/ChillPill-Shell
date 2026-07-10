@@ -61,7 +61,7 @@ RowLayout {
     Text {
         text: root.icon
         color: Theme.fg
-        font { family: "JetBrainsMono Nerd Font"; pixelSize: 10 }
+        font { family: Theme.nerdFontFamily; pixelSize: 10 }
     }
 
     // percentage

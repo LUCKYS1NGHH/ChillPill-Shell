@@ -46,7 +46,7 @@ ShellRoot {
   property int osdInWidth: 120
   property real osdInHeight: 3.7
   property int osdBarRadius: 2
-  property int osdSpeed: 60
+  property int osdSpeed: 60 // how fast bar fill/unfill
   property int osdWidth: 220
   property int osdHeight: 40
 
@@ -67,10 +67,11 @@ ShellRoot {
     }
 
     margins {
-      top: 9
+      top: Config.pillTopMargin
     }
 
-    exclusiveZone: 26 // fixed gap of the active window for the top bar, never changes
+    // fixed gap of the active window for the top bar
+    exclusiveZone: Config.pillBottomMargin
     color: "transparent"
 
     // Mask input to only the capsule
@@ -142,9 +143,9 @@ ShellRoot {
       property int mprisControlsIconSize: 20
 
       Timer { id: timerDoneHideTimer; interval: 2500; onTriggered: box.timerDone = false }
-      Timer { id: volumeHideTimer; interval: 850; onTriggered: box.volumeActive = false }
-      Timer { id: brightnessHideTimer; interval: 850; onTriggered: box.brightnessActive = false }
-      Timer { id: batteryStatusHideTimer; interval: 850; onTriggered: box.batteryCharging = false }
+      Timer { id: volumeHideTimer; interval: Config.osdDuration; onTriggered: box.volumeActive = false }
+      Timer { id: brightnessHideTimer; interval: Config.osdDuration; onTriggered: box.brightnessActive = false }
+      Timer { id: batteryStatusHideTimer; interval: Config.osdDuration; onTriggered: box.batteryCharging = false }
       Timer { id: brightnessThrottle; interval: 80; repeat: false }
 
       Process { id: brightnessSetProc; running: false }
@@ -412,7 +413,7 @@ ShellRoot {
             Text {
               text: volumeModule.icon
               color: volumeModule.muted ? "#fd2222" : Theme.fg
-              font.family: "JetBrainsMono Nerd Font"
+              font.family: Theme.nerdFontFamily
               font.pixelSize: 13
               anchors.leftMargin: 10
             }
@@ -460,7 +461,7 @@ ShellRoot {
             Text {
               text: brightnessModule.icon
               color: Theme.fg
-              font.family: "JetBrainsMono Nerd Font"
+              font.family: Theme.nerdFontFamily
               font.pixelSize: 13
             }
 
@@ -640,7 +641,7 @@ ShellRoot {
               id: bellIcon
               text: String.fromCodePoint(0xf0f3)
               color: Theme.fg
-              font { family: "JetBrainsMono Nerd Font"; pixelSize: 16 }
+              font { family: Theme.nerdFontFamily; pixelSize: 16 }
               visible: notifIcon.status !== Image.Ready
               anchors.left: parent.left
               anchors.top: parent.top
@@ -799,7 +800,7 @@ ShellRoot {
             Image {
               id: avatarImg
               anchors.fill: parent
-              source: "file://" + Quickshell.env("HOME") + "/.pfp.png"
+              source: "file://" + Config.displayPicture
               fillMode: Image.PreserveAspectCrop
               asynchronous: false
               visible: false
@@ -955,7 +956,7 @@ ShellRoot {
                 hoverEnabled: true
               }
 
-              Process { id: lockProc; command: ["bash", "-c", "hyprlock"]; running: false }
+              Process { id: lockProc; command: ["bash", "-c", Config.screenLockAppCommand]; running: false }
             }
 
             // sleep
@@ -1065,7 +1066,7 @@ ShellRoot {
 
     Timer {
         id: mediaPopupHideTimer
-        interval: 2000
+        interval: Config.mediaAutoOpenDuration
         repeat: false
         onTriggered: {
           if (mediaAutoOpened) {

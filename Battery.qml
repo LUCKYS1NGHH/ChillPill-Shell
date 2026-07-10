@@ -17,7 +17,7 @@ RowLayout {
     color: box.batteryIconColor
 
     font {
-      family: "JetBrainsMono Nerd Font"
+      family: Theme.nerdFontFamily
       pixelSize: fontSize
     }
   }

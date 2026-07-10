@@ -5,7 +5,7 @@ Text {
 
   property string fontFamily: Theme.fontFamily
 
-  text: Qt.formatDateTime(clock.date, "hh:mm")
+  text: Qt.formatDateTime(clock.date, Config.clockFormat)
   color: Theme.fg
 
   font {
