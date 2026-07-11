@@ -15,6 +15,7 @@ Item {
   property var notifications: []
   property var notificationsReversed: [] // pre-computed. avoid recomputing per bindig
   property int maxStored: Config.maxNotificationsInStack
+  property bool avoidDuplicateNotifications: Config.avoidDuplicateNotifications
 
   SoundEffect {
     id: notifySound
@@ -30,8 +31,27 @@ Item {
     notificationsReversed = notifications.slice().reverse()
   }
 
+  function isDuplicate(notif): bool {
+    for (let i = 0; i < notifications.length; i++) {
+      const n = notifications[i]
+      if (n.appName === notif.appName &&
+          n.summary === notif.summary &&
+          n.body === notif.body) {
+        return true
+      }
+    }
+    return false
+  }
+
   function enqueue(notif): void {
+    // conditionl duplicate check
+    if (avoidDuplicateNotifications && isDuplicate(notif)) {
+      console.log("Duplicate notification ignored:", notif.summary)
+      return
+    }
+
     notif.receivedTime = new Date()
+    notif.tracked = true
     notifications.push(notif)
     if (notifications.length > maxStored) {
       const old = notifications.shift()
