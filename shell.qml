@@ -58,7 +58,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 450
+    implicitHeight: 482
 
     anchors {
       top: true
@@ -86,6 +86,12 @@ ShellRoot {
         x: Math.floor(calendarPopup.x); y: Math.floor(calendarPopup.y)
         width: calendarPopup.shown ? Math.ceil(calendarPopup.width) : 0
         height: calendarPopup.shown ? Math.ceil(calendarPopup.height) : 0
+      }
+      Region {
+        intersection: Intersection.Combine
+        x: Math.floor(weatherPopupBox.x); y: Math.floor(weatherPopupBox.y)
+        width: weatherPopupBox.shown ? Math.ceil(weatherPopupBox.width) : 0
+        height: weatherPopupBox.shown ? Math.ceil(weatherPopupBox.height) : 0
       }
     }
 
@@ -190,7 +196,7 @@ ShellRoot {
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
-        if (!miniDashboard) calendarPopup.shown = false
+        if (!miniDashboard) calendarPopup.shown = false; weatherPopupBox.shown = false
       }
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
@@ -984,7 +990,11 @@ ShellRoot {
 
             Item { Layout.fillWidth: true }
 
-            Datetime { id: datetimeItem; anchors.centerIn: parent; dateFg: "#aaaaaa"; }
+            Datetime { id: datetimeItem; dateFg: "#aaaaaa"; }
+
+            Item { Layout.fillWidth: true }
+
+            WeatherIndicator { id: weatherIndicatorItem }
 
             Item { Layout.fillWidth: true }
 
@@ -1045,12 +1055,24 @@ ShellRoot {
     // calendar popup box
     CalendarBox { id: calendarPopup }
 
+    WeatherPopup { id: weatherPopupBox }
+
     // open calendar when click on date in mini dashboard
     Connections {
       target: datetimeItem
       function onToggleCalendar() {
         console.log("toggleCalendar launched, current opacity:", calendarPopup.opacity)
         calendarPopup.shown = !calendarPopup.shown
+        weatherPopupBox.shown = false
+      }
+    }
+
+    // open weather when click on weather in mini dashboard
+    Connections {
+      target: weatherIndicatorItem
+      function onToggleWeather() {
+        weatherPopupBox.shown = !weatherPopupBox.shown
+        calendarPopup.shown = false
       }
     }
 
