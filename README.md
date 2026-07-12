@@ -1,0 +1,119 @@
+# ChillPill-Shell
+
+A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especially for those who don't have a Dedicated GPU (Like me) for their GNU/Linux Hyprland machine.
+
+[![ChillPill-Shell 0.1.0](https://img.shields.io/badge/CPShell-0.1.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+---
+
+### Resource Usage
+
+- RAM: 200-600 MB (Average 400)
+- CPU: Idle 0%, Average 3%, Min 0.1%, Max 10% (Varies with your CPU, a better CPU uses less)
+- GPU: Idle 0%, Average 15%, Min 6%, Max 50% (Varies with your GPU, a better GPU uses less)
+
+#### My Hardware
+
+- RAM: 8GB
+- CPU: i5 3337U (Dualcore)
+- GPU (Integrated): Intel HD 4000
+
+---
+
+### Showcase
+
+<p>
+   <img src="screenshots/image_1.webp" width="49%">
+   <img src="screenshots/image_2.webp" width="49%">
+   <img src="screenshots/image_3.webp" width="49%">
+   <img src="screenshots/image_4.webp" width="49%">
+   <img src="screenshots/image_5.webp" width="49%">
+   <img src="screenshots/image_6.webp" width="49%">
+   <img src="screenshots/image_7.webp" width="49%">
+   <img src="screenshots/image_8.webp" width="49%">
+</p>
+
+
+### Features
+
+- Main Pill Bar                : Battery, volume, workspaces, network, clock
+- Control Center               : Media Player, Buttons (WiFi, Silent Notifications, Timer), Volume and Brightness Sliders, Notifications Stack
+- Cliphist (Clipboard History) : Search, Clipboard images preview, Item index number
+- Mini Dashboard               : Profile Image, Username, Hostname, Uptime, Battery, Basic network info, Today bandwidth usage, Datetime, Weather, Calendar, Power buttons (lock, sleep, shutdown, reboot)
+- DBus Notification            : App icon (optional), summary, body
+- OSD                          : Battery, volume, brightness, timer
+
+### Configurable options
+
+```
+{
+  "displayPicture": "/home/<user>/.pfp.png",
+  "clockFormat": "hh:mm",
+  "pillTopMargin": 9,
+  "pillBottomMargin": 26,
+  "textFontFamily": "Monocraft",
+  "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
+  "timerPresets": [1, 5, 10, 15, 30],
+  "mediaAutoOpenDuration": 2000,
+  "maxWorkspaces": 5,
+  "notificationDisplayTime": 3000,
+  "maxNotificationsInStack": 20,
+  "bandwidthRefreshInterval": 300000,
+  "screenLockAppCommand": "hyprlock",
+  "osdDuration": 800,
+  "weatherLocation": "Delhi",
+  "weatherUnits": "metric",
+  "weatherRefreshInterval": 3600000,
+  "avoidDuplicateNotifications": true
+}
+```
+
+---
+
+### Dependencies
+
+> All available in the Arch repos/AUR.
+> other distros users have to install them from their own package manager,
+> and most of these packages are likely already installed in your system.
+
+- [cliphist](https://github.com/sentriz/cliphist)
+- [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (AUR package. non-Arch users can use the setup script instead)
+- [inotify-tools](https://github.com/inotify-tools/inotify-tools)
+- [brightnessctl](https://github.com/Hummer12007/brightnessctl)
+
+---
+
+### Install
+
+> [!TIP]
+> Use my Hyprland [dotfiles](https://github.com/LUCKYS1NGHH/dotfiles), it's also made for No Dedicated GPU machines.
+> You will get more better performance.
+
+```bash
+git clone --depth=1 https://github.com/LUCKYS1NGHH/ChillPill-Shell.git
+cd ChillPill-Shell
+chmod +x install.sh
+sudo ./install.sh
+```
+
+### Key Bindings
+
+Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland Lua (v0.55+) config file.
+
+```
+hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
+hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
+hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
+```
+
+---
+
+### Thanks
+
+Special thanks to [enhaoswen](https://github.com/enhaoswen) for the Wi-Fi controller backend for Quickshell.
+
+### Author
+
+LUCKYS1NGHH / https://github.com/LUCKYS1NGHH/ChillPill-Shell
