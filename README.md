@@ -129,6 +129,17 @@ chmod +x install.sh
 sudo ./install.sh
 ```
 
+<details>
+<summary>Uninstall?</summary>
+
+```bash
+chmod +x uninstall.sh
+sudo ./uninstall.sh
+```
+</details>
+
+---
+
 ### Key Bindings
 
 Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland Lua (v0.55+) config file.
