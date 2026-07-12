@@ -55,7 +55,7 @@ Item {
 
     Process {
         id: listProc
-        command: ["bash", "-c", "~/.config/quickshell/cliphist-img.sh"]
+        command: ["bash", "-c", "/usr/share/chillpill-shell/scripts/cliphist-img.sh"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
