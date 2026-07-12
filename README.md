@@ -24,17 +24,48 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 ### Showcase
 
-<p>
-   <img src="screenshots/image_1.webp" width="49%">
-   <img src="screenshots/image_2.webp" width="49%">
-   <img src="screenshots/image_3.webp" width="49%">
-   <img src="screenshots/image_4.webp" width="49%">
-   <img src="screenshots/image_5.webp" width="49%">
-   <img src="screenshots/image_6.webp" width="49%">
-   <img src="screenshots/image_7.webp" width="49%">
-   <img src="screenshots/image_8.webp" width="49%">
-</p>
-
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><b>Main pill bar</b></p>
+      <img src="screenshots/image_1.webp" width="100%" alt="Main pill bar showing battery, volume, workspaces, wifi and clock" />
+    </td>
+    <td width="50%">
+      <p align="center"><b>Control center</b></p>
+      <img src="screenshots/image_2.webp" width="100%" alt="Control center with media player, sliders, few buttons and notification stack" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><b>Media player auto-open</b></p>
+      <img src="screenshots/image_3.webp" width="100%" alt="Media player auto open" />
+    </td>
+    <td width="50%">
+      <p align="center"><b>Bandwidth alert notification (nusgmon-alert)</b></p>
+      <img src="screenshots/image_4.webp" width="100%" alt="Notification popup of nusgmon-alert.sh" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><b>Cliphist (clipboard manager)</b></p>
+      <img src="screenshots/image_5.webp" width="100%" alt="Cliphist clipboard history" />
+    </td>
+    <td width="50%">
+      <p align="center"><b>Mini dashboard — calendar</b></p>
+      <img src="screenshots/image_6.webp" width="100%" alt="Mini dashboard with calendar popup" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><b>Mini dashboard — weather</b></p>
+      <img src="screenshots/image_7.webp" width="100%" alt="Mini dashboard with weather popup" />
+    </td>
+    <td width="50%">
+      <p align="center"><b>Volume OSD (has more OSDs like brightness, battery, timer)</b></p>
+      <img src="screenshots/image_8.webp" width="100%" alt="Volume OSD" />
+    </td>
+  </tr>
+</table>
 
 ### Features
 
@@ -42,7 +73,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - Control Center               : Media Player, Buttons (WiFi, Silent Notifications, Timer), Volume and Brightness Sliders, Notifications Stack
 - Cliphist (Clipboard History) : Search, Clipboard images preview, Item index number
 - Mini Dashboard               : Profile Image, Username, Hostname, Uptime, Battery, Basic network info, Today bandwidth usage, Datetime, Weather, Calendar, Power buttons (lock, sleep, shutdown, reboot)
-- DBus Notification            : App icon (optional), summary, body
+- DBus Notification            : App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - OSD                          : Battery, volume, brightness, timer
 
 ### Configurable options
