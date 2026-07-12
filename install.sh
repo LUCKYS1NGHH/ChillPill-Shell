@@ -36,7 +36,7 @@ cp -r share /usr/share/chillpill-shell
 
 # copy QML files
 info "Copying QML files"
-install -m 644 *.qml /usr/share/chillpill-shell
+install -m 644 qml/* /usr/share/chillpill-shell
 
 # copy backend files
 info "Copying backend files"
