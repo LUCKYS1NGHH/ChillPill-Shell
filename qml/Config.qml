@@ -20,7 +20,7 @@ Singleton {
       property string textFontFamily: "Monocraft"
       property string nerdFontFamily: "JetBrainsMono Nerd Font Propo"
       property list<int> timerPresets: [1, 5, 10, 15, 30]
-      property int mediaAutoPopupDuration: 2000
+      property int mediaAutoOpenDuration: 3000
       property int maxWorkspaces: 5
       property int notificationDisplayTime: 3000
       property int maxNotificationsInStack: 20
@@ -41,7 +41,7 @@ Singleton {
   readonly property alias textFontFamily: adapter.textFontFamily
   readonly property alias nerdFontFamily: adapter.nerdFontFamily
   readonly property alias timerPresets: adapter.timerPresets
-  readonly property alias mediaAutoPopupDuration: adapter.mediaAutoPopupDuration
+  readonly property alias mediaAutoOpenDuration: adapter.mediaAutoOpenDuration
   readonly property alias maxWorkspaces: adapter.maxWorkspaces
   readonly property alias notificationDisplayTime: adapter.notificationDisplayTime
   readonly property alias maxNotificationsInStack: adapter.maxNotificationsInStack
