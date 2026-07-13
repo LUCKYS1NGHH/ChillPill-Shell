@@ -104,15 +104,18 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 ---
 
 ### Dependencies
-
-> All available in the Arch repos/AUR.
-> other distros users have to install them from their own package manager,
-> and most of these packages are likely already installed in your system.
+> [!NOTE]
+> ChillPill-Shell is in its initial release and has only been tested on **Arch Linux + Hyprland**.
+> Other distros/compositors may work but are unsupported for now.
+> All listed packages are available in the Arch repos/AUR; other distro users will need to
+> install the equivalents from their own package manager (most are likely already installed like cliphist and brightnessctl).
 
 - [cliphist](https://github.com/sentriz/cliphist)
 - [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (AUR package. non-Arch users can use the setup script instead)
 - [inotify-tools](https://github.com/inotify-tools/inotify-tools)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
+- Qt Multimedia (`qt6-multimedia` on Arch)
+- Qt5Compat (`qt6-5compat` on Arch)
 
 ---
 
