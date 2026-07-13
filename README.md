@@ -78,6 +78,8 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 ### Configurable options
 
+> Located at ~/.config/chillpill-shell/config.jsonc
+
 ```
 {
   "displayPicture": "/home/<user>/.pfp.png",
