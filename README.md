@@ -41,7 +41,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
       <img src="screenshots/image_3.webp" width="100%" alt="Media player auto open" />
     </td>
     <td width="50%">
-      <p align="center"><b>Bandwidth alert notification (nusgmon-alert)</b></p>
+      <p align="center"><b>Notification popup (nusgmon-alert)</b></p>
       <img src="screenshots/image_4.webp" width="100%" alt="Notification popup of nusgmon-alert.sh" />
     </td>
   </tr>
