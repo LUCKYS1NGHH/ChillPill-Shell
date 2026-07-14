@@ -11,14 +11,16 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 ### Resource Usage
 
 - RAM: 200-600 MB (Average 400)
-- CPU: Idle 0%, Average 3%, Min 0.1%, Max 10% (Varies with your CPU, a better CPU uses less)
-- GPU: Idle 0%, Average 15%, Min 6%, Max 50% (Varies with your GPU, a better GPU uses less)
+- CPU: Idle 0%, Average 3%, Min 0.1%, Max 10%
+- GPU: Idle 0%, Average 15%, Min 6%, Max 50%
+
+> CPU and GPU usage varies with system. a better CPU and GPU use less.
 
 #### My Hardware
 
-- RAM: 8GB
+- RAM: 8GB (DDR3)
 - CPU: i5 3337U (Dualcore)
-- GPU (Integrated): Intel HD 4000
+- GPU: Intel HD 4000 (Integrated)
 
 ---
 
@@ -37,7 +39,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   </tr>
   <tr>
     <td width="50%">
-      <p align="center"><b>Media player auto-open</b></p>
+      <p align="center"><b>Media player auto-open on media playing</b></p>
       <img src="screenshots/image_3.webp" width="100%" alt="Media player auto open" />
     </td>
     <td width="50%">
@@ -106,11 +108,12 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 ---
 
 ### Dependencies
+
 > [!NOTE]
-> ChillPill-Shell is in its initial release and has only been tested on **Arch Linux + Hyprland**.
-> Other distros/compositors may work but are unsupported for now.
-> All listed packages are available in the Arch repos/AUR; other distro users will need to
-> install the equivalents from their own package manager (most are likely already installed like cliphist and brightnessctl).
+> Currently it's initial release.
+> Tested only on **Arch Linux** + **Hyprland**. other setups unsupported for now.
+> Packages listed are Arch/AUR names - grab equivalents from your own package manager.
+> Also few packages like `brightnessctl` and `cliphist` are likely already installed.
 
 - [cliphist](https://github.com/sentriz/cliphist)
 - [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (AUR package. non-Arch users can use the setup script instead)
