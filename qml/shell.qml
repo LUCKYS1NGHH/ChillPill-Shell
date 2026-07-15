@@ -775,7 +775,14 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard && !mediaAutoOpened && !notificationModule.active && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.cliphistOpen ? 1 : 0
+        opacity: box.miniDashboard
+                 && !mediaAutoOpened
+                 && !notificationModule.active
+                 && !box.volumeActive
+                 && !box.brightnessActive
+                 && !box.batteryCharging
+                 && !box.timerDone
+                 && !box.cliphistOpen ? 1 : 0
 
         Behavior on opacity {
           SequentialAnimation {
