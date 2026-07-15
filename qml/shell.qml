@@ -293,9 +293,9 @@ ShellRoot {
       OsdBar {
           active: box.volumeActive && !box.controlCenter && !box.timerDone
           icon: volumeModule.icon
+          iconColor: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
           percent: volumeModule.vol / 100
           muted: volumeModule.muted
-          mutedFg: volumeModule.mutedFg
           barWidth: volumeModule.mutedFg ? 90 : 110
           valueText: volumeModule.muted ? "muted" : volumeModule.vol + "%"
       }
