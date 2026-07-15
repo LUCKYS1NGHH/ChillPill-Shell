@@ -46,7 +46,10 @@ Item {
   function enqueue(notif): void {
     // conditionl duplicate check
     if (avoidDuplicateNotifications && isDuplicate(notif)) {
-      console.log("Duplicate notification ignored:", notif.summary)
+      queue.push(notif)
+      trigger()
+      if (!current) advance()
+      console.log("Duplicate notification ignored to append in notification stack:", notif.summary)
       return
     }
 
