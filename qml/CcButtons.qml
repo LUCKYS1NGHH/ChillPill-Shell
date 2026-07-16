@@ -95,7 +95,7 @@ RowLayout {
     height: root.buttonHeight
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
-    color: notificationModule.dndEnabled ? "#2e2c28" : (dndHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    color: notificationModule.dndEnabled ? "#2e2c28" : (dndHover.hovered ? Qt.lighter(root.buttonBgOff, 1.5) : root.buttonBgOff)
     border.width: buttonBorderWidth
     border.color: buttonBorderColor
     scale: dndMouse.pressed ? 0.93 : 1.0
@@ -125,7 +125,7 @@ RowLayout {
     width: root.buttonWidth
     height: root.buttonHeight
     radius: root.buttonRadius
-    color: countdownModule.running ? "#25282c" : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.6) : root.buttonBgOff)
+    color: countdownModule.running ? "#25282c" : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.5) : root.buttonBgOff)
     border.width: buttonBorderWidth
     border.color: buttonBorderColor
     scale: timerMouse.pressed ? 0.93 : 1.0
