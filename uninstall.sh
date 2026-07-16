@@ -17,4 +17,10 @@ if [[ -e /usr/share/applications/chillpill.desktop ]]; then
    rm /usr/share/applications/chillpill.desktop
 fi
 
+if [[ -e /etc/systemd/user/chillpill-shell.service ]]; then
+   rm /etc/systemd/user/chillpill-shell.service
+fi
+
+pkill qs
+
 echo "ChillPill-Shell uninstalled successfully :("
