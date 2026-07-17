@@ -23,7 +23,7 @@ REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
 info "Creating few new directories"
 mkdir -p /usr/share/chillpill-shell/IslandBackend
 mkdir -p "$REAL_HOME/.config/chillpill-shell"
-mkdir -p /etc/systemd/user
+#mkdir -p /etc/systemd/user
 
 # build backend
 info "Building backend from source files"
@@ -74,8 +74,8 @@ if [[ ! -f "$REAL_HOME/.config/chillpill-shell/config.jsonc" ]]; then
 fi
 
 # place systemd file
-info "Copying systemd file to /etc/systemd/user"
-install -m 644 chillpill-shell.service /etc/systemd/user/chillpill-shell.service
+#info "Copying systemd file to /etc/systemd/user"
+#install -m 644 chillpill-shell.service /etc/systemd/user/chillpill-shell.service
 
 # chown back the files permission to real user
 chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.config/chillpill-shell"
@@ -86,4 +86,4 @@ rm -rf build
 
 echo -e "\nRun the command '\e[32mchillpill-shell\e[0m' to start now."
 echo -e "or open '\e[32mCP-Shell\e[0m' through your app launcher.\n"
-echo -e "To auto-run at every startup, execute this command: \e[32msystemctl --user enable chillpill-shell\e[0m\n"
+echo -e "To auto-run at every startup, paste this code in your ~/.config/hypr/hyprland.lua config:\n\e[32mhl.exec_cmd(\"chillpill-shell\")\e[0m\n"
