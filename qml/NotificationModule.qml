@@ -46,9 +46,11 @@ Item {
   function enqueue(notif): void {
     // conditionl duplicate check
     if (avoidDuplicateNotifications && isDuplicate(notif)) {
-      queue.push(notif)
-      trigger()
-      if (!current) advance()
+      if (!dndEnabled) {
+        queue.push(notif)
+        trigger()
+        if (!current) advance()
+      }
       console.log("Duplicate notification ignored to append in notification stack:", notif.summary)
       return
     }
@@ -62,9 +64,7 @@ Item {
     }
     syncReversed()
     notificationsChanged()
-
     if (dndEnabled) return
-
     queue.push(notif)
     trigger()
     if (!current) advance()
