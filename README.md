@@ -146,6 +146,14 @@ sudo ./uninstall.sh
 ```
 </details>
 
+### Auto startup
+
+To auto-run at every time you start your hyprland, paste this code in your `~/.config/hypr/hyprland.lua` config file
+
+```
+hl.exec_cmd("chillpill-shell")
+```
+
 ---
 
 ### Key Bindings
