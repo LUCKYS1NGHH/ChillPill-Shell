@@ -42,6 +42,9 @@ ShellRoot {
   property int buttonHoverSpeed: 120
   property int buttonctlRadius: 6
 
+  property bool notifFullscreenMode: false
+  property bool fullscreenActive: ToplevelManager.activeToplevel && ToplevelManager.activeToplevel.fullscreen
+
   // osd ui
   property int osdInWidth: 120
   property real osdInHeight: 3.7
@@ -57,6 +60,7 @@ ShellRoot {
 
   PanelWindow {
 
+    WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     implicitHeight: 482
 
@@ -168,7 +172,7 @@ ShellRoot {
 
       implicitWidth: batteryCharging ? osdWidth
                      : box.timerDone ? osdWidth
-                     : notificationModule.active ? 280
+                     : (notificationModule.active && !notifFullscreenMode) ? 280
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? osdWidth
@@ -179,7 +183,7 @@ ShellRoot {
 
       implicitHeight: batteryCharging ? osdHeight
                   : box.timerDone ? osdHeight
-                  : notificationModule.active ? 50
+                  : (notificationModule.active && !notifFullscreenMode) ? 50
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
@@ -331,7 +335,7 @@ ShellRoot {
 
       // notification
       NotificationPopup {
-        active: notificationModule.active && !box.volumeActive && !box.batteryCharging && !box.timerDone && !box.brightnessActive
+        active: notificationModule.active && !notifFullscreenMode && !box.volumeActive && !box.batteryCharging && !box.timerDone && !box.brightnessActive
         notif: notificationModule.current
       }
 
@@ -1128,5 +1132,76 @@ ShellRoot {
   }
 
   NotificationModule { id: notificationModule; visible: false }
+
+  FullscreenOsd {
+    id: fsNotif
+    active: notificationModule.active && notifFullscreenMode
+    visible: notifFullscreenMode
+    cardWidth: 280
+    cardHeight: 50
+
+    property var displayNotif: null
+
+    RowLayout {
+      anchors.centerIn: parent
+      spacing: 10
+
+      Text {
+        text: String.fromCodePoint(0xf0f3)
+        color: Theme.fg
+        font { family: Theme.nerdFontFamily; pixelSize: 14 }
+        visible: cardIcon.status !== Image.Ready
+        anchors.topMargin: fsNotif.displayNotif.body ? 20 : 0
+      }
+
+      Image {
+        id: cardIcon
+        width: 22; height: 22
+        fillMode: Image.PreserveAspectCrop
+        source: {
+          if (fsNotif.displayNotif && fsNotif.displayNotif.image) return fsNotif.displayNotif.image
+          if (fsNotif.displayNotif && fsNotif.displayNotif.appIcon) {
+            return fsNotif.displayNotif.appIcon.startsWith("/")
+              ? "file://" + fsNotif.displayNotif.appIcon
+              : "image://icon/" + fsNotif.displayNotif.appIcon
+          }
+          return ""
+        }
+        sourceSize: Qt.size(22, 22)
+        visible: status === Image.Ready
+      }
+
+      Column {
+        spacing: 2
+
+        Text {
+          text: fsNotif.displayNotif ? fsNotif.displayNotif.summary : ""
+          color: Theme.fg
+          font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+          elide: Text.ElideRight
+          width: 220
+        }
+
+        Text {
+          text: fsNotif.displayNotif ? fsNotif.displayNotif.body : ""
+          color: "#9b9b9b"
+          font { family: Theme.fontFamily; pixelSize: 9 }
+          elide: Text.ElideRight
+          width: 220
+          visible: text !== ""
+        }
+      }
+    }
+  }
+
+  Connections {
+    target: notificationModule
+    function onActiveChanged() {
+      if (notificationModule.active) notifFullscreenMode = fullscreenActive
+    }
+    function onCurrentChanged() {
+      if (notificationModule.current) fsNotif.displayNotif = notificationModule.current
+    }
+  }
 
 }
