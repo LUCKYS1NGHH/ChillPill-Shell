@@ -344,7 +344,7 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
         height: box.cliphistOpen ? box.implicitHeight - 25 : 0
-        opacity: box.cliphistOpen && !notificationModule.active && !mediaAutoOpened && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
+        opacity: box.cliphistOpen && !notificationModule.active && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
@@ -780,7 +780,6 @@ ShellRoot {
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
         opacity: box.miniDashboard
-                 && !mediaAutoOpened
                  && !notificationModule.active
                  && !box.volumeActive
                  && !box.brightnessActive
