@@ -18,7 +18,7 @@ PanelWindow {
   property int cardHeight: 50
   property int cardRadius: 99
   property int restMargin: 1
-  property int animDuration: 250
+  property int animDuration: 260
 
   WlrLayershell.layer: WlrLayershell.Overlay
   exclusiveZone: 0
@@ -30,7 +30,7 @@ PanelWindow {
   margins.top: slideOffset
 
   Behavior on slideOffset {
-    NumberAnimation { duration: root.animDuration; easing.type: Easing.OutExpo; easing.overshoot: 1 }
+    NumberAnimation { duration: root.animDuration; easing.type: Easing.OutBack; easing.overshoot: 0.9 }
   }
 
   Rectangle {
@@ -41,6 +41,14 @@ PanelWindow {
     radius: root.cardRadius
     implicitWidth: root.cardWidth
     implicitHeight: root.cardHeight
+
+    opacity: root.active ? 1 : 0
+    scale: root.active ? 1 : 0.85
+    transformOrigin: Item.Top
+
+    Behavior on opacity {
+      NumberAnimation { duration: root.animDuration * 0.6; easing.type: Easing.OutExpo }
+    }
 
     Row {
       id: cardRow
