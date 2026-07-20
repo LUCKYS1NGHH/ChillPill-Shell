@@ -78,6 +78,21 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - DBus Notification            : App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - OSD                          : Battery, volume, brightness, timer
 
+<details>
+<summary>Know more</summary>
+
+---
+- Main pill bar width expands on hover
+- Audio (to mute/unmute) and workspaces (to switch) in the main pill bar are clickable.
+- Control center has WiFi controller which has list of active networks and has password prompt. also timer minutes can be change by right
+  click.
+- Cliphist shows image previews from `~/.cache/quickshell/cliphist-imgs` by converting image binaries into real images and save there.
+- Notifications are able to show in slide animation (like iOS mute) while you playing video game or watching movie in full screen.
+  also it can show custom app icon to show in notification, else it shows bell icon.
+- Your today's bandwidth status in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
+---
+</details>
+
 ### Configurable options
 
 > Located at ~/.config/chillpill-shell/config.jsonc
@@ -148,7 +163,7 @@ sudo ./uninstall.sh
 
 ### Auto startup
 
-To auto-run at every time you start your hyprland, paste this code in your `~/.config/hypr/hyprland.lua` config file
+To auto-run at every time you start your Hyprland, paste this line in your `~/.config/hypr/hyprland.lua` config file
 
 ```
 hl.exec_cmd("chillpill-shell")
@@ -158,7 +173,9 @@ hl.exec_cmd("chillpill-shell")
 
 ### Key Bindings
 
-Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland Lua (v0.55+) config file.
+Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland (Lua) config file.
+
+> Adjust key combinations by your preferences
 
 ```
 hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
