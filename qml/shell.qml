@@ -1143,14 +1143,13 @@ ShellRoot {
 
     RowLayout {
       anchors.centerIn: parent
-      spacing: 10
+      spacing: 12
 
       Text {
         text: String.fromCodePoint(0xf0f3)
         color: Theme.fg
         font { family: Theme.nerdFontFamily; pixelSize: 14 }
         visible: cardIcon.status !== Image.Ready
-        anchors.topMargin: fsNotif.displayNotif.body ? 20 : 0
       }
 
       Image {
@@ -1178,7 +1177,7 @@ ShellRoot {
           color: Theme.fg
           font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
           elide: Text.ElideRight
-          width: 220
+          Layout.maximumWidth: 200
         }
 
         Text {
@@ -1186,8 +1185,8 @@ ShellRoot {
           color: "#9b9b9b"
           font { family: Theme.fontFamily; pixelSize: 9 }
           elide: Text.ElideRight
-          width: 220
           visible: text !== ""
+          Layout.maximumWidth: 200
         }
       }
     }
