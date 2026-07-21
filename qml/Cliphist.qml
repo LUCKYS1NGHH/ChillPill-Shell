@@ -211,6 +211,7 @@ Item {
                     visible: modelData.imagePath !== ""
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
+                    sourceSize: Qt.size(80, 50)
                 }
 
                 // text label

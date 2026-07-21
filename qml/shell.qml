@@ -820,6 +820,7 @@ ShellRoot {
               fillMode: Image.PreserveAspectCrop
               asynchronous: false
               visible: false
+              sourceSize: Qt.size(avatarSize, avatarSize)
             }
 
             OpacityMask {
