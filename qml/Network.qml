@@ -38,7 +38,7 @@ RowLayout {
 
   Text {
       text: {
-          if (!Networking.wifiEnabled) return "disconnected"
+          if (!Networking.wifiEnabled) return "off"
           if (!root.active) return "N/A"
           return root.active.name
       }
