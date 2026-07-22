@@ -104,6 +104,8 @@ ShellRoot {
       id: box
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
+      opacity: (!fullscreenActive && !notifFullscreenMode ) ? 1 : 0
+      visible: opacity > 0
       clip: true
 
       property bool hovered: false
@@ -1196,7 +1198,11 @@ ShellRoot {
   Connections {
     target: notificationModule
     function onActiveChanged() {
-      if (notificationModule.active) notifFullscreenMode = fullscreenActive
+        if (notificationModule.active) {
+            notifFullscreenMode = fullscreenActive
+        } else {
+            notifFullscreenMode = false
+        }
     }
     function onCurrentChanged() {
       if (notificationModule.current) fsNotif.displayNotif = notificationModule.current
