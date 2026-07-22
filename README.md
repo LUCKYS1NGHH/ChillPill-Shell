@@ -10,7 +10,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 ### Resource Usage
 
-- RAM: 200-600 MB (Average 400)
+- RAM: 200-500 MB (Average 350)
 - CPU: Idle 0%, Average 3%, Min 0.1%, Max 10%
 - GPU: Idle 0%, Average 15%, Min 6%, Max 50%
 
@@ -73,7 +73,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 - Main Pill Bar                : Battery, volume, workspaces, network, clock
 - Control Center               : Media Player, Buttons (WiFi, Silent Notifications, Timer), Volume and Brightness Sliders, Notifications Stack
-- Cliphist (Clipboard History) : Search, Clipboard images preview, Item index number
+- Cliphist (Clipboard History) : Search, Clipboard images preview, Item index status, `Delete` key to delete any item
 - Mini Dashboard               : Profile Image, Username, Hostname, Uptime, Battery, Basic network info, Today bandwidth usage, Datetime, Weather, Calendar, Power buttons (lock, sleep, shutdown, reboot)
 - DBus Notification            : App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - OSD                          : Battery, volume, brightness, timer
