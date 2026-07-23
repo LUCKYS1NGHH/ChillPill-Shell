@@ -43,12 +43,13 @@ PanelWindow {
     ColumnLayout {
       anchors.fill: parent
       anchors.margins: 12
-      spacing: 12
+      spacing: 13
 
       Text {
         text: "Wi-Fi"
-        color: "#d0d0d0"
+        color: "#d2d2d2"
         font { family: Theme.fontFamily; pixelSize: 14; bold: true }
+        Layout.leftMargin: 5
       }
 
       Text {
@@ -65,6 +66,7 @@ PanelWindow {
         font { family: Theme.fontFamily; pixelSize: 11 }
         wrapMode: Text.Wrap
         Layout.fillWidth: true
+        Layout.leftMargin: 5
       }
 
       Flickable {
@@ -86,8 +88,10 @@ PanelWindow {
             delegate: Rectangle {
               width: networkColumn.width
               height: 50
-              radius: 12
-              color: connected ? "#4a81d9" : (networkMouse.containsMouse ? "#3a3a3a" : "#333333")
+              radius: 11
+              color: connected ? "#4173c4" : (networkMouse.containsMouse ? "#313131" : "#252525")
+              border.color: connected ? "" : "#2f2f2f"
+              border.width: connected ? 0 : 1
 
               MouseArea {
                 id: networkMouse
@@ -111,13 +115,15 @@ PanelWindow {
               Row {
                 anchors.fill: parent
                 anchors.margins: 12
-                spacing: 10
+                anchors.leftMargin: 17
+                spacing: 15
 
+                // security type icon (lock/unlock)
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: secure ? "\uf023" : "\uf09c"
                   font { family: Theme.nerdFontFamily; pixelSize: 12 }
-                  color: "#bdbdbd"
+                  color: "#b4b4b4"
                 }
 
                 Column {
@@ -126,11 +132,12 @@ PanelWindow {
                   Text {
                     text: displayName || ssid
                     color: "#ffffff"
-                    font { family: Theme.fontFamily; pixelSize: 12; weight: connected ? 600 : 300 }
+                    font { family: Theme.fontFamily; pixelSize: 12; weight: connected ? 500 : 300 }
                   }
                   Text {
                     text: connected ? "Connected" : (signal >= 0 ? signal + "%" : "")
-                    color: connected ? "#ccdbf3" : "#888"
+                    color: connected ? "#c8d7ef" : "#949494"
+                    elide: Text.ElideRight
                     font { family: Theme.fontFamily; pixelSize: 10 }
                   }
                 }
@@ -201,11 +208,15 @@ PanelWindow {
           Rectangle {
             id: submitBtn
             width: 80; height: 32; radius: 8
-            color: "#367eee"
+            color: submitBtnMA.containsMouse ? "#3f76d0" : "#3874d7" 
             signal clicked()
             Text { anchors.centerIn: parent; text: "Join"; color: "#fff"; font { family: Theme.fontFamily; pixelSize: 12 } }
+            Behavior on color { ColorAnimation { duration: 80 } }
             MouseArea {
+              id: submitBtnMA
+              hoverEnabled: true
               anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
               onClicked: {
                 WifiController.connectToNetwork(wifiListWindow.passwordPromptSsid, wifiListWindow.passwordValue)
                 wifiListWindow.passwordPromptVisible = false
@@ -214,12 +225,17 @@ PanelWindow {
               }
             }
           }
+
           Rectangle {
             width: 80; height: 32; radius: 8
-            color: "#343434"
+            color: cancelBtnMA.containsMouse ? "#303030" : "#343434"
             Text { anchors.centerIn: parent; text: "Cancel"; color: "#dadada"; font { family: Theme.fontFamily; pixelSize: 12 } }
+            Behavior on color { ColorAnimation { duration: 80 } }
             MouseArea {
+              id: cancelBtnMA
+              hoverEnabled: true
               anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
               onClicked: {
                 wifiListWindow.passwordPromptVisible = false
                 wifiListWindow.passwordValue = ""
