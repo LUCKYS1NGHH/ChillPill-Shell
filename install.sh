@@ -43,7 +43,7 @@ install -m 644 qml/* /usr/share/chillpill-shell
 info "Copying backend files"
 install -m 644 \
     build/libIslandBackend.so \
-    build/libIslandBackendplugin.so \
+    build/libIslandBackendPlugin.so \
     build/qmldir \
     build/IslandBackend.qmltypes \
     /usr/share/chillpill-shell/IslandBackend

@@ -10,6 +10,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core DBus Qml)
 qt_add_qml_module(IslandBackend
     URI IslandBackend
     VERSION 1.0
+    PLUGIN_TARGET IslandBackendPlugin
     SOURCES
         backend/WifiController.h
         backend/WifiController.cpp
@@ -21,7 +22,7 @@ target_include_directories(IslandBackend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/bac
 
 target_link_libraries(IslandBackend PRIVATE Qt6::Core Qt6::DBus Qt6::Qml)
 
-add_custom_command(TARGET IslandBackendplugin POST_BUILD
+add_custom_command(TARGET IslandBackendPlugin POST_BUILD
     COMMAND sed -i "/^prefer/d" ${CMAKE_CURRENT_BINARY_DIR}/qmldir
     COMMENT "Stripping prefer line from generated qmldir"
 )
