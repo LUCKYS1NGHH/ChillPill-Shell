@@ -84,6 +84,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 ---
 - Main pill bar width expands on hover
 - Audio (to mute/unmute) and workspaces (to switch) in the main pill bar are clickable.
+- Control center's media player progress bar is not only for status, it's usable to control the media you playing.
 - Control center has WiFi controller which has list of active networks and has password prompt. also timer minutes can be change by right
   click.
 - Cliphist shows image previews from `~/.cache/quickshell/cliphist-imgs` by converting image binaries into real images and save there.
