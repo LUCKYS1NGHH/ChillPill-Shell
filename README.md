@@ -128,7 +128,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 > [!NOTE]
 > Currently it's initial release.
 > Tested only on **Arch Linux** + **Hyprland**. other setups unsupported for now.
-> Packages listed are Arch/AUR names - grab equivalents from your own package manager.
+> Packages listed are Arch names - grab equivalents from your own package manager.
 > Also few packages like `brightnessctl` and `cliphist` are likely already installed.
 
 - [cliphist](https://github.com/sentriz/cliphist)
@@ -137,6 +137,8 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - Qt Multimedia (`qt6-multimedia` on Arch)
 - Qt5Compat (`qt6-5compat` on Arch)
+
+> These packages will auto install for Arch users through install.sh
 
 ---
 
