@@ -10,6 +10,16 @@ if [[ ! "$EUID" -eq 0 ]]; then
     die "Please run this script as root to install chillpill-shell. i have to setup some files."
 fi
 
+if command -v pacman &>/dev/null; then
+    info "Installing dependencies in your Arch Linux."
+    pacman -S --noconfirm quickshell cliphist inotify-tools brightnessctl cmake qt6-multimedia qt6-5compat python-psutil
+
+    info "Installing nusgmon (to record your bandwidth) through git"
+    git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
+    (cd /tmp/nusgmon-build && ./setup.sh)
+    rm -rf /tmp/nusgmon-build
+fi
+
 command -v quickshell >/dev/null || die "Quickshell not installed."
 command -v cliphist >/dev/null || die "Cliphist not installed."
 command -v nusgmon >/dev/null || die "Nusgmon not installed."
