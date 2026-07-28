@@ -183,7 +183,7 @@ Item {
             text: (root.filteredEntries.length === 0 ? 0 : root.selectedIndex + 1)
                    + " / " + root.filteredEntries.length + " (" + total + ")"
             color: "#999999"
-            font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
+            font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
             anchors.right: parent.right
             anchors.rightMargin: 6
           }

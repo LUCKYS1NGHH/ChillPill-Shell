@@ -54,7 +54,6 @@ Item {
             let e = entries[i]
             list.push({
                 name: e.name,
-                genericName: e.genericName || "",
                 comment: e.comment || "",
                 icon: e.icon,
                 entry: e
@@ -109,7 +108,7 @@ Item {
               text: (filteredApps.count === 0 ? 0 : root.selectedIndex + 1)
                      + " / " + appList.count + " (" + appList.count + ")"
               color: "#999999"
-              font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
+              font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
               anchors.right: parent.right
               anchors.rightMargin: 6
             }
@@ -193,9 +192,9 @@ Item {
                     anchors.left: parent.left
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    anchors.margins: 6
-                    width: 3
-                    radius: 2
+                    anchors.margins: 7
+                    width: 2
+                    radius: 5
                     color: Theme.accent
                     opacity: index === root.selectedIndex ? 1 : 0
                     Behavior on opacity { NumberAnimation { duration: 120 } }
@@ -215,7 +214,7 @@ Item {
                         source: Quickshell.iconPath(modelData.icon, true)
                         asynchronous: true
                         scale: index === root.selectedIndex ? 1.10 : (rowHover.hovered ? 1.10 : 1)
-                        Behavior on scale { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                        Behavior on scale { NumberAnimation { duration: 500; easing.type: Easing.OutExpo } }
                     }
 
                     ColumnLayout {
@@ -224,7 +223,7 @@ Item {
 
                         Text {
                             text: modelData.name
-                            color: index === root.selectedIndex ? Theme.fg : Theme.fg
+                            color: Theme.fg
                             opacity: index === root.selectedIndex ? 1 : 0.9
                             font { family: Theme.fontFamily; pixelSize: 11; weight: index === root.selectedIndex ? 600 : 500 }
                             elide: Text.ElideRight
@@ -233,8 +232,8 @@ Item {
                         Text {
                             text: modelData.comment
                             visible: text.length > 0
-                            color: "#8a8a8a"
-                            font { family: Theme.fontFamily; pixelSize: 9 }
+                            color: "#8d8d8d"
+                            font { family: Theme.fontFamily; pixelSize: 9; weight: 500 }
                             elide: Text.ElideRight
                             Layout.fillWidth: true
                         }

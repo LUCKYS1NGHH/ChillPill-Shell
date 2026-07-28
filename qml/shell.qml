@@ -205,7 +205,7 @@ ShellRoot {
                   : volumeActive ? osdHeight
                   : brightnessActive ? osdHeight
                   : cliphistOpen ? 270
-                  : miniDashboard ? 157
+                  : miniDashboard ? 155
                   : appLauncher ? 380
                   : row.implicitHeight + (hovered ? 10 : 10)
 
@@ -265,18 +265,21 @@ ShellRoot {
             console.log("Left click detected, opening control center")
             box.controlCenter = !box.controlCenter
             mediaAutoOpened = false
+            box.appLauncher = false
             mediaPopupHideTimer.stop()
           }
 
           if (mouse.button === Qt.MiddleButton) {
             console.log("Middle click detected, opening cliphist")
             mediaAutoOpened = false
+            box.appLauncher = false
             box.cliphistOpen = !box.cliphistOpen
           }
 
           if (mouse.button === Qt.RightButton) {
               console.log("Right click detected, opening mini dashboard")
               mediaAutoOpened = false
+              box.appLauncher = false
               box.miniDashboard = !box.miniDashboard
           }
         }
@@ -325,7 +328,7 @@ ShellRoot {
 
       // volume
       OsdBar {
-          active: box.volumeActive && !box.controlCenter && !box.timerDone
+          active: box.volumeActive && !box.timerDone
           icon: volumeModule.icon
           iconColor: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
           percent: volumeModule.vol / 100
@@ -449,8 +452,8 @@ ShellRoot {
         // media player
         MediaPlayer {
           margin: box.controlCenter && mediaAutoOpened ? 5 : 14
-          artistFontSize: box.controlCenter && mediaAutoOpened ? 10 : 9
-          artistFontWeight: box.controlCenter && mediaAutoOpened ? 500 : 400
+          artistFontSize: 10
+          artistFontWeight: box.controlCenter && mediaAutoOpened ? 500 : 300
           artistFontColor: box.controlCenter && mediaAutoOpened ? "#9b9b9b" : "#7b7b7b"
           color: box.controlCenter && mediaAutoOpened ? "#1a1a1a" : "#151515"
           radius: box.controlCenter && mprisModule.hasPlayer ? 16 : 25
