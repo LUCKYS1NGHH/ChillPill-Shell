@@ -24,7 +24,7 @@ Rectangle {
   opacity: shown ? 1 : 0
   width: 280
   height: contentCol.implicitHeight + 26
-  x: (parent.width - weatherPopup.width) / 2
+  x: (Screen.width - weatherPopup.width) / 2
   y: box.y + box.height + 5
   color: Theme.bg
   radius: 20
