@@ -106,7 +106,7 @@ ShellRoot {
       }
     }
 
-    // main box for the dynamic view
+    // main dynamic pill bar
     Rectangle {
       id: box
       anchors.top: parent.top
@@ -180,7 +180,7 @@ ShellRoot {
       readonly property int notifBump: notificationModule.notifications.length > 0
         ? Math.min(notifList.contentHeight + 40, 130) : 0
 
-      // adjust box shape
+      // adjust box shape conditionally
       implicitWidth: batteryCharging ? osdWidth
                      : box.timerDone ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 280
@@ -253,7 +253,7 @@ ShellRoot {
             return
           }
 
-          // mini dashboard accept only left
+          // mini dashboard accept only right
           if (box.miniDashboard) {
             if (mouse.button === Qt.RightButton) {
               box.miniDashboard = false
@@ -397,7 +397,7 @@ ShellRoot {
         }
       }
 
-      // app launcher opens on
+      // app launcher opens through IPC
       Item {
           anchors.centerIn: parent
           width: box.implicitWidth - 28
@@ -472,7 +472,7 @@ ShellRoot {
           playerHeight: box.ccButtonHeight
         } 
 
-        // sliders
+        // control center sliders
         Column {
           id: sliderColumn
           anchors.top: parent.top
@@ -648,7 +648,7 @@ ShellRoot {
         }
       }
 
-      // notification list stack
+      // notifications list stack
       Rectangle {
         id: notifBox
         anchors.top: sliderColumn.bottom
