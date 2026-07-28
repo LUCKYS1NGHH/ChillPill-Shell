@@ -67,6 +67,15 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
       <img src="screenshots/image_8.webp" width="100%" alt="Volume OSD" />
     </td>
   </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><b>App launcher</b></p>
+      <img src="screenshots/image_9.webp" width="100%" alt="App launcher with search support and apps index status"
+    </td>
+    <td width="50%>
+      <p align="center"><b>Control center — Wifi panel</b></p>
+      <img src="screenshots/image_10.webp" width="100%" alt="Control center with wifi panel opened">
+    </td>
 </table>
 
 ### Features
