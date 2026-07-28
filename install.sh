@@ -12,7 +12,7 @@ fi
 
 if command -v pacman &>/dev/null; then
     info "Installing dependencies in your Arch Linux."
-    pacman -S --noconfirm quickshell cliphist inotify-tools brightnessctl cmake qt6-multimedia qt6-5compat python-psutil
+    pacman -S --noconfirm --needed quickshell cliphist inotify-tools brightnessctl cmake qt6-multimedia qt6-5compat python-psutil wl-clipboard
 
     info "Installing nusgmon (to record your bandwidth) through git"
     git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
@@ -26,6 +26,7 @@ command -v nusgmon >/dev/null || die "Nusgmon not installed."
 command -v inotifywait >/dev/null || die "Inotify not installed."
 command -v brightnessctl >/dev/null || die "Brightnessctl not installed."
 command -v cmake >/dev/null || die "Cmake not installed."
+command -v wl-copy >/dev/null || die "Wl-clipabord not installed."
 
 REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
 
