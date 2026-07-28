@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Widgets
 import QtQuick
 import Quickshell.Services.Mpris
 
@@ -60,10 +61,10 @@ Rectangle {
             spacing: 15
 
             // album art
-            Rectangle {
+            ClippingRectangle {
                 width: 47; height: 47
-                radius: 8
-                color: "#2a2a2a"
+                radius: 7
+                color: "transparent"
                 anchors.verticalCenter: parent.verticalCenter
                 clip: true
 
