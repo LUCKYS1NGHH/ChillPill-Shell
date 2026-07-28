@@ -146,7 +146,6 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - [inotify-tools](https://github.com/inotify-tools/inotify-tools)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - Qt Multimedia (`qt6-multimedia` on Arch)
-- Qt5Compat (`qt6-5compat` on Arch)
 - [wl-clipbaord](https://github.com/bugaevc/wl-clipboard)
 
 > These packages will auto install for Arch users through install.sh
