@@ -99,10 +99,11 @@ ShellRoot {
         height: calendarPopup.shown ? Math.ceil(calendarPopup.height) : 0
       }
       Region {
-        intersection: Intersection.Combine
-        x: Math.floor(weatherPopupBox.x); y: Math.floor(weatherPopupBox.y)
-        width: weatherPopupBox.shown ? Math.ceil(weatherPopupBox.width) : 0
-        height: weatherPopupBox.shown ? Math.ceil(weatherPopupBox.height) : 0
+          intersection: Intersection.Combine
+          x: weatherPopupLoader.item ? Math.floor(weatherPopupLoader.item.x) : 0
+          y: weatherPopupLoader.item ? Math.floor(weatherPopupLoader.item.y) : 0
+          width: weatherPopupLoader.item && weatherPopupLoader.item.shown ? Math.ceil(weatherPopupLoader.item.width) : 0
+          height: weatherPopupLoader.item && weatherPopupLoader.item.shown ? Math.ceil(weatherPopupLoader.item.height) : 0
       }
     }
 
@@ -222,7 +223,7 @@ ShellRoot {
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
-        if (!miniDashboard) calendarPopup.shown = false; weatherPopupBox.shown = false
+        if (!miniDashboard) calendarPopup.shown = false; weatherPopupLoader.item.shown = false
       }
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
@@ -1129,7 +1130,22 @@ ShellRoot {
     // calendar popup box
     CalendarBox { id: calendarPopup }
 
-    WeatherPopup { id: weatherPopupBox }
+    Loader {
+        id: weatherPopupLoader
+        active: false
+        asynchronous: false
+
+        sourceComponent: WeatherPopup {
+            onShownChanged: if (!shown) closeTimer.start()
+        }
+
+        onLoaded: item.shown = true
+        Timer {
+            id: closeTimer
+            interval: 250
+            onTriggered: weatherPopupLoader.active = false
+        }
+    }
 
     // open calendar when click on date in mini dashboard
     Connections {
@@ -1137,7 +1153,7 @@ ShellRoot {
       function onToggleCalendar() {
         console.log("toggleCalendar launched, current opacity:", calendarPopup.opacity)
         calendarPopup.shown = !calendarPopup.shown
-        weatherPopupBox.shown = false
+        weatherPopupLoader.item.shown = false
       }
     }
 
@@ -1145,7 +1161,10 @@ ShellRoot {
     Connections {
       target: weatherIndicatorItem
       function onToggleWeather() {
-        weatherPopupBox.shown = !weatherPopupBox.shown
+        if (!weatherPopupLoader.active)
+          weatherPopupLoader.active = true
+        else
+          weatherPopupLoader.item.shown = !weatherPopupLoader.item.shown
         calendarPopup.shown = false
       }
     }
