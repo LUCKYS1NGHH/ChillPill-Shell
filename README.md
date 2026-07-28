@@ -117,7 +117,8 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   "weatherLocation": "Delhi",
   "weatherUnits": "metric",
   "weatherRefreshInterval": 3600000,
-  "avoidDuplicateNotifications": true
+  "avoidDuplicateNotifications": true,
+  "defaultTerminal": "kitty"
 }
 ```
 
@@ -137,6 +138,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - Qt Multimedia (`qt6-multimedia` on Arch)
 - Qt5Compat (`qt6-5compat` on Arch)
+- [wl-clipbaord](https://github.com/bugaevc/wl-clipboard)
 
 > These packages will auto install for Arch users through install.sh
 
@@ -184,6 +186,7 @@ Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste thi
 hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
 hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call appLauncher toggle"))
 ```
 
 ---
