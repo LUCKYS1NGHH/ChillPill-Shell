@@ -13,23 +13,30 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.appLauncher = false }
       function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true }
       function hide(): void { box.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
-      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false }
+      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false }
       function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false }
       function hide(): void { box.controlCenter = false }
   }
 
   IpcHandler {
       target: "miniDashboard"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.appLauncher = false }
       function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false }
       function hide(): void { box.miniDashboard = false }
+  }
+
+  IpcHandler {
+    target: "appLauncher"
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = !box.appLauncher }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = true }
+    function hide(): void { box.appLauncher = false }
   }
 
   property string bg: Theme.bg
@@ -61,7 +68,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.layer: WlrLayershell.Top
-    WlrLayershell.keyboardFocus: box.cliphistOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     implicitHeight: 482
 
     anchors {
@@ -108,6 +115,7 @@ ShellRoot {
       visible: opacity > 0
       clip: true
 
+      property bool appLauncher: false
       property bool hovered: false
       property bool miniDashboard: false
       property bool volumeActive: false
@@ -172,6 +180,7 @@ ShellRoot {
       readonly property int notifBump: notificationModule.notifications.length > 0
         ? Math.min(notifList.contentHeight + 40, 130) : 0
 
+      // adjust box shape
       implicitWidth: batteryCharging ? osdWidth
                      : box.timerDone ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 280
@@ -179,8 +188,9 @@ ShellRoot {
                      : controlCenter ? 390
                      : volumeActive ? osdWidth
                      : brightnessActive ? osdWidth
-                     : cliphistOpen ? 450
+                     : appLauncher ? 400
                      : miniDashboard ? 420
+                     : cliphistOpen ? 450
                      : row.implicitWidth + (hovered ? 68 : 56)
 
       implicitHeight: batteryCharging ? osdHeight
@@ -196,9 +206,19 @@ ShellRoot {
                   : brightnessActive ? osdHeight
                   : cliphistOpen ? 270
                   : miniDashboard ? 157
+                  : appLauncher ? 380
                   : row.implicitHeight + (hovered ? 10 : 10)
 
-      radius: notificationModule.active ? 99 : cliphistOpen ? 25 : controlCenter && mprisModule.hasPlayer ? 23 : controlCenter && (notificationModule.notifications.length > 0) ? 25 : 20
+      radius: notificationModule.active ? 99
+        : cliphistOpen ? 25
+        : controlCenter && mprisModule.hasPlayer ? 23
+        : controlCenter && (notificationModule.notifications.length > 0) ? 25
+        : appLauncher ? 30
+        : 20
+
+      Behavior on radius {
+          NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
+      }
       color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
@@ -233,7 +253,7 @@ ShellRoot {
             return
           }
 
-          // last, mini dashboard accept only left
+          // mini dashboard accept only left
           if (box.miniDashboard) {
             if (mouse.button === Qt.RightButton) {
               box.miniDashboard = false
@@ -278,7 +298,15 @@ ShellRoot {
         anchors.leftMargin: 28
         anchors.rightMargin: 28
         spacing: 13
-        opacity: !box.cliphistOpen && !notificationModule.active && !box.controlCenter && !box.miniDashboard && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.timerDone ? 1 : 0
+        opacity: !box.cliphistOpen
+                 && !notificationModule.active
+                 && !box.controlCenter
+                 && !box.miniDashboard
+                 && !box.volumeActive
+                 && !box.brightnessActive
+                 && !box.batteryCharging
+                 && !box.appLauncher
+                 && !box.timerDone ? 1 : 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -346,7 +374,12 @@ ShellRoot {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
         height: box.cliphistOpen ? box.implicitHeight - 25 : 0
-        opacity: box.cliphistOpen && !notificationModule.active && !box.volumeActive && !box.brightnessActive && !box.batteryCharging && !box.controlCenter ? 1 : 0
+        opacity: box.cliphistOpen
+                 && !notificationModule.active
+                 && !box.volumeActive
+                 && !box.brightnessActive
+                 && !box.batteryCharging
+                 && !box.controlCenter ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
@@ -362,6 +395,40 @@ ShellRoot {
           anchors.fill: parent
           onCloseRequested: box.cliphistOpen = false
         }
+      }
+
+      // app launcher opens on
+      Item {
+          anchors.centerIn: parent
+          width: box.implicitWidth - 28
+          height: box.appLauncher ? 352 : 0
+          opacity: box.appLauncher
+                   && !notificationModule.active
+                   && !box.volumeActive
+                   && !box.brightnessActive
+                   && !box.batteryCharging
+                   && !box.controlCenter
+                   && !box.miniDashboard
+                   && !box.cliphistOpen ? 1 : 0
+          visible: opacity > 0
+
+          Behavior on opacity {
+              SequentialAnimation {
+                  PauseAnimation { duration: box.appLauncher ? 15 : 0 }
+                  NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
+              }
+          }
+
+          Loader {
+              anchors.fill: parent
+              active: box.appLauncher
+              asynchronous: true
+
+              sourceComponent: AppLauncher {
+                  shown: box.appLauncher
+                  onCloseRequested: box.appLauncher = false
+              }
+          }
       }
 
       // control center opens on left click
