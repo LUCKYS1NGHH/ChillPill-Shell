@@ -5,7 +5,7 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import Quickshell.Widgets
 import Quickshell.Services.UPower
 import Quickshell.Services.Notifications
 
@@ -875,12 +875,14 @@ ShellRoot {
         visible: opacity > 0
 
         RowLayout {
-          // profile picture
-          Item {
+          // profile picture (display picture)
+          ClippingRectangle {
             anchors.top: parent.top
             anchors.left: parent.left
             width: avatarSize
             height: avatarSize
+            radius: avatarSize / 2
+            color: "transparent"
 
             Image {
               id: avatarImg
@@ -888,18 +890,7 @@ ShellRoot {
               source: "file://" + Config.displayPicture
               fillMode: Image.PreserveAspectCrop
               asynchronous: false
-              visible: false
               sourceSize: Qt.size(avatarSize, avatarSize)
-            }
-
-            OpacityMask {
-              anchors.fill: parent
-              source: avatarImg
-              maskSource: Rectangle {
-                width: avatarSize
-                height: avatarSize
-                radius: avatarSize / 2
-              }
             }
           }
 
