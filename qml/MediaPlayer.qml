@@ -19,7 +19,7 @@ Rectangle {
     property int margin: 14
 
     // artist name adjustments
-    property int artistFontSize: 9
+    property int artistFontSize: 10
     property string artistFontColor: "#656565"
     property int artistFontWeight: 600
 
@@ -213,7 +213,7 @@ Rectangle {
                 Text {
                     anchors.left: parent.left
                     text: mediaCard.mprisTimePlayed
-                    color: "#626262"
+                    color: "#676767"
                     font.pixelSize: 10
                     font.family: Theme.fontFamily
                 }
@@ -221,7 +221,7 @@ Rectangle {
                 Text {
                     anchors.right: parent.right
                     text: mediaCard.mprisTimeTotal
-                    color: "#626262"
+                    color: "#676767"
                     font.pixelSize: 10
                     font.family: Theme.fontFamily
                 }
