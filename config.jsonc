@@ -16,5 +16,6 @@
   "weatherLocation": "Delhi",
   "weatherUnits": "metric",
   "weatherRefreshInterval": 3600000,
-  "avoidDuplicateNotifications": true
+  "avoidDuplicateNotifications": true,
+  "defaultTerminal": "kitty"
 }
