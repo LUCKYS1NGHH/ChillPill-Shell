@@ -31,6 +31,7 @@ Singleton {
       property string weatherLocation: "Delhi"
       property int weatherRefreshInterval: 3600000
       property bool avoidDuplicateNotifications: true
+      property string defaultTerminal: "kitty"
     }
   }
 
@@ -52,5 +53,5 @@ Singleton {
   readonly property alias weatherLocation: adapter.weatherLocation
   readonly property alias weatherRefreshInterval: adapter.weatherRefreshInterval
   readonly property alias avoidDuplicateNotifications: adapter.avoidDuplicateNotifications
-
+  readonly property alias defaultTerminal: adapter.defaultTerminal
 }
