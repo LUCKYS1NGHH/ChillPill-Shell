@@ -184,7 +184,7 @@ ShellRoot {
       // adjust box shape conditionally
       implicitWidth: batteryCharging ? osdWidth
                      : box.timerDone ? osdWidth
-                     : (notificationModule.active && !notifFullscreenMode) ? 280
+                     : (notificationModule.active && !notifFullscreenMode) ? 305
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : volumeActive ? osdWidth
@@ -196,7 +196,7 @@ ShellRoot {
 
       implicitHeight: batteryCharging ? osdHeight
                   : box.timerDone ? osdHeight
-                  : (notificationModule.active && !notifFullscreenMode) ? 50
+                  : (notificationModule.active && !notifFullscreenMode) ? 52
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
                   : controlCenter && mprisModule.hasPlayer
@@ -736,8 +736,8 @@ ShellRoot {
             // custom appicon
             Image {
               id: notifIcon
-              width: 20
-              height: 20
+              width: 22
+              height: 22
               fillMode: Image.PreserveAspectFit
               asynchronous: true
               source: {
@@ -749,7 +749,7 @@ ShellRoot {
                 }
                 return ""
               }
-              sourceSize: Qt.size(20, 20)
+              sourceSize: Qt.size(22, 22)
               visible: status === Image.Ready
               anchors.top: parent.top
               anchors.left: parent.left
@@ -821,7 +821,7 @@ ShellRoot {
                 id: bodyText
                 text: modelData.body
                 color: "#9f9f9f"
-                font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
+                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
                 Layout.bottomMargin: 2
@@ -1220,8 +1220,8 @@ ShellRoot {
     id: fsNotif
     active: notificationModule.active && notifFullscreenMode
     visible: notifFullscreenMode
-    cardWidth: 280
-    cardHeight: 50
+    cardWidth: 300
+    cardHeight: 52
 
     property var displayNotif: null
 
@@ -1238,7 +1238,7 @@ ShellRoot {
 
       Image {
         id: cardIcon
-        width: 22; height: 22
+        width: 23; height: 23
         fillMode: Image.PreserveAspectCrop
         source: {
           if (fsNotif.displayNotif && fsNotif.displayNotif.image) return fsNotif.displayNotif.image
@@ -1249,17 +1249,17 @@ ShellRoot {
           }
           return ""
         }
-        sourceSize: Qt.size(22, 22)
+        sourceSize: Qt.size(23, 23)
         visible: status === Image.Ready
       }
 
-      Column {
-        spacing: 2
+      ColumnLayout {
+        spacing: 3
 
         Text {
           text: fsNotif.displayNotif ? fsNotif.displayNotif.summary : ""
           color: Theme.fg
-          font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+          font { family: Theme.fontFamily; pixelSize: 10; weight: 700 }
           elide: Text.ElideRight
           Layout.maximumWidth: 200
         }
