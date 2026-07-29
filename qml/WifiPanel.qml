@@ -24,8 +24,8 @@ PanelWindow {
   WlrLayershell.keyboardFocus: passwordPromptVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
   exclusionMode: ExclusionMode.Ignore
-  width: 290
-  height: 380
+  width: 270
+  height: 360
   color: "transparent"
 
   // auto hide if control center close
@@ -38,11 +38,11 @@ PanelWindow {
     anchors.topMargin: 40
     anchors.rightMargin: 30
     color: "#1c1c1c"
-    radius: 15
+    radius: 26
 
     ColumnLayout {
       anchors.fill: parent
-      anchors.margins: 12
+      anchors.margins: 16
       spacing: 13
 
       Text {
@@ -87,8 +87,8 @@ PanelWindow {
 
             delegate: Rectangle {
               width: networkColumn.width
-              height: 50
-              radius: 11
+              height: 45
+              radius: 16
               color: connected ? "#4173c4" : (networkMouse.containsMouse ? "#313131" : "#252525")
               border.color: connected ? "" : "#2f2f2f"
               border.width: connected ? 0 : 1
@@ -114,9 +114,9 @@ PanelWindow {
 
               Row {
                 anchors.fill: parent
-                anchors.margins: 12
+                anchors.margins: 10
                 anchors.leftMargin: 17
-                spacing: 15
+                spacing: 20
 
                 // security type icon (lock/unlock)
                 Text {
@@ -132,13 +132,13 @@ PanelWindow {
                   Text {
                     text: displayName || ssid
                     color: "#ffffff"
-                    font { family: Theme.fontFamily; pixelSize: 12; weight: connected ? 500 : 300 }
+                    font { family: Theme.fontFamily; pixelSize: 11; weight: connected ? 500 : 300 }
                   }
                   Text {
                     text: connected ? "Connected" : (signal >= 0 ? signal + "%" : "")
                     color: connected ? "#c8d7ef" : "#949494"
                     elide: Text.ElideRight
-                    font { family: Theme.fontFamily; pixelSize: 10 }
+                    font { family: Theme.fontFamily; pixelSize: 9 }
                   }
                 }
               }
@@ -162,8 +162,8 @@ PanelWindow {
       visible: wifiListWindow.passwordPromptVisible
       onVisibleChanged: if (visible) passwordField.forceActiveFocus()
       anchors.fill: parent
-      color: "#272727"
-      radius: 13
+      color: "#1c1c1c"
+      radius: 28
       z: 10
 
       MouseArea { anchors.fill: parent }
@@ -177,7 +177,7 @@ PanelWindow {
           width: parent.width
           text: "Password for " + wifiListWindow.passwordPromptSsid
           color: "#e1e1e1"
-          font { family: Theme.fontFamily; pixelSize: 13; bold: true }
+          font { family: Theme.fontFamily; pixelSize: 13; weight: 600 }
           wrapMode: Text.Wrap
         }
 
@@ -185,7 +185,7 @@ PanelWindow {
           width: parent.width
           height: 36
           radius: 8
-          color: "#404040"
+          color: "#3a3a3a"
           border.color: "#5a5a5a"
           border.width: 1
 
@@ -207,8 +207,8 @@ PanelWindow {
           spacing: 8
           Rectangle {
             id: submitBtn
-            width: 80; height: 32; radius: 8
-            color: submitBtnMA.containsMouse ? "#3f76d0" : "#3874d7" 
+            width: 80; height: 32; radius: 9
+            color: submitBtnMA.containsMouse ? "#3065be" : "#3874d7"
             signal clicked()
             Text { anchors.centerIn: parent; text: "Join"; color: "#fff"; font { family: Theme.fontFamily; pixelSize: 12 } }
             Behavior on color { ColorAnimation { duration: 80 } }
@@ -227,8 +227,8 @@ PanelWindow {
           }
 
           Rectangle {
-            width: 80; height: 32; radius: 8
-            color: cancelBtnMA.containsMouse ? "#303030" : "#343434"
+            width: 80; height: 32; radius: 9
+            color: cancelBtnMA.containsMouse ? "#2f2f2f" : "#343434"
             Text { anchors.centerIn: parent; text: "Cancel"; color: "#dadada"; font { family: Theme.fontFamily; pixelSize: 12 } }
             Behavior on color { ColorAnimation { duration: 80 } }
             MouseArea {
