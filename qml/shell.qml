@@ -119,12 +119,8 @@ ShellRoot {
       property bool appLauncher: false
       property bool hovered: false
       property bool miniDashboard: false
-      property bool volumeActive: false
-      property bool brightnessActive: false
       property bool controlCenter: false
       property bool cliphistOpen: false
-      property bool batteryCharging: false
-      property bool timerDone: false
 
       property var battery: UPower.displayDevice
       property bool charging: battery.state === UPowerDeviceState.Charging
@@ -143,8 +139,9 @@ ShellRoot {
       }
 
       onChargingChanged: {
-        box.batteryCharging = true
-        batteryStatusHideTimer.restart()
+        if (!box.controlCenter) box.activeOsd = "battery"
+        osdHideTimer.interval = Config.osdDuration
+        osdHideTimer.restart()
         console.log("charging:", box.charging, "level:", box.batteryLevel)
       }
 
@@ -163,13 +160,15 @@ ShellRoot {
       property string sliderColor: "#c9c9c9"
       property int mprisControlsIconSize: 20
 
-      Timer { id: timerDoneHideTimer; interval: 2500; onTriggered: box.timerDone = false }
-      Timer { id: volumeHideTimer; interval: Config.osdDuration; onTriggered: box.volumeActive = false }
-      Timer { id: brightnessHideTimer; interval: Config.osdDuration; onTriggered: box.brightnessActive = false }
-      Timer { id: batteryStatusHideTimer; interval: Config.osdDuration; onTriggered: box.batteryCharging = false }
-      Timer { id: brightnessThrottle; interval: 80; repeat: false }
+      property string activeOsd: "" // volume, brightness, timer, battery
 
       Process { id: brightnessSetProc; running: false }
+
+      Timer {
+        id: osdHideTimer
+        onTriggered: box.activeOsd = ""
+      }
+      Timer { id: brightnessThrottle; interval: 80; repeat: false }
 
       onImplicitHeightChanged: {
           heightAnim.stop()
@@ -182,20 +181,20 @@ ShellRoot {
         ? Math.min(notifList.contentHeight + 40, 130) : 0
 
       // adjust box shape conditionally
-      implicitWidth: batteryCharging ? osdWidth
-                     : box.timerDone ? osdWidth
+      implicitWidth: box.activeOsd === "battery" ? osdWidth
+                     : box.activeOsd === "timer" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 280
                      : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
-                     : volumeActive ? osdWidth
-                     : brightnessActive ? osdWidth
+                     : activeOsd === "volume" ? osdWidth
+                     : box.activeOsd === "brightness" ? osdWidth
                      : appLauncher ? 400
                      : miniDashboard ? 420
                      : cliphistOpen ? 450
                      : row.implicitWidth + (hovered ? 68 : 56)
 
-      implicitHeight: batteryCharging ? osdHeight
-                  : box.timerDone ? osdHeight
+      implicitHeight: activeOsd === "battery" ? osdHeight
+                  : activeOsd === "timer" ? osdHeight
                   : (notificationModule.active && !notifFullscreenMode) ? 50
                   : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
                       ? 124
@@ -203,8 +202,8 @@ ShellRoot {
                       ? (240 + notifBump)
                   : controlCenter
                       ? (118 + notifBump)
-                  : volumeActive ? osdHeight
-                  : brightnessActive ? osdHeight
+                  : activeOsd === "volume" ? osdHeight
+                  : activeOsd === "brightness" ? osdHeight
                   : cliphistOpen ? 270
                   : miniDashboard ? 155
                   : appLauncher ? 380
@@ -290,8 +289,9 @@ ShellRoot {
           id: brightnessModule
           visible: false
           onBrightnessUpdated: {
-              box.brightnessActive = true
-              brightnessHideTimer.restart()
+              if (!box.controlCenter) box.activeOsd = "brightness"
+              osdHideTimer.interval = Config.osdDuration
+              osdHideTimer.restart()
           }
       }
 
@@ -306,11 +306,8 @@ ShellRoot {
                  && !notificationModule.active
                  && !box.controlCenter
                  && !box.miniDashboard
-                 && !box.volumeActive
-                 && !box.brightnessActive
-                 && !box.batteryCharging
-                 && !box.appLauncher
-                 && !box.timerDone ? 1 : 0
+                 && box.activeOsd === ""
+                 && !box.appLauncher ? 1 : 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -318,8 +315,9 @@ ShellRoot {
         Volume {
           id: volumeModule
           onVolumeChanged: {
-            box.volumeActive = true
-            volumeHideTimer.restart()
+            if (!box.controlCenter) box.activeOsd = "volume"
+            osdHideTimer.interval = Config.osdDuration
+            osdHideTimer.restart()
             }
         }
         Workspaces {}
@@ -329,7 +327,7 @@ ShellRoot {
 
       // volume
       OsdBar {
-          active: box.volumeActive && !box.timerDone
+          active: box.activeOsd === "volume"
           icon: volumeModule.icon
           iconColor: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
           percent: volumeModule.vol / 100
@@ -340,7 +338,7 @@ ShellRoot {
 
       // brightness
       OsdBar {
-          active: box.brightnessActive && !box.volumeActive && !box.controlCenter
+          active: box.activeOsd === "brightness"
           icon: brightnessModule.icon
           percent: brightnessModule.percent
           valueText: Math.round(brightnessModule.percent * 100) + "%"
@@ -349,7 +347,7 @@ ShellRoot {
 
       // battery
       OsdBar {
-        active: box.batteryCharging && !box.volumeActive && !box.brightnessActive && !box.timerDone
+        active: box.activeOsd === "battery"
         icon: box.batteryIcon
         iconColor: box.batteryIconColor
         valueText: box.charging ? "Charging" : "Charging stopped"
@@ -359,7 +357,7 @@ ShellRoot {
 
       // timer end
       OsdBar {
-        active: box.timerDone
+        active: box.activeOsd === "timer"
         icon: String.fromCodePoint(0xf1ad1)
         iconColor: "#5892f3"
         valueText: "Timer finished"
@@ -369,7 +367,9 @@ ShellRoot {
 
       // notification
       NotificationPopup {
-        active: notificationModule.active && !notifFullscreenMode && !box.volumeActive && !box.batteryCharging && !box.timerDone && !box.brightnessActive
+        active: notificationModule.active
+                && !notifFullscreenMode
+                && box.activeOsd === ""
         notif: notificationModule.current
       }
 
@@ -380,9 +380,7 @@ ShellRoot {
         height: box.cliphistOpen ? box.implicitHeight - 25 : 0
         opacity: box.cliphistOpen
                  && !notificationModule.active
-                 && !box.volumeActive
-                 && !box.brightnessActive
-                 && !box.batteryCharging
+                 && box.activeOsd === ""
                  && !box.controlCenter ? 1 : 0
         visible: opacity > 0
 
@@ -408,9 +406,7 @@ ShellRoot {
           height: box.appLauncher ? 352 : 0
           opacity: box.appLauncher
                    && !notificationModule.active
-                   && !box.volumeActive
-                   && !box.brightnessActive
-                   && !box.batteryCharging
+                   && box.activeOsd === ""
                    && !box.controlCenter
                    && !box.miniDashboard
                    && !box.cliphistOpen ? 1 : 0
@@ -439,9 +435,9 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && !box.batteryCharging && !notificationModule.active && !box.timerDone ? 1 : 0
+        opacity: box.controlCenter && box.activeOsd === "" && !notificationModule.active ? 1 : 0
         visible: opacity > 0
-        height: box.controlCenter && !box.batteryCharging ? box.implicitHeight - 25 : 0
+        height: box.controlCenter && box.activeOsd === "" ? box.implicitHeight - 25 : 0
 
         Behavior on opacity {
           SequentialAnimation {
@@ -854,10 +850,7 @@ ShellRoot {
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
         opacity: box.miniDashboard
                  && !notificationModule.active
-                 && !box.volumeActive
-                 && !box.brightnessActive
-                 && !box.batteryCharging
-                 && !box.timerDone
+                 && box.activeOsd === ""
                  && !box.cliphistOpen ? 1 : 0
 
         Behavior on opacity {
@@ -1194,8 +1187,9 @@ ShellRoot {
     Connections {
       target: countdownModule
       function onTimerFinished() {
-        box.timerDone = true
-        timerDoneHideTimer.restart()
+        if (!box.controlCenter) box.activeOsd = "timer"
+        osdHideTimer.interval = 2500
+        osdHideTimer.restart()
       }
     }
   }
