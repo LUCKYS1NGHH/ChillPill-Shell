@@ -18,14 +18,14 @@ Item {
     Text {
       text: String.fromCodePoint(0xf0f3)
       color: Theme.fg
-      font { family: Theme.nerdFontFamily; pixelSize: 14 }
+      font { family: Theme.nerdFontFamily; pixelSize: 15 }
       visible: notifIcon.status !== Image.Ready
     }
 
     Image {
       id: notifIcon
-      width: 22
-      height: 22
+      width: 23
+      height: 23
       fillMode: Image.PreserveAspectCrop
       source: {
         if (root.notif && root.notif.image) return root.notif.image
@@ -36,16 +36,16 @@ Item {
         }
         return ""
       }
-      sourceSize: Qt.size(22, 22)
+      sourceSize: Qt.size(23, 23)
       visible: status === Image.Ready
     }
 
     ColumnLayout {
-      spacing: 2
+      spacing: 3
       Text {
         text: root.notif ? root.notif.summary : ""
         color: Theme.fg
-        font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+        font { family: Theme.fontFamily; pixelSize: 10; weight: 700 }
         elide: Text.ElideRight
         Layout.maximumWidth: 220
       }
