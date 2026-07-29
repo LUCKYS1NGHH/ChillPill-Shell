@@ -22,7 +22,7 @@ RowLayout {
   property string activePort: ""
   readonly property bool isHeadphone: activePort.indexOf("headphone") !== -1
                                      || activePort.indexOf("headset") !== -1
-
+  spacing: 4 * Config.paddingScale
   function checkPort() {
     if (!ready) return
     portCheck.command = ["bash", "-c",
@@ -68,7 +68,7 @@ RowLayout {
     }
 
     font.family: Theme.nerdFontFamily
-    font.pixelSize: 10
+    font.pixelSize: 10 * Config.pillScale
   }
 
   MouseArea {
@@ -84,13 +84,12 @@ RowLayout {
     text: {
       if (!root.ready) return "-"
       if (root.muted) return "0%"
-
       return root.vol + "%"
     }
     color: fg
 
     font {
-      pixelSize: 10
+      pixelSize: 10 * Config.pillScale
       family: Theme.fontFamily
       weight: 500
     }

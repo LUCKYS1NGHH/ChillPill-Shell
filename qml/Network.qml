@@ -6,6 +6,8 @@ import QtQuick.Layouts
 RowLayout {
   id: root
 
+  spacing: 4 * Config.paddingScale
+
   property string iconFg: "#6791dc"
   property string disconIconFg: "#9ea9bd"
 
@@ -32,7 +34,7 @@ RowLayout {
 
     font {
       family: "FiraCode Nerd Font Propo"
-      pixelSize: 10
+      pixelSize: 10 * Config.pillScale
     }
   }
 
@@ -43,8 +45,8 @@ RowLayout {
           return root.active.name
       }
       color: Theme.fg
-      font { family: Theme.fontFamily; pixelSize: 10; weight: 500 }
+      font { family: Theme.fontFamily; pixelSize: 10 * Config.pillScale; weight: 500 }
       elide: Text.ElideRight
-      Layout.maximumWidth: 90
+      Layout.maximumWidth: 90 * Config.pillScale
   }
 }

@@ -11,7 +11,7 @@ Text {
   font {
     family: Theme.fontFamily
     weight: 500
-    pixelSize: 10
+    pixelSize: 10 * Config.pillScale
     letterSpacing: -0.5
   }
 }
