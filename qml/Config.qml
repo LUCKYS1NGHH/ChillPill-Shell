@@ -32,6 +32,7 @@ Singleton {
       property int weatherRefreshInterval: 3600000
       property bool avoidDuplicateNotifications: true
       property string defaultTerminal: "kitty"
+      property real pillScale: 1.0
     }
   }
 
@@ -54,4 +55,6 @@ Singleton {
   readonly property alias weatherRefreshInterval: adapter.weatherRefreshInterval
   readonly property alias avoidDuplicateNotifications: adapter.avoidDuplicateNotifications
   readonly property alias defaultTerminal: adapter.defaultTerminal
+  readonly property alias pillScale: adapter.pillScale
+  readonly property real paddingScale: 1 + (pillScale - 1) * 0.6  // sub linear, keep padding sane
 }

@@ -192,7 +192,7 @@ ShellRoot {
                      : appLauncher ? 400
                      : miniDashboard ? 420
                      : cliphistOpen ? 450
-                     : row.implicitWidth + (hovered ? 68 : 56)
+                     : row.implicitWidth + (12 * Config.paddingScale) + (hovered ? 68 : 56) * Config.paddingScale
 
       implicitHeight: batteryCharging ? osdHeight
                   : box.timerDone ? osdHeight
@@ -208,14 +208,15 @@ ShellRoot {
                   : cliphistOpen ? 270
                   : miniDashboard ? 155
                   : appLauncher ? 380
-                  : row.implicitHeight + (hovered ? 10 : 10)
+                  : (row.implicitHeight * Config.pillScale) + 10
 
       radius: notificationModule.active ? 99
         : cliphistOpen ? 25
         : controlCenter && mprisModule.hasPlayer ? 23
         : controlCenter && (notificationModule.notifications.length > 0) ? 25
         : appLauncher ? 30
-        : 20
+        : miniDashboard ? 20
+        : 20 * Config.pillScale
 
       Behavior on radius {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
@@ -301,7 +302,7 @@ ShellRoot {
         anchors.centerIn: parent
         anchors.leftMargin: 28
         anchors.rightMargin: 28
-        spacing: 13
+        spacing: 13 * Config.paddingScale
         opacity: !box.cliphistOpen
                  && !notificationModule.active
                  && !box.controlCenter

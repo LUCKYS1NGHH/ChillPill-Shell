@@ -6,10 +6,11 @@ RowLayout {
   id: root
 
   property string fg: "#dadada"
-  property int fontSize: 10
-
+  property int fontSize: 10 * Config.pillScale
   property var battery: box.battery
   property bool charging: box.charging
+
+  spacing: 4 * Config.paddingScale
 
   // icon
   Text {
