@@ -134,21 +134,22 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 ---
 
 ### Dependencies
-
 > [!NOTE]
-> Currently it's initial release.
-> Tested only on **Arch Linux** + **Hyprland**. other setups unsupported for now.
-> Packages listed are Arch names - grab equivalents from your own package manager.
-> Also few packages like `brightnessctl` and `cliphist` are likely already installed.
+> It's an initial release, tested only on **Arch Linux** + **Hyprland**. other setups unsupported for now.
+> Packages below are Arch's; find the equivalent for your distro.
+> `brightnessctl` and `cliphist` are likely already installed on most systems.
 
 - [cliphist](https://github.com/sentriz/cliphist)
-- [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (AUR package. non-Arch users can use the setup script instead)
+- [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) — AUR package; non-Arch users can use the setup script instead
 - [inotify-tools](https://github.com/inotify-tools/inotify-tools)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
+- [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
 - Qt Multimedia (`qt6-multimedia` on Arch)
-- [wl-clipbaord](https://github.com/bugaevc/wl-clipboard)
 
-> These packages will auto install for Arch users through install.sh
+> [!TIP]
+> `install.sh` auto-installs all of the above for Arch users, **except** these optional fonts:
+> - Monocraft Font (`ttf-monocraft-git` / `ttf-monocraft-nerd` on AUR)
+> - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
 
 ---
 
