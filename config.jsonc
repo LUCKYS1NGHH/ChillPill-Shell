@@ -17,5 +17,6 @@
   "weatherUnits": "metric",
   "weatherRefreshInterval": 3600000,
   "avoidDuplicateNotifications": true,
-  "defaultTerminal": "kitty"
+  "defaultTerminal": "kitty",
+  "pillScale": 1.0
 }
