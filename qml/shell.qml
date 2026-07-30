@@ -189,7 +189,7 @@ ShellRoot {
                      : controlCenter ? 390
                      : volumeActive ? osdWidth
                      : brightnessActive ? osdWidth
-                     : appLauncher ? 400
+                     : appLauncher ? 410
                      : miniDashboard ? 420
                      : cliphistOpen ? 460
                      : row.implicitWidth + (12 * Config.paddingScale) + (hovered ? 68 : 56) * Config.paddingScale
@@ -207,7 +207,7 @@ ShellRoot {
                   : brightnessActive ? osdHeight
                   : cliphistOpen ? 280
                   : miniDashboard ? 155
-                  : appLauncher ? 380
+                  : appLauncher ? 400
                   : (row.implicitHeight * Config.pillScale) + 10
 
       radius: notificationModule.active ? 99
@@ -406,7 +406,7 @@ ShellRoot {
       Item {
           anchors.centerIn: parent
           width: box.implicitWidth - 28
-          height: box.appLauncher ? 352 : 0
+          height: box.appLauncher ? 372 : 0
           opacity: box.appLauncher
                    && !notificationModule.active
                    && !box.volumeActive
