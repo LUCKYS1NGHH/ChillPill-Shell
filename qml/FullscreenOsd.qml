@@ -41,6 +41,7 @@ PanelWindow {
     radius: root.cardRadius
     implicitWidth: root.cardWidth
     implicitHeight: root.cardHeight
+    clip: true
 
     opacity: root.active ? 1 : 0
     scale: root.active ? 1 : 0.85

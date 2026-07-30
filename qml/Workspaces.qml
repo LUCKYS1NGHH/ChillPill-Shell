@@ -4,9 +4,9 @@ import QtQuick
 import QtQuick.Layouts
 
 RowLayout {
-
   Layout.fillWidth: false
-
+  spacing: 4 * Config.paddingScale
+ 
   Repeater {
     model: Config.maxWorkspaces // max workspace buttons/texts to show
 
@@ -19,9 +19,9 @@ RowLayout {
       property string activeBg: "#4d5258"
       property string inactiveBg: "#393c41"
 
-      width: 17.5
-      height: width
-      radius: 8
+      Layout.preferredWidth: 17.5 * Config.pillScale
+      Layout.preferredHeight: Layout.preferredWidth
+      radius: 8 * Config.pillScale
       color: isActive ? activeBg : (ws ? inactiveBg : "transparent")
 
       // animate color transition on workspace switch
@@ -33,7 +33,7 @@ RowLayout {
         color: wsButton.isActive ? "#ffffff" : "#dae0ea"
         font {
           family: Theme.fontFamily
-          pixelSize: 9
+          pixelSize: 9 * Config.pillScale
           weight: 300
         }
       }
