@@ -19,8 +19,8 @@ Item {
 
     signal closeRequested()
 
-    width: 320
-    height: 210
+    width: 340
+    height: 220
     visible: shown
     opacity: shown ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 180 } }
@@ -153,7 +153,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 15
+        radius: 18
         color: "#1a1a1a"
         border.color: "#333"
         border.width: 1
@@ -249,7 +249,7 @@ Item {
         ListView {
             id: listView
             width: parent.width
-            height: parent.height - 65
+            height: parent.height - 67
             clip: true
             model: root.filteredEntries
             currentIndex: root.selectedIndex
@@ -260,7 +260,7 @@ Item {
 
             delegate: Rectangle {
                 width: listView.width
-                height: modelData.id === root.collapsingId ? 5 : (modelData.imagePath ? 50 : 28)
+                height: modelData.id === root.collapsingId ? 5 : (modelData.imagePath ? 55 : 30)
                 radius: 7
                 color: modelData.id === root.deletingId ? "#e22d2d" : (index === root.selectedIndex ? "#313131" : "transparent")
                 clip: true
@@ -287,12 +287,12 @@ Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: 8
+                    anchors.leftMargin: 12
                     anchors.rightMargin: 8
                     text: modelData.label
                     visible: !modelData.imagePath
                     color: Theme.fg
-                    font { family: Theme.fontFamily; pixelSize: 9 }
+                    font { family: Theme.fontFamily; pixelSize: 10 }
                     elide: Text.ElideRight
                 }
 
