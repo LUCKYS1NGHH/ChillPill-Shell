@@ -13,6 +13,7 @@ RowLayout {
   property color buttonBgOff
   property color buttonFgOff
 
+  property bool notificationPopup: false
   property bool controlCenterOpen: false
   property bool mediaAutoOpened: false
   property bool wifiPanelOpened: false
@@ -84,6 +85,10 @@ RowLayout {
     visible: root.wifiPanelOpened
     anchorX: wifiBtn.mapToGlobal(0, 0).x - width  // sit left of the wifi button
     anchorY: wifiBtn.mapToGlobal(0, 0).y
+  }
+
+  onNotificationPopupChanged: {
+    if (root.notificationPopup) root.wifiPanelOpened = false
   }
 
   Item { Layout.fillWidth: true }

@@ -112,7 +112,7 @@ ShellRoot {
       id: box
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
-      opacity: (!fullscreenActive && !notifFullscreenMode ) ? 1 : 0
+      opacity: (!fullscreenActive && !notifFullscreenMode) ? 1 : 0
       visible: opacity > 0
       clip: true
 
@@ -309,6 +309,7 @@ ShellRoot {
                  && !box.miniDashboard
                  && box.activeOsd === ""
                  && !box.appLauncher ? 1 : 0
+        visible: opacity > 0
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -471,6 +472,7 @@ ShellRoot {
           mediaAutoOpened: mediaAutoOpened
           hasPlayer: mprisModule.hasPlayer
           playerHeight: box.ccButtonHeight
+          notificationPopup: notificationModule.active
         } 
 
         // control center sliders
