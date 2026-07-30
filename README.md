@@ -159,6 +159,14 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 > Use my Hyprland [dotfiles](https://github.com/LUCKYS1NGHH/dotfiles), it's also made for No Dedicated GPU machines.
 > You will get more better performance.
 
+
+#### Arch users (AUR)
+
+```
+paru -S chillpill-shell
+```
+
+#### Other
 ```bash
 git clone --depth=1 https://github.com/LUCKYS1NGHH/ChillPill-Shell.git
 cd ChillPill-Shell
@@ -169,6 +177,12 @@ sudo ./install.sh
 <details>
 <summary>Uninstall?</summary>
 
+#### Arch
+```
+paru -R chillpill-shell
+```
+
+#### Other
 ```bash
 chmod +x uninstall.sh
 sudo ./uninstall.sh
