@@ -191,7 +191,7 @@ ShellRoot {
                      : brightnessActive ? osdWidth
                      : appLauncher ? 400
                      : miniDashboard ? 420
-                     : cliphistOpen ? 450
+                     : cliphistOpen ? 460
                      : row.implicitWidth + (12 * Config.paddingScale) + (hovered ? 68 : 56) * Config.paddingScale
 
       implicitHeight: batteryCharging ? osdHeight
@@ -205,13 +205,13 @@ ShellRoot {
                       ? (118 + notifBump)
                   : volumeActive ? osdHeight
                   : brightnessActive ? osdHeight
-                  : cliphistOpen ? 270
+                  : cliphistOpen ? 280
                   : miniDashboard ? 155
                   : appLauncher ? 380
                   : (row.implicitHeight * Config.pillScale) + 10
 
       radius: notificationModule.active ? 99
-        : cliphistOpen ? 25
+        : cliphistOpen ? 28
         : controlCenter && mprisModule.hasPlayer ? 23
         : controlCenter && (notificationModule.notifications.length > 0) ? 25
         : appLauncher ? 30
@@ -377,8 +377,8 @@ ShellRoot {
       // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
-        width: box.implicitWidth - 24
-        height: box.cliphistOpen ? box.implicitHeight - 25 : 0
+        width: box.implicitWidth - 25
+        height: box.cliphistOpen ? box.implicitHeight - 26 : 0
         opacity: box.cliphistOpen
                  && !notificationModule.active
                  && !box.volumeActive
