@@ -104,10 +104,35 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 </details>
 
 ### Configurable options
+> Located at `~/.config/chillpill-shell/config.jsonc`
 
-> Located at ~/.config/chillpill-shell/config.jsonc
+| Option | Description | Default |
+|---|---|---|
+| `displayPicture` | Profile image path for mini dashboard | `/home/<user>/.pfp.png` |
+| `clockFormat` | Clock format for the pill bar | `hh:mm` |
+| `pillTopMargin` | Top spacing of pill bar | `9` |
+| `pillBottomMargin` | Bottom spacing of pill bar | `26` |
+| `pillScale` | Scale factor for pill bar size | `1.0` |
+| `textFontFamily` | Font family for general text | `Monocraft` |
+| `nerdFontFamily` | Font family for icons (Nerd Fonts) | `JetBrainsMono Nerd Font Propo` |
+| `timerPresets` | Timer minute presets | `[1, 5, 10, 15, 30]` |
+| `mediaAutoOpenDuration` | Media-playing popup duration (ms) | `2000` |
+| `maxWorkspaces` | Max workspaces shown in pill bar | `5` |
+| `notificationDisplayTime` | Notification popup duration (ms) | `3000` |
+| `maxNotificationsInStack` | Max notifications shown in stack | `20` |
+| `avoidDuplicateNotifications` | Skip appending duplicate notifications to stack | `true` |
+| `bandwidthRefreshInterval` | Bandwidth usage refresh interval (ms) | `300000` (5 min) |
+| `screenLockAppCommand` | Screen lock command for mini dashboard's lock button | `hyprlock` |
+| `osdDuration` | OSD (on-screen display) duration (ms) | `800` |
+| `weatherLocation` | City for weather widget | `Delhi` |
+| `weatherUnits` | Temperature units: `metric` (°C) or `imperial` (°F) | `metric` |
+| `weatherRefreshInterval` | Weather refresh interval (ms) | `3600000` (1 hr) |
+| `defaultTerminal` | Terminal used to open TUI apps from launcher | `kitty` |
 
-```
+<details>
+<summary>Raw config example</summary>
+
+```jsonc
 {
   "displayPicture": "/home/<user>/.pfp.png",
   "clockFormat": "hh:mm",
@@ -127,9 +152,11 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   "weatherUnits": "metric",
   "weatherRefreshInterval": 3600000,
   "avoidDuplicateNotifications": true,
-  "defaultTerminal": "kitty"
+  "defaultTerminal": "kitty",
+  "pillScale": 1.0
 }
 ```
+</details>
 
 ---
 
