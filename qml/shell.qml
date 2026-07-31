@@ -378,7 +378,7 @@ ShellRoot {
       // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
-        width: box.implicitWidth - 25
+        width: box.implicitWidth - 26
         height: box.cliphistOpen ? box.implicitHeight - 26 : 0
         opacity: box.cliphistOpen
                  && !notificationModule.active
@@ -809,7 +809,7 @@ ShellRoot {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: notificationModule.dismiss(modelData)
+                    onClicked: notificationModule.dismiss(modelData._id)
                   }
                 }
               }
