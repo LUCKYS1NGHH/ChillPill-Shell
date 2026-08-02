@@ -158,6 +158,9 @@ ShellRoot {
       property int sliderHeight: 4
       property int sliderRadius: 4
       property string sliderColor: "#c9c9c9"
+      // invisible extra clickable area above/below the thin slider bars
+      // (proportional to the bar height, so it scales with sliderHeight)
+      property int sliderHitSlop: sliderHeight * 2
       property int mprisControlsIconSize: 20
 
       property string activeOsd: "" // volume, brightness, timer, battery
@@ -516,6 +519,9 @@ ShellRoot {
 
               MouseArea {
                 anchors.fill: parent
+                // negative margins extend the clickable area beyond the thin bar
+                anchors.topMargin: -box.sliderHitSlop
+                anchors.bottomMargin: -box.sliderHitSlop
                 onClicked: (mouse) => {
                   volumeModule.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width))
                 }
@@ -563,6 +569,9 @@ ShellRoot {
 
               MouseArea {
                 anchors.fill: parent
+                // negative margins extend the clickable area beyond the thin bar
+                anchors.topMargin: -box.sliderHitSlop
+                anchors.bottomMargin: -box.sliderHitSlop
                 onClicked: (mouse) => {
                   let pct = Math.round(Math.max(0, Math.min(1, mouse.x / width)) * 100)
                   brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
