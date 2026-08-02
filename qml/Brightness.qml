@@ -48,10 +48,18 @@ RowLayout {
     }
 
     // detect the real backlight device instead of hardcoding one,
-    // so the sysfs watcher below works on any machine
+    // so the sysfs watcher below works on any machine. Prefer a
+    // device with type "raw" (kernel-native backlight) over
+    // "platform"/"firmware" ones like acpi_video0, then fall back
+    // to the first device found.
     Process {
         id: deviceProbe
-        command: ["ls", "/sys/class/backlight"]
+        command: ["sh", "-c", `for d in /sys/class/backlight/*; do
+            if [ "$(cat "$d/type" 2>/dev/null)" = raw ]; then
+                basename "$d"; exit 0
+            fi
+        done
+        ls /sys/class/backlight | head -1`]
         running: true
         stdout: StdioCollector {
             onStreamFinished: root.backlightDevice = this.text.trim().split("\n")[0]
