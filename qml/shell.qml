@@ -159,7 +159,8 @@ ShellRoot {
       property int sliderRadius: 4
       property string sliderColor: "#c9c9c9"
       // invisible extra clickable area above/below the thin slider bars
-      property int sliderHitSlop: 8
+      // (proportional to the bar height, so it scales with sliderHeight)
+      property int sliderHitSlop: sliderHeight * 2
       property int mprisControlsIconSize: 20
 
       property string activeOsd: "" // volume, brightness, timer, battery
