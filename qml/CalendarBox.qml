@@ -1,20 +1,20 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-
 Rectangle {
   id: calendarPopup
   property bool shown: false
   visible: opacity > 0
   opacity: shown ? 1 : 0
   width: 225
-  height: 187
+  height: daysGrid.y + daysGrid.height + 12
   x: (parent.width - calendarPopup.width) / 2
   y: box.y + box.height + 5
   color: "#1e1e1e"
   radius: 18
 
   Behavior on opacity { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
+  Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutExpo } }
 
   RowLayout {
     id: calHeader
@@ -55,6 +55,7 @@ Rectangle {
   }
 
   Grid {
+    id: daysGrid
     columns: 7
     anchors.top: dayHeaders.bottom
     anchors.topMargin: 4
