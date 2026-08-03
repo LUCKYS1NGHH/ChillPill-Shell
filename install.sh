@@ -82,8 +82,9 @@ chmod 755 /usr/share/chillpill-shell/IslandBackend/*
 
 # place config file if it not exists
 if [[ ! -f "$REAL_HOME/.config/chillpill-shell/config.jsonc" ]]; then
-   info "Copying config file to ~/.config/chillpill-shell"
+   info "Copying config file to ~/.config/chillpill-shell and /usr/share/chillpill-shell"
    install -m 644 config.jsonc "$REAL_HOME/.config/chillpill-shell/config.jsonc"
+   install -m 644 config.jsonc /usr/share/chillpill-shell/config.jsonc.example
 fi
 
 # place systemd file
