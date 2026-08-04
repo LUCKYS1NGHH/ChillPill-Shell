@@ -99,7 +99,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   <tr>
     <td width="50%">
       <p align="center"><b>Wallpaper switcher</b></p>
-      <img src="screenshots/image_11.webp" width="50%" alt="Wallpaper switcher with opened with previews">
+      <img src="screenshots/image_11.webp" width="100%" alt="Wallpaper switcher with opened with previews">
     </td>
   </tr>
 </table>
