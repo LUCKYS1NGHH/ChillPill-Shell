@@ -2,7 +2,7 @@
 
 A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especially for those who don't have a Dedicated GPU (Like me) for their GNU/Linux Hyprland machine.
 
-[![ChillPill-Shell 0.1.0](https://img.shields.io/badge/CPShell-0.1.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.2.0](https://img.shields.io/badge/CPShell-0.2.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -76,6 +76,13 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
       <p align="center"><b>Control center — Wifi panel</b></p>
       <img src="screenshots/image_10.webp" width="100%" alt="Control center with wifi panel opened">
     </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><b>Wallpaper switcher</b></p>
+      <img src="screenshots/image_11.webp" width="50%" alt="Wallpaper switcher with opened with previews">
+    </td>
+  </tr>
 </table>
 
 ### Features
@@ -86,6 +93,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - Mini Dashboard               : Profile Image, Username, Hostname, Uptime, Battery, Basic network info, Today bandwidth usage, Datetime, Weather, Calendar, Power buttons (lock, sleep, shutdown, reboot)
 - DBus Notification            : App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - OSD                          : Battery, volume, brightness, timer
+- Wallpaper switcher           : A wallpaper switcher
 
 <details>
 <summary>Know more</summary>
@@ -100,6 +108,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - Notifications are able to show in slide animation (like iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.
 - Your today's bandwidth status in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
+- Wallpaper switcher shows you the filename of the image on hover. uses `awww` in backend to update wallpaper.
 ---
 </details>
 
@@ -128,6 +137,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 | `weatherUnits` | Temperature units: `metric` (°C) or `imperial` (°F) | `metric` |
 | `weatherRefreshInterval` | Weather refresh interval (ms) | `3600000` (1 hr) |
 | `defaultTerminal` | Terminal used to open TUI apps from launcher | `kitty` |
+| `wallpapersDir` | Wallpapers directory for wallpaper switcher | `/home/<user>/Pictures/wallpapers` |
 
 <details>
 <summary>Raw config example</summary>
@@ -153,7 +163,8 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   "weatherRefreshInterval": 3600000,
   "avoidDuplicateNotifications": true,
   "defaultTerminal": "kitty",
-  "pillScale": 1.0
+  "pillScale": 1.0,
+  "wallpapersDir": "/home/<user>/Pictures/wallpapers"
 }
 ```
 </details>
@@ -171,12 +182,14 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - [inotify-tools](https://github.com/inotify-tools/inotify-tools)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
+- awww
 - Qt Multimedia (`qt6-multimedia` on Arch)
 
 > [!TIP]
 > `install.sh` auto-installs all of the above for Arch users, **except** these optional fonts:
 > - Monocraft Font (`ttf-monocraft-git` / `ttf-monocraft-nerd` on AUR)
 > - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
+> - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
 
 ---
 
@@ -237,6 +250,7 @@ hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpi
 hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call appLauncher toggle"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call wallpaperSwitcher toggle"))
 ```
 
 ---

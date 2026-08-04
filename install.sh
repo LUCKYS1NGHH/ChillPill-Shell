@@ -13,7 +13,7 @@ fi
 if [[ "$1" != "--skip-deps" ]]; then
   if command -v pacman &>/dev/null; then
       info "Installing dependencies in your Arch Linux."
-      pacman -S --noconfirm --needed quickshell cliphist inotify-tools brightnessctl cmake qt6-multimedia python-psutil wl-clipboard
+      pacman -S --noconfirm --needed quickshell cliphist inotify-tools brightnessctl cmake qt6-multimedia python-psutil wl-clipboard awww
 
       info "Installing nusgmon (to record your bandwidth) through git"
       git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
@@ -22,6 +22,7 @@ if [[ "$1" != "--skip-deps" ]]; then
   fi
 fi
 
+command -v awww >/dev/null || die "Awww not installed."
 command -v quickshell >/dev/null || die "Quickshell not installed."
 command -v cliphist >/dev/null || die "Cliphist not installed."
 command -v nusgmon >/dev/null || die "Nusgmon not installed."
