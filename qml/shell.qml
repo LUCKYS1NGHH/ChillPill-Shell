@@ -13,30 +13,37 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.appLauncher = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.appLauncher = false; box.wallpaperSwitcherOpen = false }
+      function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true; }
       function hide(): void { box.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
-      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false }
-      function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false }
+      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false }
+      function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; }
       function hide(): void { box.controlCenter = false }
   }
 
   IpcHandler {
       target: "miniDashboard"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.appLauncher = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false }
+      function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false; box.wallpaperSwitcherOpen = false }
       function hide(): void { box.miniDashboard = false }
   }
 
   IpcHandler {
     target: "appLauncher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = !box.appLauncher }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = true }
-    function hide(): void { box.appLauncher = false }
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = !box.appLauncher; box.wallpaperSwitcherOpen = false}
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = true; }
+    function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
+  }
+
+  IpcHandler {
+    target: "wallpaperSwitcher"
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = true }
+    function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
   }
 
   property string bg: Theme.bg
@@ -68,7 +75,7 @@ ShellRoot {
   PanelWindow {
 
     WlrLayershell.layer: WlrLayershell.Top
-    WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher || box.wallpaperSwitcherOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     implicitHeight: 482
 
     anchors {
@@ -121,6 +128,7 @@ ShellRoot {
       property bool miniDashboard: false
       property bool controlCenter: false
       property bool cliphistOpen: false
+      property bool wallpaperSwitcherOpen: false
 
       property var battery: UPower.displayDevice
       property bool charging: battery.state === UPowerDeviceState.Charging
@@ -194,6 +202,7 @@ ShellRoot {
                      : appLauncher ? 400
                      : miniDashboard ? 420
                      : cliphistOpen ? 460
+                     : wallpaperSwitcherOpen ? 600
                      : row.implicitWidth + (12 * Config.paddingScale) + (hovered ? 68 : 56) * Config.paddingScale
 
       implicitHeight: activeOsd === "battery" ? osdHeight
@@ -210,6 +219,7 @@ ShellRoot {
                   : cliphistOpen ? 270
                   : miniDashboard ? 155
                   : appLauncher ? 400
+                  : wallpaperSwitcherOpen ? 308
                   : (row.implicitHeight * Config.pillScale) + 10
 
       radius: notificationModule.active ? 99
@@ -218,6 +228,7 @@ ShellRoot {
         : controlCenter && (notificationModule.notifications.length > 0) ? 25
         : appLauncher ? 30
         : miniDashboard ? 20
+        : wallpaperSwitcherOpen ? 30
         : 20 * Config.pillScale
 
       Behavior on radius {
@@ -265,11 +276,18 @@ ShellRoot {
             return
           }
 
+          if (box.wallpaperSwitcherOpen) {
+            if (mouse.button !== Qt.LeftButton) {
+              return
+            }
+          }
+
           if (mouse.button === Qt.LeftButton) {
             console.log("Left click detected, opening control center")
             box.controlCenter = !box.controlCenter
             mediaAutoOpened = false
             box.appLauncher = false
+            box.wallpaperSwitcherOpen = false
             mediaPopupHideTimer.stop()
           }
 
@@ -277,6 +295,7 @@ ShellRoot {
             console.log("Middle click detected, opening cliphist")
             mediaAutoOpened = false
             box.appLauncher = false
+            box.wallpaperSwitcherOpen = false
             box.cliphistOpen = !box.cliphistOpen
           }
 
@@ -284,6 +303,7 @@ ShellRoot {
               console.log("Right click detected, opening mini dashboard")
               mediaAutoOpened = false
               box.appLauncher = false
+              box.wallpaperSwitcherOpen = false
               box.miniDashboard = !box.miniDashboard
           }
         }
@@ -299,7 +319,7 @@ ShellRoot {
           }
       }
 
-      // modulues in bar
+      // modules in bar
       RowLayout {
         id: row
         anchors.centerIn: parent
@@ -311,6 +331,7 @@ ShellRoot {
                  && !box.controlCenter
                  && !box.miniDashboard
                  && box.activeOsd === ""
+                 && !box.wallpaperSwitcherOpen
                  && !box.appLauncher ? 1 : 0
         visible: opacity > 0
 
@@ -401,6 +422,47 @@ ShellRoot {
           shown: box.cliphistOpen
           anchors.fill: parent
           onCloseRequested: box.cliphistOpen = false
+        }
+      }
+
+      // wallpaper switcher
+      Item {
+        anchors.centerIn: parent
+        width: box.implicitWidth - 28
+        height: box.wallpaperSwitcherOpen ? 280 : 0
+        opacity: box.wallpaperSwitcherOpen
+                 && !notificationModule.active
+                 && box.activeOsd === ""
+                 && !box.controlCenter
+                 && !box.miniDashboard
+                 && !box.cliphistOpen
+                 && !box.appLauncher ? 1 : 0
+        visible: opacity > 0
+
+        Behavior on opacity {
+          SequentialAnimation {
+            PauseAnimation { duration: box.wallpaperSwitcherOpen ? 15 : 0 }
+            NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
+          }
+        }
+        Loader {
+          id: wallpaperLoader
+          anchors.fill: parent
+          active: box.wallpaperSwitcherOpen
+          asynchronous: true
+          sourceComponent: WallpaperSwitcher {
+            shown: box.wallpaperSwitcherOpen
+            onCloseRequested: box.wallpaperSwitcherOpen = false
+          }
+          onLoaded: item.forceActiveFocus()
+        }
+
+        Connections {
+          target: box
+          function onWallpaperSwitcherOpenChanged() {
+            if (box.wallpaperSwitcherOpen && wallpaperLoader.item)
+              wallpaperLoader.item.forceActiveFocus()
+          }
         }
       }
 
