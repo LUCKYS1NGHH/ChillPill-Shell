@@ -2,15 +2,34 @@
 
 A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especially for those who don't have a Dedicated GPU (Like me) for their GNU/Linux Hyprland machine.
 
+<div align="center">
+
 [![ChillPill-Shell 0.2.0](https://img.shields.io/badge/CPShell-0.2.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+</div>
+
+<div align="center">
+
+[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-2d2d2d?style=flat-square)](#resource-usage)
+[![Showcase](https://img.shields.io/badge/Showcase-2d2d2d?style=flat-square)](#showcase)
+[![Features](https://img.shields.io/badge/Features-2d2d2d?style=flat-square)](#features)
+[![Configuration](https://img.shields.io/badge/Configuration-2d2d2d?style=flat-square)](#configurable-options)
+[![Dependencies](https://img.shields.io/badge/Dependencies-2d2d2d?style=flat-square)](#dependencies)
+[![Installation](https://img.shields.io/badge/Installation-2d2d2d?style=flat-square)](#install)
+[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-2d2d2d?style=flat-square)](#auto-startup)
+[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-2d2d2d?style=flat-square)](#key-bindings)
+[![Thanks](https://img.shields.io/badge/Thanks-2d2d2d?style=flat-square)](#thanks)
+[![Author](https://img.shields.io/badge/Author-2d2d2d?style=flat-square)](#author)
+
+</div>
 
 ---
 
 ### Resource Usage
 
-- RAM: 200-500 MB (Average 350)
+- RAM: 200-500 MB (Average 380)
 - CPU: Idle 0%, Average 3%, Min 0.1%, Max 10%
 - GPU: Idle 0%, Average 15%, Min 6%, Max 50%
 
@@ -85,7 +104,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   </tr>
 </table>
 
-### Features
+## Features
 
 - Main Pill Bar                : Battery, volume, workspaces, network, clock
 - Control Center               : Media Player, Buttons (WiFi, Silent Notifications, Timer), Volume and Brightness Sliders, Notifications Stack
@@ -112,7 +131,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 ---
 </details>
 
-### Configurable options
+## Configurable options
 > Located at `~/.config/chillpill-shell/config.jsonc`
 
 | Option | Description | Default |
@@ -141,6 +160,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 <details>
 <summary>Raw config example</summary>
+---
 
 ```jsonc
 {
@@ -167,6 +187,8 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   "wallpapersDir": "/home/<user>/Pictures/wallpapers"
 }
 ```
+
+---
 </details>
 
 ---
@@ -178,7 +200,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 > `brightnessctl` and `cliphist` are likely already installed on most systems.
 
 - [cliphist](https://github.com/sentriz/cliphist)
-- [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) — AUR package; non-Arch users can use the setup script instead
+- [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (AUR package; non-Arch users can use the setup script instead)
 - [inotify-tools](https://github.com/inotify-tools/inotify-tools)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
@@ -191,14 +213,11 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 > - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
 > - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
 
----
-
-### Install
+## Install
 
 > [!TIP]
 > Use my Hyprland [dotfiles](https://github.com/LUCKYS1NGHH/dotfiles), it's also made for No Dedicated GPU machines.
 > You will get more better performance.
-
 
 #### Arch users (AUR)
 
@@ -237,9 +256,7 @@ To auto-run at every time you start your Hyprland, paste this line in your `~/.c
 hl.exec_cmd("chillpill-shell")
 ```
 
----
-
-### Key Bindings
+## Key Bindings
 
 Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland (Lua) config file.
 
