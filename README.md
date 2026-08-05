@@ -4,7 +4,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 <div align="center">
 
-[![ChillPill-Shell 0.2.0](https://img.shields.io/badge/CPShell-0.2.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.2.1](https://img.shields.io/badge/CPShell-0.2.1-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -136,7 +136,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 | Option | Description | Default |
 |---|---|---|
-| `displayPicture` | Profile image path for mini dashboard | `/home/<user>/.pfp.png` |
+| `displayPicture` | Profile image path for mini dashboard | `~/.pfp.png` |
 | `clockFormat` | Clock format for the pill bar | `hh:mm` |
 | `pillTopMargin` | Top spacing of pill bar | `9` |
 | `pillBottomMargin` | Bottom spacing of pill bar | `26` |
@@ -156,7 +156,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 | `weatherUnits` | Temperature units: `metric` (°C) or `imperial` (°F) | `metric` |
 | `weatherRefreshInterval` | Weather refresh interval (ms) | `3600000` (1 hr) |
 | `defaultTerminal` | Terminal used to open TUI apps from launcher | `kitty` |
-| `wallpapersDir` | Wallpapers directory for wallpaper switcher | `/home/<user>/Pictures/wallpapers` |
+| `wallpapersDir` | Wallpapers directory for wallpaper switcher | `~/Pictures/wallpapers` |
 
 <details>
 <summary>Raw config example</summary>
@@ -164,7 +164,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 ```jsonc
 {
-  "displayPicture": "/home/<user>/.pfp.png",
+  "displayPicture": "~/.pfp.png",
   "clockFormat": "hh:mm",
   "pillTopMargin": 9,
   "pillBottomMargin": 26,
@@ -184,7 +184,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   "avoidDuplicateNotifications": true,
   "defaultTerminal": "kitty",
   "pillScale": 1.0,
-  "wallpapersDir": "/home/<user>/Pictures/wallpapers"
+  "wallpapersDir": "~/Pictures/wallpapers"
 }
 ```
 
