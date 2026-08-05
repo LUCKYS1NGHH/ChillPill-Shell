@@ -1,5 +1,5 @@
 {
-  "displayPicture": "/home/xingyun/.pfp.png",
+  "displayPicture": "~/.pfp.png",
   "clockFormat": "hh:mm",
   "pillTopMargin": 9,
   "pillBottomMargin": 26,
@@ -18,5 +18,6 @@
   "weatherRefreshInterval": 3600000,
   "avoidDuplicateNotifications": true,
   "defaultTerminal": "kitty",
-  "pillScale": 1.0
+  "pillScale": 1.0,
+  "wallpapersDir": "~/Pictures/wallpapers"
 }

@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Widgets
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import Qt.labs.folderlistmodel
@@ -8,6 +9,7 @@ Rectangle {
   id: wallpaperPopup
   property bool shown: false
   property string selectedWallpaper: ""
+  property bool awwwMissing: false
   anchors.fill: parent
 
   onShownChanged: {
@@ -34,9 +36,17 @@ Rectangle {
     if (path) applyWallpaper(path)
   }
 
+  // check once whether awww exists on PATH
+  Process {
+    id: awwwCheck
+    command: ["sh", "-c", "command -v awww"]
+    running: true
+    onExited: (code) => { wallpaperPopup.awwwMissing = (code !== 0) }
+  }
+
   FolderListModel {
     id: wallpaperModel
-    folder: "file://" + Config.wallpapersDir
+    folder: "file://" + Config.wallpapersDir.replace("~", Quickshell.env("HOME"))
     nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
     showDirs: false
     caseSensitive: false
@@ -55,8 +65,35 @@ Rectangle {
     anchors.margins: 8
     spacing: 15
 
+    // fallback: awww missing
+    Text {
+      visible: wallpaperPopup.awwwMissing
+      Layout.alignment: Qt.AlignHCenter
+      Layout.fillWidth: true
+      horizontalAlignment: Text.AlignHCenter
+      wrapMode: Text.WordWrap
+      color: "#f9cb41"
+      text: "awww not found on $PATH\ninstall it to apply wallpapers"
+      font { family: Theme.fontFamily; pixelSize: 12 }
+    }
+
+    // fallback: no wallpapers found
+    Text {
+      visible: !wallpaperPopup.awwwMissing
+                && wallpaperModel.status === FolderListModel.Ready
+                && wallpaperModel.count === 0
+      Layout.alignment: Qt.AlignHCenter
+      Layout.fillWidth: true
+      horizontalAlignment: Text.AlignHCenter
+      wrapMode: Text.WordWrap
+      color: "#f9cb41"
+      text: "No wallpapers found in\n" + Config.wallpapersDir
+      font { family: Theme.fontFamily; pixelSize: 12 }
+    }
+
     GridView {
       id: wallGrid
+      visible: !wallpaperPopup.awwwMissing && wallpaperModel.count > 0
       Layout.fillWidth: true
       Layout.fillHeight: true
       cellWidth: width / 3
@@ -67,11 +104,6 @@ Rectangle {
       focus: true
       keyNavigationEnabled: true
       keyNavigationWraps: true
-
-      Keys.onPressed: (e) => {
-        console.log("wallGrid got key:", e.key)
-        e.accepted = false   // let GridView's own arrow-nav still run
-      }
 
       Keys.onEscapePressed: wallpaperPopup.closeRequested()
       Keys.onReturnPressed: wallpaperPopup.activateCurrent()
@@ -85,7 +117,6 @@ Rectangle {
         property bool isCurrent: GridView.isCurrentItem
         property bool isSelected: wallpaperPopup.selectedWallpaper === wallUrl
 
-        // radial stagger: distance of this cell from the grid's center cell
         property int columns: 3
         property real rowIdx: Math.floor(index / columns)
         property real colIdx: index % columns
@@ -145,7 +176,7 @@ Rectangle {
               Behavior on opacity { NumberAnimation { duration: 115 } }
             }
 
-            // filename bar
+            // filename shadowed bar
             Rectangle {
               anchors.left: parent.left
               anchors.right: parent.right
@@ -155,7 +186,7 @@ Rectangle {
               Behavior on opacity { NumberAnimation { duration: 250 } }
               gradient: Gradient {
                 GradientStop { position: 0.0; color: "#00000000" }
-                GradientStop { position: 1.2; color: "#cc000000" }
+                GradientStop { position: 1.0; color: "#cc000000" }
               }
 
               Text {
