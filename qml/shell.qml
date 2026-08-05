@@ -946,19 +946,21 @@ ShellRoot {
         visible: opacity > 0
 
         RowLayout {
-          // profile picture (display picture)
-          ClippingRectangle {
+         // profile picture (display picture)
+           ClippingRectangle {
+            id: avatarClip
             anchors.top: parent.top
             anchors.left: parent.left
             width: avatarSize
             height: avatarSize
             radius: avatarSize / 2
-            color: "transparent"
+            property string imgPath: Config.displayPicture ? "file://" + Config.displayPicture.replace("~", Quickshell.env("HOME")) : ""
+            color: (imgPath === "" || avatarImg.status !== Image.Ready) ? "#454545" : "transparent"
 
             Image {
               id: avatarImg
               anchors.fill: parent
-              source: "file://" + Config.displayPicture
+              source: avatarClip.imgPath
               fillMode: Image.PreserveAspectCrop
               asynchronous: false
               sourceSize: Qt.size(avatarSize, avatarSize)
