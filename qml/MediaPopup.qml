@@ -52,7 +52,7 @@ Item {
 
             layer.enabled: true
             layer.effect: MultiEffect {
-                shadowEnabled: true
+                shadowEnabled: mprisModule.artUrl !== ""
                 shadowColor: Theme.coverArtGlowShadow
                 shadowBlur: 2.6
                 shadowOpacity: 0.8
@@ -65,6 +65,15 @@ Item {
                 source: mprisModule.artUrl
                 fillMode: Image.PreserveAspectCrop
                 sourceSize: Qt.size(84, 84)
+              }
+
+            Text {
+                anchors.centerIn: parent
+                visible: mprisModule.artUrl === ""
+                text: "\uf001"
+                font.family: Theme.nerdFontFamily
+                font.pixelSize: 18
+                color: "#555"
             }
         }
 
