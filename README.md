@@ -58,7 +58,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   </tr>
   <tr>
     <td width="50%">
-      <p align="center"><b>Media player auto-open on media playing</b></p>
+      <p align="center"><b>Media playing popup</b></p>
       <img src="screenshots/image_3.webp" width="100%" alt="Media player auto open" />
     </td>
     <td width="50%">
@@ -160,7 +160,6 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 <details>
 <summary>Raw config example</summary>
----
 
 ```jsonc
 {
@@ -188,7 +187,6 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 }
 ```
 
----
 </details>
 
 ---

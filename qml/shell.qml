@@ -70,7 +70,7 @@ ShellRoot {
   readonly property int notifMaxHeight: 97
 
   // media player related
-  property bool mediaAutoOpened: true
+  property bool mediaAutoOpened: false
 
   PanelWindow {
     id: panelWindow
