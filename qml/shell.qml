@@ -70,10 +70,10 @@ ShellRoot {
   readonly property int notifMaxHeight: 97
 
   // media player related
-  property bool mediaAutoOpened: false
+  property bool mediaAutoOpened: true
 
   PanelWindow {
-
+    id: panelWindow
     WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher || box.wallpaperSwitcherOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     implicitHeight: 482
@@ -195,10 +195,10 @@ ShellRoot {
       implicitWidth: box.activeOsd === "battery" ? osdWidth
                      : box.activeOsd === "timer" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 305
-                     : controlCenter && mediaAutoOpened ? 380
                      : controlCenter ? 390
                      : activeOsd === "volume" ? osdWidth
                      : box.activeOsd === "brightness" ? osdWidth
+                     : mediaAutoOpened ? 340
                      : appLauncher ? 400
                      : miniDashboard ? 420
                      : cliphistOpen ? 460
@@ -208,14 +208,13 @@ ShellRoot {
       implicitHeight: activeOsd === "battery" ? osdHeight
                   : activeOsd === "timer" ? osdHeight
                   : (notificationModule.active && !notifFullscreenMode) ? 52
-                  : controlCenter && mprisModule.hasPlayer && mediaAutoOpened
-                      ? 124
                   : controlCenter && mprisModule.hasPlayer
                       ? (240 + notifBump)
                   : controlCenter
                       ? (118 + notifBump)
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
+                  : mediaAutoOpened ? 90
                   : cliphistOpen ? 270
                   : miniDashboard ? 155
                   : appLauncher ? 400
@@ -223,6 +222,7 @@ ShellRoot {
                   : (row.implicitHeight * Config.pillScale) + 10
 
       radius: notificationModule.active ? 99
+        : mediaAutoOpened ? 22
         : cliphistOpen ? 28
         : controlCenter && mprisModule.hasPlayer ? 23
         : controlCenter && (notificationModule.notifications.length > 0) ? 25
@@ -234,10 +234,14 @@ ShellRoot {
       Behavior on radius {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
-      color: controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
+
+      color: mediaAutoOpened ? Theme.bg1 : controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
-        if (!miniDashboard) calendarPopup.shown = false; weatherPopupLoader.item.shown = false
+          if (!box.miniDashboard) {
+              calendarPopup.shown = false
+              if (weatherPopupLoader.item) weatherPopupLoader.item.shown = false
+          }
       }
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
@@ -252,6 +256,8 @@ ShellRoot {
         onExited: box.hovered = false
 
         onClicked: (mouse) => {
+
+          if (mediaAutoOpened) return
 
           // restrict control center to only accept left click
           if (box.controlCenter) {
@@ -328,6 +334,7 @@ ShellRoot {
         spacing: 13 * Config.paddingScale
         opacity: !box.cliphistOpen
                  && !notificationModule.active
+                 && !mediaAutoOpened
                  && !box.controlCenter
                  && !box.miniDashboard
                  && box.activeOsd === ""
@@ -407,6 +414,7 @@ ShellRoot {
         opacity: box.cliphistOpen
                  && !notificationModule.active
                  && box.activeOsd === ""
+                 && !mediaAutoOpened
                  && !box.controlCenter ? 1 : 0
         visible: opacity > 0
 
@@ -433,6 +441,7 @@ ShellRoot {
         opacity: box.wallpaperSwitcherOpen
                  && !notificationModule.active
                  && box.activeOsd === ""
+                 && !mediaAutoOpened
                  && !box.controlCenter
                  && !box.miniDashboard
                  && !box.cliphistOpen
@@ -474,6 +483,7 @@ ShellRoot {
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""
+                   && !mediaAutoOpened
                    && !box.controlCenter
                    && !box.miniDashboard
                    && !box.cliphistOpen ? 1 : 0
@@ -498,11 +508,28 @@ ShellRoot {
           }
       }
 
+      // media popup
+      Item {
+          anchors.fill: parent
+          opacity: box.activeOsd === "" && !notificationModule.active ? 1 : 0
+          visible: opacity > 0
+
+          Loader {
+              anchors.centerIn: parent
+              active: mediaAutoOpened
+              asynchronous: true
+
+              sourceComponent: MediaPopup {
+                  active: mediaAutoOpened
+              }
+          }
+      }
+
       // control center opens on left click
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && box.activeOsd === "" && !notificationModule.active ? 1 : 0
+        opacity: box.controlCenter && !mediaAutoOpened && box.activeOsd === "" && !notificationModule.active ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter && box.activeOsd === "" ? box.implicitHeight - 25 : 0
 
@@ -515,13 +542,13 @@ ShellRoot {
 
         // media player
         MediaPlayer {
-          margin: box.controlCenter && mediaAutoOpened ? 5 : 14
+          margin: 14
           artistFontSize: 10
-          artistFontWeight: box.controlCenter && mediaAutoOpened ? 500 : 300
-          artistFontColor: box.controlCenter && mediaAutoOpened ? "#9b9b9b" : "#7b7b7b"
-          color: box.controlCenter && mediaAutoOpened ? "#1a1a1a" : "#151515"
-          radius: box.controlCenter && mprisModule.hasPlayer ? 16 : 25
-          border.width: box.controlCenter && mediaAutoOpened ? 0 : 1
+          artistFontWeight: 300
+          artistFontColor: "#7b7b7b"
+          color: "#151515"
+          radius: 16
+          border.width: 1
         }
 
         // control center buttons
@@ -550,7 +577,6 @@ ShellRoot {
           anchors.leftMargin: 15
           anchors.rightMargin: 2
           spacing: 5
-          visible: !mediaAutoOpened
 
           // volume
           RowLayout {
@@ -736,7 +762,7 @@ ShellRoot {
         bottomLeftRadius: 13
         bottomRightRadius: 13
         color: "#161616"
-        visible: notificationModule.notifications.length > 0 && box.controlCenter && !mediaAutoOpened
+        visible: notificationModule.notifications.length > 0 && box.controlCenter
         clip: true
         border.width: 1
         border.color: "#2f2f2f"
@@ -923,9 +949,11 @@ ShellRoot {
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
         opacity: box.miniDashboard
+                 && !mediaAutoOpened
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !box.cliphistOpen ? 1 : 0
+        visible: opacity > 0
 
         Behavior on opacity {
           SequentialAnimation {
@@ -942,8 +970,6 @@ ShellRoot {
                     box.miniDashboard = !box.miniDashboard
             }
         }
-
-        visible: opacity > 0
 
         RowLayout {
          // profile picture (display picture)
@@ -1222,7 +1248,7 @@ ShellRoot {
       function onToggleCalendar() {
         console.log("toggleCalendar launched, current opacity:", calendarPopup.opacity)
         calendarPopup.shown = !calendarPopup.shown
-        weatherPopupLoader.item.shown = false
+        if (weatherPopupLoader.item) weatherPopupLoader.item.shown = false
       }
     }
 
@@ -1230,6 +1256,7 @@ ShellRoot {
     Connections {
       target: weatherIndicatorItem
       function onToggleWeather() {
+        if (mediaAutoOpened) return
         if (!weatherPopupLoader.active)
           weatherPopupLoader.active = true
         else
@@ -1241,22 +1268,18 @@ ShellRoot {
     Connections {
         target: mprisModule
         function onNowPlaying() {
-          if (box.cliphistOpen || box.miniDashboard) return
-          if (!box.controlCenter) mediaAutoOpened = true
-          box.controlCenter = true
-          mediaPopupHideTimer.restart()
+            if (box.controlCenter) return
+            if (!box.mediaPopup) mediaAutoOpened = true
+            mediaPopupHideTimer.restart()
         }
     }
 
     Timer {
         id: mediaPopupHideTimer
-        interval: Config.mediaAutoOpenDuration
+        interval: Config.mediaPopupDuration
         repeat: false
         onTriggered: {
-          if (mediaAutoOpened) {
-            box.controlCenter = false
-            mediaAutoOpened = false
-          }
+          if (mediaAutoOpened) mediaAutoOpened = false
         }
     }
 
@@ -1270,7 +1293,7 @@ ShellRoot {
     }
   }
 
-  Mpris { id: mprisModule; visible: false }
+  MprisModule { id: mprisModule; visible: false }
 
   CountdownModule { id: countdownModule; visible: false }
 

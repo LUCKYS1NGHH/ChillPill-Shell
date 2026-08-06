@@ -4,7 +4,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 
 <div align="center">
 
-[![ChillPill-Shell 0.2.1](https://img.shields.io/badge/CPShell-0.2.1-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.3.0](https://img.shields.io/badge/CPShell-0.3.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -107,7 +107,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 ## Features
 
 - Main Pill Bar                : Battery, volume, workspaces, network, clock
-- Control Center               : Media Player, Buttons (WiFi, Silent Notifications, Timer), Volume and Brightness Sliders, Notifications Stack
+- Control Center               : Media Player, Buttons (WiFi, Silent Notifs, Timer), Volume and Brightness Sliders, Notification Stack
 - Cliphist (Clipboard History) : Search, Clipboard images preview, Item index status, `Delete` key to delete any item
 - Mini Dashboard               : Profile Image, Username, Hostname, Uptime, Battery, Basic network info, Today bandwidth usage, Datetime, Weather, Calendar, Power buttons (lock, sleep, shutdown, reboot)
 - DBus Notification            : App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
@@ -121,13 +121,13 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 - Main pill bar width expands on hover
 - Audio (to mute/unmute) and workspaces (to switch) in the main pill bar are clickable.
 - Control center's media player progress bar is not only for status, it's usable to control the media you playing.
-- Control center has WiFi controller which has list of active networks and has password prompt. also timer minutes can be change by right
-  click.
+- Control center has WiFi controller which has list of active networks and has password prompt. also timer minutes
+  can be change by right click.
 - Cliphist shows image previews from `~/.cache/quickshell/cliphist-imgs` by converting image binaries into real images and save there.
-- Notifications are able to show in slide animation (like iOS mute) while you playing video game or watching movie in full screen.
+- Notifications are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.
 - Your today's bandwidth status in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
-- Wallpaper switcher shows you the filename of the image on hover. uses `awww` in backend to update wallpaper.
+- Wallpaper switcher shows you the filename of the image on hover. uses `awww` in backend to update the wallpaper.
 ---
 </details>
 
@@ -144,7 +144,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
 | `textFontFamily` | Font family for general text | `Monocraft` |
 | `nerdFontFamily` | Font family for icons (Nerd Fonts) | `JetBrainsMono Nerd Font Propo` |
 | `timerPresets` | Timer minute presets | `[1, 5, 10, 15, 30]` |
-| `mediaAutoOpenDuration` | Media-playing popup duration (ms) | `2000` |
+| `mediaPopupDuration` | Media-playing popup duration (ms) | `2000` |
 | `maxWorkspaces` | Max workspaces shown in pill bar | `5` |
 | `notificationDisplayTime` | Notification popup duration (ms) | `3000` |
 | `maxNotificationsInStack` | Max notifications shown in stack | `20` |
@@ -171,7 +171,7 @@ A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especia
   "textFontFamily": "Monocraft",
   "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
   "timerPresets": [1, 5, 10, 15, 30],
-  "mediaAutoOpenDuration": 2000,
+  "mediaPopupDuration": 2000,
   "maxWorkspaces": 5,
   "notificationDisplayTime": 3000,
   "maxNotificationsInStack": 20,

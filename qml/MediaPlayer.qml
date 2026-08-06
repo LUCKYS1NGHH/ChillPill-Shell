@@ -81,7 +81,7 @@ Rectangle {
                     anchors.centerIn: parent
                     visible: mprisModule.artUrl === ""
                     text: "\uf001"
-                    font.family: "FiraCode Nerd Font Propo"
+                    font.family: Theme.nerdFontFamily
                     font.pixelSize: 18
                     color: "#555"
                 }
@@ -121,7 +121,7 @@ Rectangle {
 
                 Text {
                     text: "⏮"
-                    font.family: "FiraCode Nerd Font Propo"
+                    font.family: Theme.nerdFontFamily
                     font.pixelSize: 23
                     color: prevHover.containsMouse ? "#ffffff" : "#cfcfcf"
                     anchors.verticalCenter: parent.verticalCenter
@@ -137,7 +137,7 @@ Rectangle {
 
                 Text {
                     text: mprisModule.playing ? "󰏤" : "󰐊"
-                    font.family: "FiraCode Nerd Font Propo"
+                    font.family: Theme.nerdFontFamily
                     font.pixelSize: 23
                     color: playHover.containsMouse ? "#ffffff" : "#cdcdcd"
                     anchors.verticalCenter: parent.verticalCenter
@@ -153,7 +153,7 @@ Rectangle {
 
                 Text {
                     text: "⏭"
-                    font.family: "FiraCode Nerd Font Propo"
+                    font.family: Theme.nerdFontFamily
                     font.pixelSize: 23
                     color: nextHover.containsMouse ? "#ffffff" : "#b3b3b3"
                     anchors.verticalCenter: parent.verticalCenter
