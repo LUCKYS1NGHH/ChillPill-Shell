@@ -1,12 +1,17 @@
 # ChillPill-Shell
 
-A Lightweight and Feature-Rich dynamic pill shape bar made in Quickshell especially for those who don't have a Dedicated GPU (Like me) for their GNU/Linux Hyprland machine.
-
 <div align="center">
 
 [![ChillPill-Shell 0.3.0](https://img.shields.io/badge/CPShell-0.3.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+ChillPill-Shell is a **lightweight**, feature rich dynamic pill bar for Hyprland, built with **Quickshell**.
+It's aimed squarely at users running without a dedicated GPU (like me) — Eye candy for **No-GPU users**.
+
+It runs as a **standalone app**: launch it from your terminal or app launcher when you want it, rather than having it baked
+into your session at all times. It's not bound to any dotfiles.
 
 </div>
 
