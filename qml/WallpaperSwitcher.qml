@@ -34,6 +34,7 @@ Rectangle {
   function activateCurrent() {
     var path = wallpaperModel.get(wallGrid.currentIndex, "filePath")
     if (path) applyWallpaper(path)
+    if (Config.wsCloseOnWallpaperSet) closeRequested()
   }
 
   // check once whether awww exists on PATH
