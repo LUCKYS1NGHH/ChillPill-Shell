@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.3.0](https://img.shields.io/badge/CPShell-0.3.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.3.1](https://img.shields.io/badge/CPShell-0.3.1-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -162,6 +162,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `weatherRefreshInterval` | Weather refresh interval (ms) | `3600000` (1 hr) |
 | `defaultTerminal` | Terminal used to open TUI apps from launcher | `kitty` |
 | `wallpapersDir` | Wallpapers directory for wallpaper switcher | `~/Pictures/wallpapers` |
+| `wsCloseOnWallpaperSet` | Close wallpaper switcher after apply wallpaper | `true` |
 
 <details>
 <summary>Raw config example</summary>
@@ -188,7 +189,8 @@ into your session at all times. It's not bound to any dotfiles.
   "avoidDuplicateNotifications": true,
   "defaultTerminal": "kitty",
   "pillScale": 1.0,
-  "wallpapersDir": "~/Pictures/wallpapers"
+  "wallpapersDir": "~/Pictures/wallpapers",
+  "wsCloseOnWallpaperSet": true
 }
 ```
 
