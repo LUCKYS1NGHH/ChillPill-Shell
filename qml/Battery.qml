@@ -1,30 +1,29 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-
 RowLayout {
   id: root
-
   property string fg: "#dadada"
   property int fontSize: 10 * Config.pillScale
   property var battery: box.battery
   property bool charging: box.charging
-
+  property bool hasBattery: box.hasBattery
   spacing: 4 * Config.paddingScale
 
-  // icon
+  // icon: battery on laptops, plug on desktops
   Text {
     text: box.batteryIcon
-    color: box.batteryIconColor
+    color: hasBattery ? box.batteryIconColor : "#4bd25c"
 
     font {
       family: Theme.nerdFontFamily
-      pixelSize: fontSize
+      pixelSize: hasBattery ? fontSize : fontSize + 2
     }
   }
 
-  // percentage
+  // percentage, only makes sense with a battery like laptop
   Text {
+    visible: hasBattery
     text: box.batteryLevel + "%"
     color: fg
 
