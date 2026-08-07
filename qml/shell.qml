@@ -199,7 +199,7 @@ ShellRoot {
                      : activeOsd === "volume" ? osdWidth
                      : box.activeOsd === "brightness" ? osdWidth
                      : mediaAutoOpened ? 340
-                     : appLauncher ? 400
+                     : appLauncher ? 390
                      : miniDashboard ? 420
                      : cliphistOpen ? 460
                      : wallpaperSwitcherOpen ? 600
@@ -217,7 +217,7 @@ ShellRoot {
                   : mediaAutoOpened ? 90
                   : cliphistOpen ? 270
                   : miniDashboard ? 155
-                  : appLauncher ? 400
+                  : appLauncher ? 410
                   : wallpaperSwitcherOpen ? 308
                   : (row.implicitHeight * Config.pillScale) + 10
 
@@ -479,7 +479,7 @@ ShellRoot {
       Item {
           anchors.centerIn: parent
           width: box.implicitWidth - 28
-          height: box.appLauncher ? 372 : 0
+          height: box.appLauncher ? 380 : 0
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""

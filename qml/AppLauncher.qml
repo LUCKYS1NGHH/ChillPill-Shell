@@ -118,7 +118,7 @@ Item {
             width: parent.width
             height: 30
             radius: 8
-            color: "#252525"
+            color: "#222222"
             border.color: searchInput.activeFocus ? "#666" : "#333"
             border.width: 1
             Behavior on border.color { ColorAnimation { duration: 120 } }
@@ -170,7 +170,7 @@ Item {
         ListView {
             id: appList
             width: parent.width
-            height: parent.height - 78
+            height: parent.height - 67
             clip: true
             model: root.filteredApps
             currentIndex: root.selectedIndex
@@ -184,8 +184,8 @@ Item {
                 height: 44
                 radius: 9
                 color: index === root.selectedIndex
-                       ? Qt.rgba(121, 34, 21, 0.05)
-                       : (rowHover.hovered ? "#212121" : "transparent")
+                       ? Qt.rgba(0, 0, 0, 0.20)
+                       : (rowHover.hovered ? Qt.rgba(0, 0, 0, 0.20) : "transparent")
                 Behavior on color { ColorAnimation { duration: 150 } }
 
                 Rectangle {
