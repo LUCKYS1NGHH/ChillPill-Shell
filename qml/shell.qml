@@ -131,16 +131,14 @@ ShellRoot {
       property bool wallpaperSwitcherOpen: false
 
       property var battery: UPower.displayDevice
-      property bool charging: battery.state === UPowerDeviceState.Charging
-
-      readonly property string batteryIconColor: box.charging || box.batteryLevel > 30 ? "#4bd25c"
-         : box.batteryLevel <= 15 ? "#e22323"
-         : "#eecc47"
-
-      readonly property int batteryLevel: Math.round(battery.percentage * 100)
-
-      // get battery icon according percentage
+      property bool hasBattery: battery.isLaptopBattery && battery.isPresent
+      property bool charging: hasBattery && battery.state === UPowerDeviceState.Charging
+      readonly property string batteryIconColor: box.charging || box.batteryLevel > 30 ? "#4bd25c" : box.batteryLevel <= 15 ? "#e22323" : "#eecc47"
+      readonly property int batteryLevel: hasBattery ? Math.round(battery.percentage * 100) : 0
+      // battery icon on laptops, plug icon on desktops
       readonly property string batteryIcon: {
+        if (!hasBattery)
+          return String.fromCodePoint(0xf06a5) + " " // nf-md-power_plug
         const icons = [0xf0083, 0xf007a, 0xf007d, 0xf007c, 0xf007d, 0xf007e, 0xf007f, 0xf0082, 0xf0081, 0xf0079]
         const base = String.fromCodePoint(icons[Math.min(Math.floor(batteryLevel / 10), 9)])
         return charging ? base + String.fromCodePoint(0xf140b) : base
