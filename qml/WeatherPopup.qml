@@ -183,6 +183,7 @@ Rectangle {
           color: "#ffcd58"
           font.family: Config.nerdFontFamily
           font.pixelSize: weatherPopup.iconSizeMedium
+          Layout.leftMargin: 10
         }
 
         Text {
@@ -196,7 +197,6 @@ Rectangle {
       Item { Layout.fillWidth: true }
 
       RowLayout {
-        spacing: 5
         Text {
           text: "\ue34d"
           color: "#ff904d"
@@ -209,6 +209,7 @@ Rectangle {
           color: weatherPopup.secondaryText
           font.family: Theme.fontFamily
           font.pixelSize: weatherPopup.fontSizeSmall
+          Layout.rightMargin: 10
         }
       }
     }

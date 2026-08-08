@@ -10,7 +10,7 @@ Rectangle {
     anchors.right: parent.right
     height: mprisModule.hasPlayer ? 118 : 0
     radius: 12
-    color: "#212121"
+    color: "#1a1a1a"
     visible: mprisModule.hasPlayer
     clip: true
     border.color: "#202020"
@@ -51,7 +51,7 @@ Rectangle {
 
      Column {
         anchors.fill: parent
-        anchors.margins: margin
+        anchors.margins: 16
         spacing: 15
 
         // top row -> art + info + controls
@@ -96,7 +96,7 @@ Rectangle {
                 Text {
                     width: parent.width
                     text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
-                    color: "#e8e8e8"
+                    color: "#e9e9e9"
                     font.pixelSize: 12
                     font.bold: true
                     font.family: Theme.fontFamily
