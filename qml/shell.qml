@@ -222,8 +222,9 @@ ShellRoot {
       radius: notificationModule.active ? 99
         : mediaAutoOpened ? 22
         : cliphistOpen ? 28
-        : controlCenter && mprisModule.hasPlayer ? 23
-        : controlCenter && (notificationModule.notifications.length > 0) ? 25
+        : controlCenter && (notificationModule.notifications.length > 0) ? 28
+        : controlCenter && mprisModule.hasPlayer ? 25
+        : controlCenter ? 20
         : appLauncher ? 30
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
@@ -582,11 +583,21 @@ ShellRoot {
             spacing: 14
 
             Text {
+              id: volIcon
               text: volumeModule.icon
               color: volumeModule.muted ? "#fd2222" : Theme.fg
               font.family: Theme.nerdFontFamily
               font.pixelSize: 13
-              anchors.leftMargin: 10
+              Behavior on color { ColorAnimation { duration: 100 } }
+
+              // fade + scale pulse on every text change
+              onTextChanged: volPulse.restart()
+              scale: 1.0
+              SequentialAnimation {
+                  id: volPulse
+                  NumberAnimation { target: volIcon; property: "scale"; to: 1.15; duration: 60 }
+                  NumberAnimation { target: volIcon; property: "scale"; to: 1.0; duration: 100 }
+              }
             }
 
             Rectangle {
@@ -633,10 +644,20 @@ ShellRoot {
             spacing: 14
 
             Text {
+              id: blIcon
               text: brightnessModule.icon
               color: Theme.fg
               font.family: Theme.nerdFontFamily
               font.pixelSize: 13
+
+              // fade+scale pulse on every text change
+              onTextChanged: blPulse.restart()
+              scale: 1.0
+              SequentialAnimation {
+                  id: blPulse
+                  NumberAnimation { target: blIcon; property: "scale"; to: 1.15; duration: 60 }
+                  NumberAnimation { target: blIcon; property: "scale"; to: 1.0; duration: 100 }
+              }
             }
 
             Rectangle {
