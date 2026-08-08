@@ -25,7 +25,7 @@ PanelWindow {
 
   exclusionMode: ExclusionMode.Ignore
   width: 270
-  height: 360
+  height: 348
   color: "transparent"
 
   // auto hide if control center close
