@@ -477,8 +477,8 @@ ShellRoot {
       // app launcher opens through IPC
       Item {
           anchors.centerIn: parent
-          width: box.implicitWidth - 28
-          height: box.appLauncher ? 380 : 0
+          width: box.implicitWidth - 26
+          height: box.appLauncher ? 384 : 0
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""
