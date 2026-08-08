@@ -156,11 +156,11 @@ ShellRoot {
       // control center UI
       property real ccButtonBorderWidth: 1
       property string ccButtonBorderColor: "#202020"
-      property int ccButtonWidth: 112
+      property int ccButtonWidth: 110
       property int ccButtonHeight: 35
       property int ccButtonRadius: 10
       property string ccButtonBgOff: "#151515"
-      property string ccButtonFgOff: "#a4a4a4"
+      property string ccButtonFgOff: "#a8a8a8"
       property int sliderHeight: 4
       property int sliderRadius: 4
       property string sliderColor: "#c9c9c9"
@@ -556,8 +556,8 @@ ShellRoot {
           buttonWidth: box.ccButtonWidth
           buttonHeight: box.ccButtonHeight
           buttonRadius: box.ccButtonRadius
-          buttonBgOff: box.controlCenter && !mprisModule.hasPlayer ? "#222222" : box.ccButtonBgOff
-          buttonFgOff: box.controlCenter && !mprisModule.hasPlayer ? "#999999" : box.ccButtonFgOff
+          buttonBgOff: /*box.controlCenter && !mprisModule.hasPlayer ? "#222222" :*/ box.ccButtonBgOff
+          buttonFgOff: /*box.controlCenter && !mprisModule.hasPlayer ? "#999999" :*/ box.ccButtonFgOff
           controlCenterOpen: box.controlCenter
           mediaAutoOpened: mediaAutoOpened
           hasPlayer: mprisModule.hasPlayer

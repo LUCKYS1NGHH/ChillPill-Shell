@@ -38,8 +38,10 @@ RowLayout {
     height: root.buttonHeight
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
-    color: WifiController.enabled ? "#212529" : (wifiHover.hovered ? Qt.lighter(root.buttonBgOff, 1.5) : root.buttonBgOff)
-    border.width: buttonBorderWidth
+    color: WifiController.enabled
+            ? (wifiHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
+            : (wifiHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    border.width: WifiController.enabled ? 0 : buttonBorderWidth
     border.color: buttonBorderColor
     scale: wifiMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
@@ -50,7 +52,7 @@ RowLayout {
       spacing: 5
       Text {
         text: "\uf1eb" // wifi glyph
-        color: WifiController.enabled ? "#3f7de0" : root.buttonFgOff
+        color: WifiController.enabled ? "#4282e9" : root.buttonFgOff
         font { family: Theme.nerdFontFamily; pixelSize: 14 }
       }
       Text {
@@ -100,8 +102,10 @@ RowLayout {
     height: root.buttonHeight
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
-    color: notificationModule.dndEnabled ? "#2e2c28" : (dndHover.hovered ? Qt.lighter(root.buttonBgOff, 1.5) : root.buttonBgOff)
-    border.width: buttonBorderWidth
+    color: notificationModule.dndEnabled
+    ? (dndHover.hovered ? Qt.lighter("#262626", 1.2) : "#262626")
+    : (dndHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    border.width: notificationModule.dndEnabled ? 0 : buttonBorderWidth
     border.color: buttonBorderColor
     scale: dndMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
@@ -109,7 +113,7 @@ RowLayout {
 
     Text {
       text: String.fromCodePoint(0xf1f6)
-      color: notificationModule.dndEnabled ? "#fbf5e8" : root.buttonFgOff
+      color: notificationModule.dndEnabled ? "#fff9eb" : root.buttonFgOff
       anchors.centerIn: parent
       font { family: Theme.nerdFontFamily; pixelSize: 14 }
     }
@@ -130,8 +134,10 @@ RowLayout {
     width: root.buttonWidth
     height: root.buttonHeight
     radius: root.buttonRadius
-    color: countdownModule.running ? "#25282c" : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.5) : root.buttonBgOff)
-    border.width: buttonBorderWidth
+    color: countdownModule.running
+           ? (timerHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
+           : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
+    border.width: countdownModule.running ? 0 : buttonBorderWidth
     border.color: buttonBorderColor
     scale: timerMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
@@ -147,7 +153,7 @@ RowLayout {
           if (countdownModule.remainingSeconds > 0) return String.fromCodePoint(0xf1ae0)
           return String.fromCodePoint(0xf13ab)
         }
-        color: countdownModule.running ? "#3978c7" : root.buttonFgOff
+        color: countdownModule.running ? "#4490ee" : root.buttonFgOff
         font { family: Theme.nerdFontFamily; pixelSize: 14 }
       }
       Text {
