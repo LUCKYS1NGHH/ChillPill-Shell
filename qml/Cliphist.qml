@@ -19,8 +19,6 @@ Item {
 
     signal closeRequested()
 
-    width: 340
-    height: 220
     visible: shown
     opacity: shown ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 180 } }

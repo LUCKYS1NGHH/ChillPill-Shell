@@ -208,6 +208,7 @@ Item {
 
                     IconImage {
                         id: appIcon
+                        visible: Quickshell.iconPath(modelData.icon, true)
                         Layout.preferredWidth: 26
                         Layout.preferredHeight: 26
                         Layout.alignment: Qt.AlignVCenter
@@ -215,6 +216,16 @@ Item {
                         asynchronous: true
                         scale: index === root.selectedIndex ? 1.10 : (rowHover.hovered ? 1.10 : 1)
                         Behavior on scale { NumberAnimation { duration: 500; easing.type: Easing.OutExpo } }
+                    }
+
+                    Text {
+                        visible: !Quickshell.iconPath(modelData.icon, true)
+                        text: "?"
+                        color: Theme.fg
+                        font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 10
                     }
 
                     ColumnLayout {
