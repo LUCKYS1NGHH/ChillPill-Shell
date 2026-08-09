@@ -156,7 +156,7 @@ ShellRoot {
       // control center UI
       property real ccButtonBorderWidth: 1
       property string ccButtonBorderColor: "#202020"
-      property int ccButtonWidth: 110
+      property real ccButtonWidth: 85.3
       property int ccButtonHeight: 35
       property int ccButtonRadius: 10
       property string ccButtonBgOff: "#151515"
