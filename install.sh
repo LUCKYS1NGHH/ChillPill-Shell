@@ -22,7 +22,8 @@ fi
 if [[ "$1" != "--skip-deps" ]]; then
   if command -v pacman &>/dev/null; then
       info "Installing dependencies in your Arch Linux."
-      pacman -S --noconfirm --needed quickshell cliphist inotify-tools brightnessctl cmake qt6-multimedia python-psutil wl-clipboard awww
+      pacman -S --noconfirm --needed quickshell cliphist brightnessctl wl-clipboard \
+             inotify-tools cmake qt6-multimedia python-psutil awww blueman
 
       info "Installing nusgmon (to record your bandwidth) through git"
       git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
@@ -38,6 +39,7 @@ bin_exists nusgmon || die "Nusgmon not installed."
 bin_exists inotifywait || die "Inotify not installed."
 bin_exists brightnessctl || die "Brightnessctl not installed."
 bin_exists cmake || die "Cmake not installed."
+bin_exists blueman-manager || warn "Blueman not installed." # warn here because not everyone use bluetooth
 bin_exists wl-copy || die "Wl-clipabord not installed."
 
 REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
