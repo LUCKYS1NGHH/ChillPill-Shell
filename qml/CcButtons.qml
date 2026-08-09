@@ -54,7 +54,7 @@ RowLayout {
       Text {
         text: "\uf1eb" // wifi glyph
         color: WifiController.enabled ? "#4282e9" : root.buttonFgOff
-        font { family: Theme.nerdFontFamily; pixelSize: 14 }
+        font { family: Theme.nerdFontFamily; pixelSize: 12 }
       }
       Text {
         text: !WifiController.enabled ? "Off"
@@ -114,7 +114,7 @@ RowLayout {
       text: String.fromCodePoint(0xf1f6)
       color: notificationModule.dndEnabled ? "#fff9eb" : root.buttonFgOff
       anchors.centerIn: parent
-      font { family: Theme.nerdFontFamily; pixelSize: 14 }
+      font { family: Theme.nerdFontFamily; pixelSize: 13 }
     }
     HoverHandler { id: dndHover }
     MouseArea {

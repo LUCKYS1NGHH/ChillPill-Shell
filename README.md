@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.3.2](https://img.shields.io/badge/CPShell-0.3.2-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.4.0](https://img.shields.io/badge/CPShell-0.4.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -111,27 +111,40 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Features
 
-- Main Pill Bar                : Battery, volume, workspaces, network, clock
-- Control Center               : Media Player, Buttons (WiFi, Silent Notifs, Timer), Volume and Brightness Sliders, Notification Stack
-- Cliphist (Clipboard History) : Search, Clipboard images preview, Item index status, `Delete` key to delete any item
-- Mini Dashboard               : Profile Image, Username, Hostname, Uptime, Battery, Basic network info, Today bandwidth usage, Datetime, Weather, Calendar, Power buttons (lock, sleep, shutdown, reboot)
-- DBus Notification            : App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
-- OSD                          : Battery, volume, brightness, timer
-- Wallpaper switcher           : A wallpaper switcher
+- **Main Pill Bar**                - Battery, volume, workspaces, network, clock
+- **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume and brightness sliders, notification Stack
+- **Cliphist (Clipboard History)** - Search, clipboard image preview, item index status, `Delete` key to delete any item
+- **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
+- **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst entirely now)
+- **OSD**                          - Battery, volume, brightness, timer
+- **Wallpaper switcher**           - A wallpaper switcher
 
 <details>
 <summary>Know more</summary>
 
 ---
 - Main pill bar width expands on hover
+
 - Audio (to mute/unmute) and workspaces (to switch) in the main pill bar are clickable.
+
 - Control center's media player progress bar is not only for status, it's usable to control the media you playing.
+
 - Control center has WiFi controller which has list of active networks and has password prompt. also timer minutes
   can be change by right click.
+
+- Control center has also Bluetooth controller which has list of active, pair & connected devices/networks (make sure service is running). then 3 cases to connect bluetooth:
+
+  - case 1: device wants a PIN or passkey typed in
+  - case 2: device just wants us to display a code
+  - case 3: device wants a yes/no confirmation of a shown passkey
+
 - Cliphist shows image previews from `~/.cache/quickshell/cliphist-imgs` by converting image binaries into real images and save there.
+
 - Notifications are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.
+
 - Your today's bandwidth status in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
+
 - Wallpaper switcher shows you the filename of the image on hover. uses `awww` in backend to update the wallpaper.
 ---
 </details>
@@ -209,7 +222,8 @@ into your session at all times. It's not bound to any dotfiles.
 - [inotify-tools](https://github.com/inotify-tools/inotify-tools)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
-- awww
+- [blueman](https://github.com/blueman-project/blueman)
+- [awww](https://codeberg.org/LGFae/awww)
 - Qt Multimedia (`qt6-multimedia` on Arch)
 
 > [!TIP]
