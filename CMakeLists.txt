@@ -16,6 +16,12 @@ qt_add_qml_module(IslandBackend
         backend/WifiController.cpp
         backend/WifiNetworkModel.h
         backend/WifiNetworkModel.cpp
+        backend/BluetoothPairingAgent.h
+        backend/BluetoothPairingAgent.cpp
+        backend/BluetoothController.h
+        backend/BluetoothController.cpp
+        backend/BluetoothDeviceModel.h
+        backend/BluetoothDeviceModel.cpp
 )
 
 target_include_directories(IslandBackend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backend)
