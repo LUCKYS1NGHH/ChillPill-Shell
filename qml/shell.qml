@@ -223,8 +223,7 @@ ShellRoot {
         : mediaAutoOpened ? 22
         : cliphistOpen ? 28
         : controlCenter && (notificationModule.notifications.length > 0) && mprisModule.hasPlayer ? 27
-        : controlCenter && (notificationModule.notifications.length > 0) ? 26
-        : controlCenter && mprisModule.hasPlayer ? 25
+        : controlCenter && (!notificationModule.notifications.length > 0 || !mprisModule.hasPlayer) ? 26
         : controlCenter ? 18
         : appLauncher ? 30
         : miniDashboard ? 20
@@ -235,7 +234,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: mediaAutoOpened ? Theme.bg1 : controlCenter && mprisModule.hasPlayer ? "#1a1a1a" : bg
+      color: mediaAutoOpened && !controlCenter ? Theme.bg1 : controlCenter ? "#1a1a1a" : bg
 
       onMiniDashboardChanged: {
           if (!box.miniDashboard) {
@@ -511,7 +510,7 @@ ShellRoot {
       // media popup
       Item {
           anchors.fill: parent
-          opacity: box.activeOsd === "" && !notificationModule.active ? 1 : 0
+          opacity: box.activeOsd === "" && !notificationModule.active && !box.controlCenter ? 1 : 0
           visible: opacity > 0
 
           Loader {
@@ -529,7 +528,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && !mediaAutoOpened && box.activeOsd === "" && !notificationModule.active ? 1 : 0
+        opacity: box.controlCenter && box.activeOsd === "" && !notificationModule.active ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter && box.activeOsd === "" ? box.implicitHeight - 25 : 0
 
@@ -558,8 +557,8 @@ ShellRoot {
           buttonWidth: box.ccButtonWidth
           buttonHeight: box.ccButtonHeight
           buttonRadius: box.ccButtonRadius
-          buttonBgOff: /*box.controlCenter && !mprisModule.hasPlayer ? "#222222" :*/ box.ccButtonBgOff
-          buttonFgOff: /*box.controlCenter && !mprisModule.hasPlayer ? "#999999" :*/ box.ccButtonFgOff
+          buttonBgOff: box.ccButtonBgOff
+          buttonFgOff: box.ccButtonFgOff
           controlCenterOpen: box.controlCenter
           mediaAutoOpened: mediaAutoOpened
           hasPlayer: mprisModule.hasPlayer
