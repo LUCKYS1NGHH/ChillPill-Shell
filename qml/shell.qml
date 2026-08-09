@@ -192,10 +192,10 @@ ShellRoot {
       // adjust box shape conditionally
       implicitWidth: box.activeOsd === "battery" ? osdWidth
                      : box.activeOsd === "timer" ? osdWidth
-                     : (notificationModule.active && !notifFullscreenMode) ? 305
-                     : controlCenter ? 390
                      : activeOsd === "volume" ? osdWidth
                      : box.activeOsd === "brightness" ? osdWidth
+                     : (notificationModule.active && !notifFullscreenMode) ? 305
+                     : controlCenter ? 390
                      : mediaAutoOpened ? 340
                      : appLauncher ? 390
                      : miniDashboard ? 420
@@ -205,13 +205,13 @@ ShellRoot {
 
       implicitHeight: activeOsd === "battery" ? osdHeight
                   : activeOsd === "timer" ? osdHeight
+                  : activeOsd === "volume" ? osdHeight
+                  : activeOsd === "brightness" ? osdHeight
                   : (notificationModule.active && !notifFullscreenMode) ? 52
                   : controlCenter && mprisModule.hasPlayer
                       ? (240 + notifBump)
                   : controlCenter
                       ? (118 + notifBump)
-                  : activeOsd === "volume" ? osdHeight
-                  : activeOsd === "brightness" ? osdHeight
                   : mediaAutoOpened ? 90
                   : cliphistOpen ? 270
                   : miniDashboard ? 155
@@ -222,9 +222,10 @@ ShellRoot {
       radius: notificationModule.active ? 99
         : mediaAutoOpened ? 22
         : cliphistOpen ? 28
-        : controlCenter && (notificationModule.notifications.length > 0) ? 28
+        : controlCenter && (notificationModule.notifications.length > 0) && mprisModule.hasPlayer ? 27
+        : controlCenter && (notificationModule.notifications.length > 0) ? 26
         : controlCenter && mprisModule.hasPlayer ? 25
-        : controlCenter ? 20
+        : controlCenter ? 18
         : appLauncher ? 30
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
