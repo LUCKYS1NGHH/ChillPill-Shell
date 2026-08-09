@@ -97,7 +97,7 @@ into your session at all times. It's not bound to any dotfiles.
       <img src="screenshots/image_9.webp" width="100%" alt="App launcher with search support and apps index status"
     </td>
     <td width="50%>
-      <p align="center"><b>Control center — Wifi panel</b></p>
+      <p align="center"><b>Control center — Wifi and Blueooth panel</b></p>
       <img src="screenshots/image_10.webp" width="100%" alt="Control center with wifi panel opened">
     </td>
   </tr>
