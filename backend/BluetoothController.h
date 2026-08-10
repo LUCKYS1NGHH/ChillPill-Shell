@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QString>
 #include <QDBusMessage>
+#include <QTimer>
 #include <QtQml/qqml.h>
 
 #include "BluetoothDeviceModel.h"
@@ -56,6 +57,7 @@ private slots:
     void handleInterfacesRemoved(const QDBusMessage &msg);
     void handlePropertiesChanged(const QDBusMessage &msg);
     void handleBluezNameOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
+    void retryFindAdapter(); // covers the cold-boot race: bluetoothd owns the bus name before hci0 is registered
 
 private:
     void setEnabledState(bool on);
@@ -71,6 +73,7 @@ private:
     QString devicePathForAddress(const QString &address) const;
     void refreshCurrentDeviceName(); // scans the model for a connected device, emits if changed
     void setAdapterName(const QString &name);
+    void startAdapterRetry(); // begin/continue polling for the adapter to appear
 
     void asyncCallNoReply(const QString &objectPath, const QString &interface,
                            const QString &method, const QVariantList &args = {});
@@ -83,4 +86,6 @@ private:
     QString m_currentDeviceName;
     QString m_adapterName;
     BluetoothDeviceModel *m_devices = nullptr;
+    QTimer *m_adapterRetryTimer = nullptr;
+    int m_adapterRetriesLeft = 0;
 };

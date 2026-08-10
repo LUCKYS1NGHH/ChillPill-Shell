@@ -28,6 +28,13 @@ BluetoothController::BluetoothController(QObject *parent)
     connect(this, &BluetoothController::scanningChanged, this, &BluetoothController::statusTextChanged);
     connect(this, &BluetoothController::busyChanged, this, &BluetoothController::statusTextChanged);
 
+    // covers the cold-boot race: bluetoothd claims the bus name before hci0 finishes
+    // firmware init and gets registered as org.bluez.Adapter1, a single failed lookup
+    // at startup shouldn't be permanent
+    m_adapterRetryTimer = new QTimer(this);
+    m_adapterRetryTimer->setInterval(1500);
+    connect(m_adapterRetryTimer, &QTimer::timeout, this, &BluetoothController::retryFindAdapter);
+
     connectToBluez();
 }
 
@@ -96,9 +103,33 @@ void BluetoothController::connectToBluez() {
                 "PropertiesChanged", this, SLOT(handlePropertiesChanged(QDBusMessage)));
 
     if (findAdapter()) {
+        m_adapterRetryTimer->stop();
+        m_adapterRetriesLeft = 0;
         populateExistingDevices();
     } else {
         setErrorMessage("No Bluetooth adapter found");
+        startAdapterRetry();
+    }
+}
+
+void BluetoothController::startAdapterRetry() {
+    if (!m_adapterPath.isEmpty()) return; // already have one, nothing to retry
+    m_adapterRetriesLeft = 8; // ~12s of polling, generous for slow firmware init on cold boot
+    m_adapterRetryTimer->start();
+}
+
+void BluetoothController::retryFindAdapter() {
+    if (!m_adapterPath.isEmpty()) {
+        m_adapterRetryTimer->stop();
+        return;
+    }
+    if (--m_adapterRetriesLeft <= 0) {
+        m_adapterRetryTimer->stop();
+        return; // give up quietly - NameOwnerChanged/InterfacesAdded will still catch it later
+    }
+    if (findAdapter()) {
+        m_adapterRetryTimer->stop();
+        populateExistingDevices();
     }
 }
 
@@ -122,6 +153,7 @@ void BluetoothController::handleBluezNameOwnerChanged(const QString &name, const
         connectToBluez();
     } else if (newOwner.isEmpty()) {
         // bluez went away
+        m_adapterRetryTimer->stop();
         m_adapterPath.clear();
         setEnabledState(false);
         setErrorMessage("bluetoothd is not running");
@@ -135,7 +167,9 @@ bool BluetoothController::findAdapter() {
         manager.call("GetManagedObjects");
 
     if (!reply.isValid()) {
-        setErrorMessage(reply.error().message());
+        // whatever the exact D-Bus reason (bluetoothd off, activation race, etc.), it all
+        // means the same thing to the user - show our own custom message, not bluez's raw error text
+        setErrorMessage("No Bluetooth adapter found");
         return false;
     }
 
@@ -147,6 +181,7 @@ bool BluetoothController::findAdapter() {
         const QVariantMap adapterProps = interfaces.value(kAdapterIface);
         setEnabledState(adapterProps.value("Powered", false).toBool());
         setAdapterName(adapterProps.value("Alias", adapterProps.value("Name")).toString());
+        setErrorMessage(QString()); // clear any stale "no adapter" error from an earlier failed lookup
         return true;
     }
 
@@ -225,6 +260,7 @@ void BluetoothController::handleInterfacesAdded(const QDBusMessage &msg) {
     // adapter showing up late (bluetoothd claims the bus name before hci0 is registered)
     if (m_adapterPath.isEmpty() && interfaces.contains(kAdapterIface)) {
         m_adapterPath = path;
+        m_adapterRetryTimer->stop();
         setErrorMessage(QString());
         const QVariantMap adapterProps = interfaces.value(kAdapterIface);
         setEnabledState(adapterProps.value("Powered", false).toBool());
@@ -344,8 +380,9 @@ void BluetoothController::pairDevice(const QString &address) {
         if (reply.isError()) {
             setErrorMessage("Pairing with " + address + " failed: " + reply.error().message());
         } else {
-            // trust it as it's once paired so future connects don't need re-authorization
-            asyncCallNoReply(devicePathForAddress(address), "org.freedesktop.DBus.Properties", "Set");
+            // trust it once paired so future connects don't need re-authorization
+            asyncCallNoReply(devicePathForAddress(address), "org.freedesktop.DBus.Properties", "Set",
+                { QVariant("org.bluez.Device1"), QVariant("Trusted"), QVariant::fromValue(QDBusVariant(true)) });
         }
     });
 }
