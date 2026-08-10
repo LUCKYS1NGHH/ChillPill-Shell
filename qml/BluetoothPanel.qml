@@ -20,8 +20,8 @@ PanelWindow {
                                  ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
   exclusionMode: ExclusionMode.Ignore
-  implicitWidth: 270
-  implicitHeight: 348
+  width: 270
+  height: 348
   color: "transparent"
 
   onVisibleChanged: {

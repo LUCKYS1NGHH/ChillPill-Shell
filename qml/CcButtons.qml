@@ -86,7 +86,7 @@ RowLayout {
 
   WifiPanel {
     visible: root.wifiPanelOpened
-    anchorX: wifiBtn.mapToGlobal(0, 0).x - width  // sit left of the wifi button
+    anchorX: root.mapToGlobal(root.width, 0).x - 595 - 30
     anchorY: wifiBtn.mapToGlobal(0, 0).y
   }
 
@@ -236,7 +236,7 @@ RowLayout {
 
   BluetoothPanel {
     visible: root.btPanelOpened
-    anchorX: btBtn.mapToGlobal(0, 0).x + 889
+    anchorX: root.mapToGlobal(root.width, 0).x + 29
     anchorY: btBtn.mapToGlobal(0, 0).y
   }
 }
