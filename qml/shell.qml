@@ -223,9 +223,9 @@ ShellRoot {
       readonly property real baseRadius: notificationModule.active ? 99
         : mediaAutoOpened ? 22
         : cliphistOpen ? 28
-        : controlCenter && (notificationModule.notifications.length > 0) && mprisModule.hasPlayer ? 27
-        : controlCenter && (!notificationModule.notifications.length > 0 || !mprisModule.hasPlayer) ? 26
-        : controlCenter ? 18
+        : controlCenter ? (notificationModule.notifications.length > 0
+          ? (mprisModule.hasPlayer ? 27 : 25)
+          : (mprisModule.hasPlayer ? 26 : 22))
         : appLauncher ? 30
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
