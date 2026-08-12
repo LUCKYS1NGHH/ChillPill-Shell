@@ -33,6 +33,7 @@ Singleton {
       property bool avoidDuplicateNotifications: true
       property string defaultTerminal: "kitty"
       property real pillScale: 1.0
+      property real dpiScale: 1.4
       property string wallpapersDir: Quickshell.env("HOME") + "/Pictures/wallpapers"
       property bool wsCloseOnWallpaperSet: true
     }
@@ -58,6 +59,7 @@ Singleton {
   readonly property alias avoidDuplicateNotifications: adapter.avoidDuplicateNotifications
   readonly property alias defaultTerminal: adapter.defaultTerminal
   readonly property alias pillScale: adapter.pillScale
+  readonly property alias dpiScale: adapter.dpiScale
   readonly property real paddingScale: 1 + (pillScale - 1) * 0.6  // sub linear, keep padding sane
   readonly property alias wallpapersDir: adapter.wallpapersDir
   readonly property alias wsCloseOnWallpaperSet: adapter.wsCloseOnWallpaperSet
