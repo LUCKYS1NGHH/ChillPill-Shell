@@ -76,7 +76,9 @@ ShellRoot {
     id: panelWindow
     WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher || box.wallpaperSwitcherOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 482
+    implicitHeight: 485 * scale
+    onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
+    property real scale: screen ? screen.devicePixelRatio : 1.0
 
     anchors {
       top: true
@@ -84,11 +86,8 @@ ShellRoot {
       right: true
     }
 
-    margins {
-      top: Config.pillTopMargin
-    }
-
     // fixed gap of the active window for the top bar
+    margins.top: Config.pillTopMargin
     exclusiveZone: Config.pillBottomMargin
     color: "transparent"
 
@@ -190,10 +189,12 @@ ShellRoot {
         ? Math.min(notifList.contentHeight + 40, 130) : 0
 
       // adjust box shape conditionally
-      implicitWidth: box.activeOsd === "battery" ? osdWidth
-                     : box.activeOsd === "timer" ? osdWidth
+      readonly property real dpi: Config.dpiScale
+
+      readonly property real baseWidth: activeOsd === "battery" ? osdWidth
+                     : activeOsd === "timer" ? osdWidth
                      : activeOsd === "volume" ? osdWidth
-                     : box.activeOsd === "brightness" ? osdWidth
+                     : activeOsd === "brightness" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 305
                      : controlCenter ? 390
                      : mediaAutoOpened ? 340
@@ -203,7 +204,7 @@ ShellRoot {
                      : wallpaperSwitcherOpen ? 600
                      : row.implicitWidth + (12 * Config.paddingScale) + (hovered ? 68 : 56) * Config.paddingScale
 
-      implicitHeight: activeOsd === "battery" ? osdHeight
+      readonly property real baseHeight: activeOsd === "battery" ? osdHeight
                   : activeOsd === "timer" ? osdHeight
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
@@ -219,7 +220,7 @@ ShellRoot {
                   : wallpaperSwitcherOpen ? 308
                   : (row.implicitHeight * Config.pillScale) + 10
 
-      radius: notificationModule.active ? 99
+      readonly property real baseRadius: notificationModule.active ? 99
         : mediaAutoOpened ? 22
         : cliphistOpen ? 28
         : controlCenter && (notificationModule.notifications.length > 0) && mprisModule.hasPlayer ? 27
@@ -229,6 +230,12 @@ ShellRoot {
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
         : 20 * Config.pillScale
+
+      implicitWidth: baseWidth
+      implicitHeight: baseHeight
+      radius: baseRadius
+      scale: dpi
+      transformOrigin: Item.Top
 
       Behavior on radius {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
