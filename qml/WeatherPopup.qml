@@ -22,12 +22,12 @@ Rectangle {
   property bool shown: false
   visible: opacity > 0.01
   opacity: shown ? 1 : 0
-  width: 280
-  height: contentCol.implicitHeight + 26
+  width: 280 * box.dpi
+  height: contentCol.implicitHeight + 26 * box.dpi
   x: (Screen.width - weatherPopup.width) / 2
-  y: box.y + box.height + 5
+  y: box.y + box.height * box.dpi + 5 * box.dpi
   color: Theme.bg
-  radius: 20
+  radius: 20 * box.dpi
 
   Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutExpo } }
 
@@ -37,8 +37,8 @@ Rectangle {
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    anchors.margins: 14
-    spacing: 10
+    anchors.margins: 14 * box.dpi
+    spacing: 10 * box.dpi
 
     RowLayout {
       Layout.fillWidth: true
@@ -47,9 +47,9 @@ Rectangle {
         text: Config.weatherLocation
         color: weatherPopup.headerText
         font.family: Theme.fontFamily
-        font.pixelSize: 12
+        font.pixelSize: 12 * box.dpi
         font.weight: 500
-        Layout.leftMargin: 3
+        Layout.leftMargin: 3 * box.dpi
         Layout.fillWidth: true
         elide: Text.ElideRight
       }
@@ -58,12 +58,12 @@ Rectangle {
         text: "\uead2"
         color: refreshHover.containsMouse ? "#d1d1d1" : "#565656"
         font.family: Config.nerdFontFamily
-        font.pixelSize: 13
+        font.pixelSize: 13 * box.dpi
         Behavior on color { ColorAnimation { duration: 100 } }
         MouseArea {
           id: refreshHover
           anchors.fill: parent
-          anchors.margins: -6
+          anchors.margins: -6 * box.dpi
           hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
           onClicked: WeatherModule.refresh()
@@ -73,19 +73,19 @@ Rectangle {
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: 16
+      spacing: 16 * box.dpi
 
       Text {
         text: WeatherModule.iconGlyph
         color: WeatherModule.iconColor
         font.family: Config.nerdFontFamily
-        font.pixelSize: 32
-        Layout.preferredWidth: 45
+        font.pixelSize: 32 * box.dpi
+        Layout.preferredWidth: 45 * box.dpi
         horizontalAlignment: Text.AlignHCenter
       }
 
       ColumnLayout {
-        spacing: 1
+        spacing: 1 * box.dpi
         Layout.fillWidth: true
         Text {
           text: WeatherModule.loading ? "..."
@@ -93,14 +93,14 @@ Rectangle {
               : Math.round(WeatherModule.temp) + "°" + (Config.weatherUnits === "metric" ? "C" : "F")
           color: "#ecebeb"
           font.family: Theme.fontFamily
-          font.pixelSize: 25
+          font.pixelSize: 25 * box.dpi
           font.weight: 500
         }
         Text {
           text: WeatherModule.condition
           color: "#7e7e7e"
           font.family: Theme.fontFamily
-          font.pixelSize: weatherPopup.fontSizeBody
+          font.pixelSize: weatherPopup.fontSizeBody * box.dpi
           font.weight: 400
           visible: !WeatherModule.loading && WeatherModule.errorMessage.length === 0
           elide: Text.ElideRight
@@ -112,7 +112,7 @@ Rectangle {
     // stat tiles
     RowLayout {
       Layout.fillWidth: true
-      spacing: weatherPopup.tileSpacing
+      spacing: weatherPopup.tileSpacing * box.dpi
       visible: !WeatherModule.loading && WeatherModule.errorMessage.length === 0
 
       Repeater {
@@ -123,8 +123,8 @@ Rectangle {
         ]
         delegate: Rectangle {
           Layout.fillWidth: true
-          Layout.preferredHeight: 62
-          radius: weatherPopup.tileRadius
+          Layout.preferredHeight: 62 * box.dpi
+          radius: weatherPopup.tileRadius * box.dpi
           color: statHover.containsMouse ? Qt.lighter(weatherPopup.tileBg, 1.25) : weatherPopup.tileBg
           Behavior on color { ColorAnimation { duration: 120 } }
 
@@ -136,13 +136,13 @@ Rectangle {
 
           ColumnLayout {
             anchors.centerIn: parent
-            spacing: 3
+            spacing: 3 * box.dpi
 
             Text {
               text: modelData.icon
               color: modelData.color
               font.family: Config.nerdFontFamily
-              font.pixelSize: weatherPopup.iconSizeMedium
+              font.pixelSize: weatherPopup.iconSizeMedium * box.dpi
               Layout.alignment: Qt.AlignHCenter
             }
 
@@ -150,7 +150,7 @@ Rectangle {
               text: modelData.value
               color: weatherPopup.valueText
               font.family: Theme.fontFamily
-              font.pixelSize: weatherPopup.fontSizeBody
+              font.pixelSize: weatherPopup.fontSizeBody * box.dpi
               font.weight: 600
               Layout.alignment: Qt.AlignHCenter
             }
@@ -159,7 +159,7 @@ Rectangle {
               text: modelData.label
               color: weatherPopup.labelText
               font.family: Theme.fontFamily
-              font.pixelSize: weatherPopup.fontSizeTiny
+              font.pixelSize: weatherPopup.fontSizeTiny * box.dpi
               Layout.alignment: Qt.AlignHCenter
             }
           }
@@ -167,7 +167,7 @@ Rectangle {
       }
     }
 
-    Rectangle { Layout.fillWidth: true; height: 1; color: weatherPopup.dividerColor }
+    Rectangle { Layout.fillWidth: true; height: 1 * box.dpi; color: weatherPopup.dividerColor }
 
     // sunrise and sunset
     RowLayout {
@@ -176,21 +176,21 @@ Rectangle {
       visible: !WeatherModule.loading && WeatherModule.errorMessage.length === 0
 
       RowLayout {
-        spacing: 5
+        spacing: 5 * box.dpi
 
         Text {
           text: "\ue34c"
           color: "#ffcd58"
           font.family: Config.nerdFontFamily
-          font.pixelSize: weatherPopup.iconSizeMedium
-          Layout.leftMargin: 10
+          font.pixelSize: weatherPopup.iconSizeMedium * box.dpi
+          Layout.leftMargin: 10 * box.dpi
         }
 
         Text {
           text: WeatherModule.sunrise
           color: weatherPopup.secondaryText
           font.family: Theme.fontFamily
-          font.pixelSize: weatherPopup.fontSizeSmall
+          font.pixelSize: weatherPopup.fontSizeSmall * box.dpi
         }
       }
 
@@ -201,37 +201,37 @@ Rectangle {
           text: "\ue34d"
           color: "#ff904d"
           font.family: Config.nerdFontFamily
-          font.pixelSize: weatherPopup.iconSizeMedium
+          font.pixelSize: weatherPopup.iconSizeMedium * box.dpi
         }
 
         Text {
           text: WeatherModule.sunset
           color: weatherPopup.secondaryText
           font.family: Theme.fontFamily
-          font.pixelSize: weatherPopup.fontSizeSmall
-          Layout.rightMargin: 10
+          font.pixelSize: weatherPopup.fontSizeSmall * box.dpi
+          Layout.rightMargin: 10 * box.dpi
         }
       }
     }
 
-    Rectangle { Layout.fillWidth: true; height: 1; color: weatherPopup.dividerColor }
+    Rectangle { Layout.fillWidth: true; height: 1 * box.dpi; color: weatherPopup.dividerColor }
 
     // forecast
     RowLayout {
       Layout.fillWidth: true
-      spacing: weatherPopup.tileSpacing
+      spacing: weatherPopup.tileSpacing * box.dpi
 
       Repeater {
         model: WeatherModule.forecast
         delegate: ColumnLayout {
           Layout.fillWidth: true
-          spacing: 5
+          spacing: 5 * box.dpi
 
           Text {
             text: Qt.formatDate(new Date(modelData.date), "ddd")
             color: "#6e6e6e"
             font.family: Theme.fontFamily
-            font.pixelSize: weatherPopup.fontSizeTiny
+            font.pixelSize: weatherPopup.fontSizeTiny * box.dpi
             Layout.alignment: Qt.AlignHCenter
           }
 
@@ -239,7 +239,7 @@ Rectangle {
             text: modelData.iconGlyph
             color: modelData.iconColor
             font.family: Config.nerdFontFamily
-            font.pixelSize: weatherPopup.iconSizeForecast
+            font.pixelSize: weatherPopup.iconSizeForecast * box.dpi
             Layout.alignment: Qt.AlignHCenter
           }
 
@@ -247,10 +247,9 @@ Rectangle {
             text: Math.round(modelData.maxTemp) + "°/" + Math.round(modelData.minTemp) + "°"
             color: "#a0a0a0"
             font.family: Theme.fontFamily
-            font.pixelSize: weatherPopup.fontSizeTiny
+            font.pixelSize: weatherPopup.fontSizeTiny * box.dpi
             Layout.alignment: Qt.AlignHCenter
           }
-
         }
       }
     }
@@ -260,9 +259,9 @@ Rectangle {
       text: "Updated at " + Qt.formatTime(WeatherModule.lastUpdated, "hh:mm")
       color: "#8a8a8a"
       font.family: Theme.fontFamily
-      font.pixelSize: weatherPopup.fontSizeTiny
+      font.pixelSize: weatherPopup.fontSizeTiny * box.dpi
       Layout.alignment: Qt.AlignHCenter
-      Layout.topMargin: 2
+      Layout.topMargin: 2 * box.dpi
     }
   }
 }
