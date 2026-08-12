@@ -74,7 +74,8 @@ Rectangle {
                     fillMode: Image.PreserveAspectCrop
                     visible: mprisModule.artUrl !== ""
                     layer.enabled: true
-                    sourceSize: Qt.size(80, 80)
+                    cache: false
+                    sourceSize: Qt.size(94 * box.dpi, 94 * box.dpi)
                 }
 
                 Text {
