@@ -64,7 +64,7 @@ Item {
                 anchors.fill: parent
                 source: mprisModule.artUrl
                 fillMode: Image.PreserveAspectCrop
-                sourceSize: Qt.size(84, 84)
+                sourceSize: Qt.size(84 * box.dpi, 84 * box.dpi)
               }
 
             Text {
