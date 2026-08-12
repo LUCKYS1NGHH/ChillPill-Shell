@@ -76,7 +76,7 @@ ShellRoot {
     id: panelWindow
     WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher || box.wallpaperSwitcherOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    implicitHeight: 485 * scale
+    implicitHeight: Math.max(885 * scale, calendarPopup.visible ? calendarPopup.y + calendarPopup.height : 0)
     onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
     property real scale: screen ? screen.devicePixelRatio : 1.0
 
@@ -95,8 +95,8 @@ ShellRoot {
     mask: Region {
       Region {
         intersection: Intersection.Combine
-        x: Math.floor(box.x); y: Math.floor(box.y)
-        width: Math.ceil(box.width); height: Math.ceil(box.height)
+        x: Math.floor(box.x); y: Math.floor(box.y * box.dpi)
+        width: Math.ceil(box.width); height: Math.ceil(box.height * box.dpi)
       }
       Region {
         intersection: Intersection.Combine
