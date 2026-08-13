@@ -127,6 +127,8 @@ into your session at all times. It's not bound to any dotfiles.
 
 - DPI and Pill bar scale is available in config if you need it
 
+- Media popup art cover glowing shadow changes according the cover art's own colors
+
 - Audio (to mute/unmute) and workspaces (to switch) in the main pill bar are clickable.
 
 - Control center's media player progress bar is not only for status, it's usable to control the media you playing.
@@ -230,6 +232,7 @@ into your session at all times. It's not bound to any dotfiles.
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
 - [blueman](https://github.com/blueman-project/blueman)
 - [awww](https://codeberg.org/LGFae/awww)
+- [pywal](https://github.com/dylanaraps/pywal)
 - Qt Multimedia (`qt6-multimedia` on Arch)
 
 > [!TIP]
