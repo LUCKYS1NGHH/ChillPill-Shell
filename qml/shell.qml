@@ -95,8 +95,8 @@ ShellRoot {
     mask: Region {
       Region {
         intersection: Intersection.Combine
-        x: Math.floor(box.x); y: Math.floor(box.y * box.dpi)
-        width: Math.ceil(box.width); height: Math.ceil(box.height * box.dpi)
+        x: Math.floor(box.x - box.width * (box.dpi - 1) / 2); y: Math.floor(box.y)
+        width: Math.ceil(box.width * box.dpi); height: Math.ceil(box.height * box.dpi)
       }
       Region {
         intersection: Intersection.Combine

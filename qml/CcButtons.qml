@@ -5,6 +5,8 @@ import IslandBackend
 RowLayout {
   id: root
 
+  readonly property real dpi: Config.dpiScale
+
   property real buttonBorderWidth
   property string buttonBorderColor
   property real buttonWidth
@@ -25,8 +27,8 @@ RowLayout {
   anchors.topMargin: hasPlayer ? playerHeight + 92 : 5
   anchors.left: parent.left
   anchors.right: parent.right
-  anchors.leftMargin: 5
-  anchors.rightMargin: 5
+  anchors.leftMargin: 5 * dpi
+  anchors.rightMargin: 5 * dpi
 
   onControlCenterOpenChanged: {
     if (!controlCenterOpen) root.wifiPanelOpened = false; root.btPanelOpened = false
@@ -50,7 +52,7 @@ RowLayout {
 
     RowLayout {
       anchors.centerIn: parent
-      spacing: 5
+      spacing: 5 * root.dpi
       Text {
         text: "\uf1eb" // wifi glyph
         color: WifiController.enabled ? "#4282e9" : root.buttonFgOff
@@ -86,7 +88,7 @@ RowLayout {
 
   WifiPanel {
     visible: root.wifiPanelOpened
-    anchorX: root.mapToGlobal(root.width, 0).x - 595 - 30
+    anchorX: root.mapToGlobal(root.width, 0).x - (600 * root.dpi) - (30 * root.dpi)
     anchorY: wifiBtn.mapToGlobal(0, 0).y
   }
 
@@ -143,7 +145,7 @@ RowLayout {
 
     RowLayout {
       anchors.centerIn: parent
-      spacing: 5
+      spacing: 5 * root.dpi
       Text {
         text: {
           if (countdownModule.running) return String.fromCodePoint(0xf1ade)
@@ -200,10 +202,10 @@ RowLayout {
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
     RowLayout {
       anchors.centerIn: parent
-      spacing: 5
+      spacing: 5 * root.dpi
 
       Text {
-        text: "\uf294" // bluetooth glyph
+        text: "\uf294"
         color: BluetoothController.enabled ? "#4282e9" : root.buttonFgOff
         font { family: Theme.nerdFontFamily; pixelSize: 15 }
       }
@@ -236,7 +238,7 @@ RowLayout {
 
   BluetoothPanel {
     visible: root.btPanelOpened
-    anchorX: root.mapToGlobal(root.width, 0).x + 29
+    anchorX: root.mapToGlobal(root.width, 0).x + (29 * root.dpi)
     anchorY: btBtn.mapToGlobal(0, 0).y
   }
 }
