@@ -130,7 +130,15 @@ Rectangle {
         scale: 0.4
         transformOrigin: Item.Center
 
-        Component.onCompleted: entryAnim.start()
+        Component.onCompleted: {
+          if (Config.wsAnimation) {
+            entryAnim.start()
+          } else {
+            opacity = 1
+            scale = 1.0
+          }
+        }
+
         SequentialAnimation {
           id: entryAnim
           PauseAnimation { duration: cell.distFromCenter * 50 }
@@ -212,6 +220,7 @@ Rectangle {
           onClicked: {
             wallGrid.currentIndex = index
             wallpaperPopup.applyWallpaper(filePath)
+            if (Config.wsCloseOnWallpaperSet) closeRequested()
           }
         }
       }
