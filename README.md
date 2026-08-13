@@ -36,7 +36,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - RAM: 200-500 MB (Average 380)
 - CPU: Idle 0%, Average 3%, Min 0.1%, Max 10%
-- GPU: Idle 0%, Average 15%, Min 6%, Max 50%
+- GPU: Idle 0%, Average 15%, Min 6%, Max 45%
 
 > CPU and GPU usage varies with system. a better CPU and GPU use less.
 
@@ -123,11 +123,11 @@ into your session at all times. It's not bound to any dotfiles.
 <summary>Know more</summary>
 
 ---
-- Main pill bar width expands on hover
+- Main pill width expands on hover.
 
-- DPI and Pill bar scale is available in config if you need it
+- DPI and Pill scale is available in config if you need it.
 
-- Audio (to mute/unmute) and workspaces (to switch) in the main pill bar are clickable.
+- Audio (to mute/unmute) and workspaces (to switch) in the main pill are clickable.
 
 - Control center's media player progress bar is not only for status, it's usable to control the media you playing.
 
@@ -140,7 +140,7 @@ into your session at all times. It's not bound to any dotfiles.
   - case 2: device just wants us to display a code
   - case 3: device wants a yes/no confirmation of a shown passkey
 
-- Cliphist shows image previews from `~/.cache/quickshell/cliphist-imgs` by converting image binaries into real images and save there.
+- Cliphist shows image previews from `~/.cache/chillpill-shell/cliphist-imgs` by converting image binaries into real images and save there.
 
 - Notifications are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.
@@ -215,9 +215,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 </details>
 
----
-
-### Dependencies
+## Dependencies
 > [!NOTE]
 > It's an initial release, tested only on **Arch Linux** + **Hyprland**. other setups unsupported for now.
 > Packages below are Arch's; find the equivalent for your distro.
@@ -260,6 +258,7 @@ sudo ./install.sh
 
 <details>
 <summary>Uninstall?</summary>
+---
 
 #### Arch
 ```
@@ -271,14 +270,18 @@ paru -R chillpill-shell
 chmod +x uninstall.sh
 sudo ./uninstall.sh
 ```
+
+---
 </details>
 
 ### Auto startup
 
-To auto-run at every time you start your Hyprland, paste this line in your `~/.config/hypr/hyprland.lua` config file
+To auto-run at every time you start your Hyprland, paste this code in your `~/.config/hypr/hyprland.lua` config file
 
 ```
-hl.exec_cmd("chillpill-shell")
+hl.on("hyprland.start", function()
+   hl.exec_cmd("chillpill-shell")
+end)
 ```
 
 ## Key Bindings
@@ -296,6 +299,12 @@ hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell
 ```
 
 ---
+
+### Contributors
+
+<a href="https://github.com/LUCKYS1NGHH/chillpill-shell/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="100" />
+</a>
 
 ### Thanks
 
