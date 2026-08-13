@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.4.0](https://img.shields.io/badge/CPShell-0.4.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.5.0](https://img.shields.io/badge/CPShell-0.5.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -125,6 +125,8 @@ into your session at all times. It's not bound to any dotfiles.
 ---
 - Main pill bar width expands on hover
 
+- DPI and Pill bar scale is available in config if you need it
+
 - Audio (to mute/unmute) and workspaces (to switch) in the main pill bar are clickable.
 
 - Control center's media player progress bar is not only for status, it's usable to control the media you playing.
@@ -159,6 +161,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `pillTopMargin` | Top spacing of pill bar | `9` |
 | `pillBottomMargin` | Bottom spacing of pill bar | `26` |
 | `pillScale` | Scale factor for pill bar size | `1.0` |
+| `dpiScale` | DPI Scaling | `1.0` |
 | `textFontFamily` | Font family for general text | `Monocraft` |
 | `nerdFontFamily` | Font family for icons (Nerd Fonts) | `JetBrainsMono Nerd Font Propo` |
 | `timerPresets` | Timer minute presets | `[1, 5, 10, 15, 30]` |
@@ -176,6 +179,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `defaultTerminal` | Terminal used to open TUI apps from launcher | `kitty` |
 | `wallpapersDir` | Wallpapers directory for wallpaper switcher | `~/Pictures/wallpapers` |
 | `wsCloseOnWallpaperSet` | Close wallpaper switcher after apply wallpaper | `true` |
+| `wsAnimation` | Wallpaper switcher open animation | `true` |
 
 <details>
 <summary>Raw config example</summary>
@@ -202,8 +206,10 @@ into your session at all times. It's not bound to any dotfiles.
   "avoidDuplicateNotifications": true,
   "defaultTerminal": "kitty",
   "pillScale": 1.0,
+  "dpiScale": 1.0,
   "wallpapersDir": "~/Pictures/wallpapers",
-  "wsCloseOnWallpaperSet": true
+  "wsCloseOnWallpaperSet": true,
+  "wsAnimation": true
 }
 ```
 

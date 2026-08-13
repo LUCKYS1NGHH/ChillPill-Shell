@@ -36,6 +36,7 @@ Singleton {
       property real dpiScale: 1.4
       property string wallpapersDir: Quickshell.env("HOME") + "/Pictures/wallpapers"
       property bool wsCloseOnWallpaperSet: true
+      property bool wsAnimation: true
     }
   }
 
@@ -63,4 +64,5 @@ Singleton {
   readonly property real paddingScale: 1 + (pillScale - 1) * 0.6  // sub linear, keep padding sane
   readonly property alias wallpapersDir: adapter.wallpapersDir
   readonly property alias wsCloseOnWallpaperSet: adapter.wsCloseOnWallpaperSet
+  readonly property alias wsAnimation: adapter.wsAnimation
 }

@@ -19,6 +19,8 @@
   "avoidDuplicateNotifications": true,
   "defaultTerminal": "kitty",
   "pillScale": 1.0,
+  "dpiScale": 1.0,
   "wallpapersDir": "~/Pictures/wallpapers",
-  "wsCloseOnWallpaperSet": true
+  "wsCloseOnWallpaperSet": true,
+  "wsAnimation": true
 }
