@@ -1,8 +1,23 @@
 pragma Singleton
 import Quickshell
+import Quickshell.Io
 import QtQuick
 
 Singleton {
+    id: root
+
+    FileView {
+        id: walColors
+        path: Quickshell.env("HOME") + "/.cache/wal/colors.json"
+
+        onLoaded: {
+            let data = JSON.parse(text())
+            root.accent = data.colors.color5
+        }
+    }
+
+    function reloadColors() { walColors.reload() }
+
     property string bg: "#171717"
     property string bg1: "#151515"
 
@@ -14,9 +29,8 @@ Singleton {
 
     property string fontFamily: Config.textFontFamily
     property string nerdFontFamily: Config.nerdFontFamily
-
-    property string accent: "#979797"
-    property string coverArtGlowShadow: "#80aae6" // hardcored for now
+    property string accent: accent
+    property string coverArtGlowShadow: accent
 
     property int fontSizeBase: 13
     property int fontSize: Math.round(fontSizeBase * Config.pillScale)

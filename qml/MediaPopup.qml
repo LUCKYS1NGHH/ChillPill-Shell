@@ -58,6 +58,10 @@ Item {
                 shadowOpacity: 0.8
                 shadowHorizontalOffset: 0
                 shadowVerticalOffset: 0
+
+                Behavior on shadowColor {
+                    ColorAnimation { duration: 400; easing.type: Easing.OutCubic }
+                }
             }
 
             Image {

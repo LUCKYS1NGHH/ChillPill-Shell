@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Mpris
 import QtQuick
 import QtQuick.Layouts
@@ -9,6 +10,7 @@ Item {
     signal nowPlaying()
 
     property bool _wasPlaying: false
+    property bool pendingReload: false
 
     onPlayingChanged: {
         if (playing && !_wasPlaying)
@@ -90,7 +92,36 @@ Item {
     function prev() { if (activePlayer && activePlayer.canGoPrevious) activePlayer.previous() }
 
     onActivePlayerChanged: {
-        if (activePlayer && activePlayer.dbusName)
-            lastActivePlayerDbusName = activePlayer.dbusName
+      if (activePlayer && activePlayer.dbusName)
+        lastActivePlayerDbusName = activePlayer.dbusName
     }
+
+    Process {
+        id: walProcess
+        command: ["bash", "-c",
+            "wal -i \"$(ls -t /tmp/.org.chromium.Chromium.* 2>/dev/null | head -1)\" -n -s -t -e"
+        ]
+        running: false
+
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) Theme.reloadColors()
+            if (pendingReload) {
+              pendingReload = false
+              running = true
+            }
+        }
+      }
+
+    Timer {
+        id: artDelay
+        interval: 300
+        onTriggered: {
+            if (walProcess.running)
+                pendingReload = true
+            else
+                walProcess.running = true
+        }
+    }
+
+    onTrackChanged: artDelay.restart()
 }
