@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TMP_DIR="$HOME/.cache/quickshell/cliphist-imgs"
+TMP_DIR="$HOME/.cache/chillpill-shell/cliphist-imgs"
 mkdir -p "$TMP_DIR"
 
 if [[ -z "$1" ]]; then
