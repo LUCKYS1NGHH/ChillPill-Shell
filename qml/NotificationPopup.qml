@@ -24,8 +24,8 @@ Item {
 
     Image {
       id: notifIcon
-      width: 23
-      height: 23
+      width: 23 * box.dpi
+      height: 23 * box.dpi
       fillMode: Image.PreserveAspectCrop
       source: {
         if (root.notif && root.notif.image) return root.notif.image
@@ -36,7 +36,7 @@ Item {
         }
         return ""
       }
-      sourceSize: Qt.size(23, 23)
+      sourceSize: Qt.size(23 * box.dpi, 23 * box.dpi)
       visible: status === Image.Ready
     }
 

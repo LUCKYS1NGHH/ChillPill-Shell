@@ -870,7 +870,10 @@ ShellRoot {
                 }
                 return ""
               }
-              sourceSize: Qt.size(22, 22)
+              enabled: true
+              smooth: true
+              mipmap: true
+              sourceSize: Qt.size(22 * box.dpi, 22 * box.dpi)
               visible: status === Image.Ready
               anchors.top: parent.top
               anchors.left: parent.left
@@ -1008,6 +1011,10 @@ ShellRoot {
             radius: avatarSize / 2
             property string imgPath: Config.displayPicture ? "file://" + Config.displayPicture.replace("~", Quickshell.env("HOME")) : ""
             color: (imgPath === "" || avatarImg.status !== Image.Ready) ? "#454545" : "transparent"
+            layer.enabled: true
+            layer.smooth: true
+            layer.mipmap: true
+            layer.textureSize: Qt.size(avatarSize, avatarSize)
 
             Image {
               id: avatarImg
@@ -1015,6 +1022,8 @@ ShellRoot {
               source: avatarClip.imgPath
               fillMode: Image.PreserveAspectCrop
               asynchronous: false
+              smooth: true
+              mipmap: true
               sourceSize: Qt.size(avatarSize, avatarSize)
             }
           }
@@ -1338,19 +1347,19 @@ ShellRoot {
     id: fsNotif
     active: notificationModule.active && notifFullscreenMode
     visible: notifFullscreenMode
-    cardWidth: 300
-    cardHeight: 52
+    cardWidth: 300 * box.dpi
+    cardHeight: 52 * box.dpi
 
     property var displayNotif: null
 
     RowLayout {
       anchors.centerIn: parent
-      spacing: 12
+      spacing: 12 * box.dpi
 
       Text {
         text: String.fromCodePoint(0xf0f3)
         color: Theme.fg
-        font { family: Theme.nerdFontFamily; pixelSize: 14 }
+        font { family: Theme.nerdFontFamily; pixelSize: 14 * box.dpi }
         visible: cardIcon.status !== Image.Ready
       }
 
@@ -1367,17 +1376,17 @@ ShellRoot {
           }
           return ""
         }
-        sourceSize: Qt.size(23, 23)
+        sourceSize: Qt.size(23 * box.dpi, 23 * box.dpi)
         visible: status === Image.Ready
       }
 
       ColumnLayout {
-        spacing: 3
+        spacing: 3 * box.dpi
 
         Text {
           text: fsNotif.displayNotif ? fsNotif.displayNotif.summary : ""
           color: Theme.fg
-          font { family: Theme.fontFamily; pixelSize: 10; weight: 700 }
+          font { family: Theme.fontFamily; pixelSize: 10 * box.dpi; weight: 700 }
           elide: Text.ElideRight
           Layout.maximumWidth: 200
         }
@@ -1385,7 +1394,7 @@ ShellRoot {
         Text {
           text: fsNotif.displayNotif ? fsNotif.displayNotif.body : ""
           color: "#9b9b9b"
-          font { family: Theme.fontFamily; pixelSize: 9 }
+          font { family: Theme.fontFamily; pixelSize: 9 * box.dpi }
           elide: Text.ElideRight
           visible: text !== ""
           Layout.maximumWidth: 200
