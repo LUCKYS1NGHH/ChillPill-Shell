@@ -32,9 +32,17 @@ Item {
         spacing: defaultSpacing
 
         Text {
+            id: valIcon
             text: root.icon
             color: root.iconColor !== "" ? root.iconColor : root.fg
             font { family: Theme.nerdFontFamily; pixelSize: 15 }
+            opacity: 1.0
+            onTextChanged: iconPulse.restart()
+            SequentialAnimation {
+                id: iconPulse
+                NumberAnimation { target: valIcon; property: "opacity"; to: 0.5; duration: 100; easing.type: Easing.InOutQuad }
+                NumberAnimation { target: valIcon; property: "opacity"; to: 1.0; duration: 140; easing.type: Easing.InOutQuad }
+            }
         }
 
         Rectangle {
@@ -52,9 +60,17 @@ Item {
         }
 
         Text {
-            text: root.valueText
-            color: root.muted ? root.mutedFg : root.fg
-            font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
-        }
+          id: valText
+          text: root.valueText
+          color: root.muted ? root.mutedFg : root.fg
+          font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+          opacity: 1.0
+          onTextChanged: valPulse.restart()
+          SequentialAnimation {
+              id: valPulse
+              NumberAnimation { target: valText; property: "scale"; to: 0.9; duration: 60; easing.type: Easing.OutQuad }
+              NumberAnimation { target: valText; property: "scale"; to: 1.0; duration: 120; easing.type: Easing.OutQuad }
+          }
+      }
     }
 }
