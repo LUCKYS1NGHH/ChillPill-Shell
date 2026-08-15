@@ -618,7 +618,14 @@ ShellRoot {
                 height: parent.height
                 radius: box.sliderRadius
                 color: box.sliderColor
-                Behavior on width { NumberAnimation { duration: 60 } }
+                Behavior on width {
+                  enabled: !mouseArea.pressed
+                  SpringAnimation {
+                    spring: 15.5
+                    damping: 1.8
+                    epsilon: 0.40
+                  }
+                }
               }
 
               MouseArea {
@@ -637,11 +644,18 @@ ShellRoot {
             }
 
             Text {
+              id: volVal
               text: volumeModule.muted ? "muted" : volumeModule.vol + "%"
               color: Theme.fg
               font.family: Theme.fontFamily
               font.pixelSize: 10
               Layout.minimumWidth: 35
+              onTextChanged: valPulse.restart()
+              SequentialAnimation {
+                id: valPulse
+                NumberAnimation { target: volVal; property: "scale"; to: 0.9; duration: 60; easing.type: Easing.OutQuad }
+                NumberAnimation { target: volVal; property: "scale"; to: 1.0; duration: 120; easing.type: Easing.OutQuad }
+              }
             }
           }
 
@@ -678,7 +692,14 @@ ShellRoot {
                 height: parent.height
                 radius: box.sliderRadius
                 color: box.sliderColor
-                Behavior on width { NumberAnimation { duration: 60 } }
+                Behavior on width {
+                  enabled: !mouseArea.pressed
+                  SpringAnimation {
+                    spring: 15.5
+                    damping: 1.8
+                    epsilon: 0.40
+                  }
+                }
               }
 
               MouseArea {
@@ -705,11 +726,18 @@ ShellRoot {
             }
 
             Text {
+              id: btVal
               text: Math.round(brightnessModule.percent * 100) + "%"
               color: Theme.fg
               font.family: Theme.fontFamily
               font.pixelSize: 10
               Layout.minimumWidth: 35
+              onTextChanged: btPulse.restart()
+              SequentialAnimation {
+                  id: btPulse
+                  NumberAnimation { target: btVal; property: "scale"; to: 0.9; duration: 60; easing.type: Easing.OutQuad }
+                  NumberAnimation { target: btVal; property: "scale"; to: 1.0; duration: 120; easing.type: Easing.OutQuad }
+              }
             }
           }
         } 
