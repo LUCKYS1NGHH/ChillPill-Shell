@@ -44,6 +44,7 @@ Item {
       spacing: 3
       Text {
         text: root.notif ? root.notif.summary : ""
+        textFormat: Text.PlainText
         color: Theme.fg
         font { family: Theme.fontFamily; pixelSize: 10; weight: 700 }
         elide: Text.ElideRight
@@ -51,7 +52,12 @@ Item {
       }
 
       Text {
-        text: root.notif ? root.notif.body : ""
+        text: root.notif ? root.notif.body.replace(
+          /\[([^\]]+)\]\(["']?([^)"']+)["']?\)/g,
+          '<a href="$2">$1</a>'
+        ) : ""
+        textFormat: Text.StyledText
+        linkColor: Theme.accent
         color: "#9b9b9b"
         font { family: Theme.fontFamily; pixelSize: 9 }
         elide: Text.ElideRight

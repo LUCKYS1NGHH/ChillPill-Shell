@@ -901,6 +901,7 @@ ShellRoot {
 
                 Text {
                   text: modelData.summary
+                  textFormat: Text.PlainText
                   color: Theme.fg
                   font { family: Theme.fontFamily; pixelSize: 11; weight: 600 }
                   elide: Text.ElideRight
@@ -943,7 +944,12 @@ ShellRoot {
               // description / body
               Text {
                 id: bodyText
-                text: modelData.body
+                text: modelData.body ? modelData.body.replace(
+                  /\[([^\]]+)\]\(["']?([^)"']+)["']?\)/g,
+                  '<a href="$2">$1</a>'
+                ) : ""
+                textFormat: Text.StyledText
+                linkColor: Theme.accent
                 color: "#9f9f9f"
                 font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
                 wrapMode: Text.WordWrap
@@ -1335,6 +1341,14 @@ ShellRoot {
   NotificationServer {
     id: notifServer
     keepOnReload: false
+    imageSupported: true
+    actionsSupported: true
+    actionIconsSupported: true
+    bodySupported: true
+    bodyMarkupSupported: true
+    bodyHyperlinksSupported: true
+    bodyImagesSupported: true
+    persistenceSupported: true
     onNotification: notif => {
       notif.tracked = true
       notificationModule.enqueue(notif)
@@ -1385,6 +1399,7 @@ ShellRoot {
 
         Text {
           text: fsNotif.displayNotif ? fsNotif.displayNotif.summary : ""
+          textFormat: Text.PlainText
           color: Theme.fg
           font { family: Theme.fontFamily; pixelSize: 10 * box.dpi; weight: 700 }
           elide: Text.ElideRight
@@ -1392,7 +1407,12 @@ ShellRoot {
         }
 
         Text {
-          text: fsNotif.displayNotif ? fsNotif.displayNotif.body : ""
+          text: fsNotif.displayNotif ? fsNotif.displayNotif.body.replace(
+            /\[([^\]]+)\]\(["']?([^)"']+)["']?\)/g,
+            '<a href="$2">$1</a>'
+          ) : ""
+          textFormat: Text.StyledText
+          linkColor: Theme.accent
           color: "#9b9b9b"
           font { family: Theme.fontFamily; pixelSize: 9 * box.dpi }
           elide: Text.ElideRight
