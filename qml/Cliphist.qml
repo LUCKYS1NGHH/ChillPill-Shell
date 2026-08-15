@@ -9,19 +9,18 @@ Item {
 
     property bool shown: false
     property int selectedIndex: 0
-    property var entries: [] // list of { id, label, imagePath }
+    property var allEntries: [] // raw source of: { id, label, imagePath }
     property string searchQuery: ""
     property string deletingId: ""
     property string collapsingId: ""
-    property var filteredEntries: searchQuery.length === 0
-        ? entries
-        : entries.filter(e => e.label.toLowerCase().includes(searchQuery.toLowerCase()))
 
     signal closeRequested()
 
     visible: shown
     opacity: shown ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 180 } }
+
+    ListModel { id: listModel }
 
     onShownChanged: {
         if (shown) {
@@ -33,8 +32,15 @@ Item {
         }
     }
 
-    onFilteredEntriesChanged: {
+    onSearchQueryChanged: {
+        rebuildFilteredModel()
         selectedIndex = 0
+    }
+
+    function rebuildFilteredModel() {
+        listModel.clear()
+        let list = searchQuery.length === 0 ? allEntries : allEntries.filter(e => e.label.toLowerCase().includes(searchQuery.toLowerCase()))
+        if (list.length > 0) listModel.append(list)
     }
 
     function refresh() {
@@ -45,8 +51,8 @@ Item {
     }
 
     function copySelected() {
-        if (filteredEntries.length === 0) return
-        let entry = filteredEntries[selectedIndex]
+        if (listModel.count === 0) return
+        let entry = listModel.get(selectedIndex)
         copyProc.command = ["sh", "-c", "cliphist decode " + entry.id + " | wl-copy"]
         copyProc.running = false
         copyProc.running = true
@@ -54,8 +60,8 @@ Item {
     }
 
     function deleteSelected() {
-        if (filteredEntries.length === 0) return
-        let entry = filteredEntries[selectedIndex]
+        if (listModel.count === 0) return
+        let entry = listModel.get(selectedIndex)
         root.deletingId = entry.id
         deleteProc.command = ["sh", "-c", "printf '%s\\t' \"$1\" | cliphist delete", "_", entry.id]
         deleteProc.running = false
@@ -79,21 +85,31 @@ Item {
     Timer {
         id: removeTimer
         property string entryId: ""
-        interval: 220   // matches the collapse animation below
+        interval: 220  // matches the collapse animation on below
         repeat: false
         onTriggered: {
             let currentIdx = root.selectedIndex
             let savedContentY = listView.contentY
-            root.entries = root.entries.filter(e => e.id !== entryId)
+
+            let idx = -1
+            for (let i = 0; i < listModel.count; i++) {
+                if (listModel.get(i).id === entryId) { idx = i; break }
+            }
+            if (idx !== -1) listModel.remove(idx)
+            root.allEntries = root.allEntries.filter(e => e.id !== entryId)
+
             root.deletingId = ""
             root.collapsingId = ""
-            let newLength = filteredEntries.length
-            if (newLength === 0) selectedIndex = -1
-            else if (currentIdx >= newLength) selectedIndex = newLength - 1
-            else selectedIndex = currentIdx
+
+            let newLength = listModel.count
+            if (newLength === 0) root.selectedIndex = -1
+            else if (currentIdx >= newLength) root.selectedIndex = newLength - 1
+            else root.selectedIndex = currentIdx
+
             Qt.callLater(() => {
                 let maxY = Math.max(0, listView.contentHeight - listView.height)
                 listView.contentY = Math.min(savedContentY, maxY)
+                listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
             })
         }
     }
@@ -105,11 +121,10 @@ Item {
         stdout: StdioCollector {
             onStreamFinished: {
                 let lines = this.text.split("\n").filter(l => l.length > 0)
-                root.entries = lines.map(line => {
+                root.allEntries = lines.map(line => {
                     let tabIdx = line.indexOf("\t")
                     let id = line.substring(0, tabIdx)
                     let rest = line.substring(tabIdx + 1)
-
                     let nullIdx = rest.indexOf("\x00")
                     if (nullIdx !== -1) {
                         let label = rest.substring(0, nullIdx)
@@ -117,9 +132,9 @@ Item {
                         let imgPath = iconPart.split("\x1f")[1] || ""
                         return { id, label, imagePath: imgPath }
                     }
-
                     return { id, label: rest, imagePath: "" }
                 })
+                rebuildFilteredModel()
             }
         }
     }
@@ -178,8 +193,8 @@ Item {
           Text {
             id: listCountText
             property int total: 0
-            text: (root.filteredEntries.length === 0 ? 0 : root.selectedIndex + 1)
-                   + " / " + root.filteredEntries.length + " (" + total + ")"
+            text: (listModel.count === 0 ? 0 : root.selectedIndex + 1)
+                   + " / " + listModel.count + " (" + total + ")"
             color: "#999999"
             font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
             Layout.alignment: Qt.AlignRight
@@ -218,15 +233,15 @@ Item {
 
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Down) {
-                        if (root.filteredEntries.length > 0) {
-                            root.selectedIndex = (root.selectedIndex + 1) % root.filteredEntries.length
+                        if (listModel.count > 0) {
+                            root.selectedIndex = (root.selectedIndex + 1) % listModel.count
                         }
                         listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Up) {
-                        if (root.filteredEntries.length > 0)
+                        if (listModel.count > 0)
                             root.selectedIndex = root.selectedIndex <= 0
-                                ? root.filteredEntries.length - 1
+                                ? listModel.count - 1
                                 : root.selectedIndex - 1
                         listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
@@ -249,21 +264,21 @@ Item {
             width: parent.width
             height: parent.height - 67
             clip: true
-            model: root.filteredEntries
+            model: listModel
             currentIndex: root.selectedIndex
             highlightFollowsCurrentItem: false
             highlightMoveDuration: 80
 
-            removeDisplaced: Transition { NumberAnimation { properties: "y"; duration: 150; easing.type: Easing.OutCubic } } 
+            removeDisplaced: Transition { NumberAnimation { properties: "y"; duration: 150; easing.type: Easing.OutCubic } }
 
             delegate: Rectangle {
                 width: listView.width
-                height: modelData.id === root.collapsingId ? 5 : (modelData.imagePath ? 55 : 30)
+                height: model.id === root.collapsingId ? 5 : (model.imagePath ? 55 : 30)
                 radius: 7
-                color: modelData.id === root.deletingId ? "#e22d2d" : (index === root.selectedIndex ? "#313131" : "transparent")
+                color: model.id === root.deletingId ? "#e22d2d" : (index === root.selectedIndex ? "#313131" : "transparent")
                 clip: true
-                opacity: modelData.id === root.collapsingId ? 0 : 1
-                scale: modelData.id === root.collapsingId ? 0.75 : 1
+                opacity: model.id === root.collapsingId ? 0 : 1
+                scale: model.id === root.collapsingId ? 0.75 : 1
 
                 Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
                 Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
@@ -273,8 +288,8 @@ Item {
                 Image {
                     anchors.fill: parent
                     anchors.margins: 4
-                    source: modelData.imagePath ? ("file://" + modelData.imagePath) : ""
-                    visible: modelData.imagePath !== ""
+                    source: model.imagePath ? ("file://" + model.imagePath) : ""
+                    visible: model.imagePath !== ""
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
                     sourceSize: Qt.size(80, 50)
@@ -287,8 +302,8 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: 12
                     anchors.rightMargin: 8
-                    text: modelData.label
-                    visible: !modelData.imagePath
+                    text: model.label
+                    visible: !model.imagePath
                     color: Theme.fg
                     font { family: Theme.fontFamily; pixelSize: 10 }
                     elide: Text.ElideRight
