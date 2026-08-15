@@ -1010,8 +1010,6 @@ ShellRoot {
          // profile picture (display picture)
            ClippingRectangle {
             id: avatarClip
-            anchors.top: parent.top
-            anchors.left: parent.left
             width: avatarSize
             height: avatarSize
             radius: avatarSize / 2
@@ -1367,7 +1365,7 @@ ShellRoot {
     property var displayNotif: null
 
     RowLayout {
-      anchors.centerIn: parent
+      Layout.alignment: Qt.AlignVCenter
       spacing: 12 * box.dpi
 
       Text {

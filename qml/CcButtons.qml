@@ -27,7 +27,7 @@ RowLayout {
   anchors.topMargin: hasPlayer ? playerHeight + 92 : 5
   anchors.left: parent.left
   anchors.right: parent.right
-  anchors.leftMargin: 5 * dpi
+  anchors.leftMargin: 3 * dpi
   anchors.rightMargin: 5 * dpi
 
   onControlCenterOpenChanged: {
@@ -37,8 +37,8 @@ RowLayout {
   // wifi
   Rectangle {
     id: wifiBtn
-    width: root.buttonWidth
-    height: root.buttonHeight
+    implicitWidth: root.buttonWidth
+    implicitHeight: root.buttonHeight
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
     color: WifiController.enabled
@@ -99,8 +99,8 @@ RowLayout {
   // silent notifications
   Rectangle {
     id: dndBtn
-    width: root.buttonWidth
-    height: root.buttonHeight
+    implicitWidth: root.buttonWidth
+    implicitHeight: root.buttonHeight
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
     color: notificationModule.dndEnabled
@@ -130,8 +130,8 @@ RowLayout {
   // timer / countdown
   Rectangle {
     id: timerBtn
-    width: root.buttonWidth
-    height: root.buttonHeight
+    implicitWidth: root.buttonWidth
+    implicitHeight: root.buttonHeight
     radius: root.buttonRadius
     color: countdownModule.running
            ? (timerHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
@@ -188,8 +188,8 @@ RowLayout {
   // bluetooth
   Rectangle {
     id: btBtn
-    width: root.buttonWidth
-    height: root.buttonHeight
+    implicitWidth: root.buttonWidth
+    implicitHeight: root.buttonHeight
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
     color: BluetoothController.enabled

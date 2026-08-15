@@ -43,7 +43,7 @@ into your session at all times. It's not bound to any dotfiles.
 #### My Hardware
 
 - RAM: 8GB (DDR3)
-- CPU: i5 3337U (Dualcore)
+- CPU: i5 3337U (Dual-core)
 - GPU: Intel HD 4000 (Integrated)
 
 ---
@@ -94,10 +94,10 @@ into your session at all times. It's not bound to any dotfiles.
   <tr>
     <td width="50%">
       <p align="center"><b>App launcher</b></p>
-      <img src="screenshots/image_9.webp" width="100%" alt="App launcher with search support and apps index status"
+      <img src="screenshots/image_9.webp" width="100%" alt="App launcher with search support and apps index status">
     </td>
-    <td width="50%>
-      <p align="center"><b>Control center — Wifi and Blueooth panel</b></p>
+    <td width="50%">
+      <p align="center"><b>Control center — Wifi and Bluetooth panel</b></p>
       <img src="screenshots/image_10.webp" width="100%" alt="Control center with wifi panel opened">
     </td>
   </tr>
@@ -112,7 +112,7 @@ into your session at all times. It's not bound to any dotfiles.
 ## Features
 
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock
-- **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume and brightness sliders, notification Stack
+- **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume and brightness sliders, notification stack
 - **Cliphist (Clipboard History)** - Search, clipboard image preview, item index status, `Delete` key to delete any item
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst entirely now)
@@ -231,7 +231,7 @@ into your session at all times. It's not bound to any dotfiles.
 - Qt Multimedia (`qt6-multimedia` on Arch)
 
 > [!TIP]
-> `install.sh` auto-installs all of the above for Arch users, **except** these optional fonts:
+> `install.sh` auto-installs all of the above for Arch users, **except** these optional packages:
 > - Monocraft Font (`ttf-monocraft-git` / `ttf-monocraft-nerd` on AUR)
 > - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
 > - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
@@ -258,6 +258,7 @@ sudo ./install.sh
 
 <details>
 <summary>Uninstall?</summary>
+
 ---
 
 #### Arch
