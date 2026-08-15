@@ -191,15 +191,18 @@ ShellRoot {
       // adjust box shape conditionally
       readonly property real dpi: Config.dpiScale
 
+      property bool cliphistPreviewing: false
+
       readonly property real baseWidth: activeOsd === "battery" ? osdWidth
                      : activeOsd === "timer" ? osdWidth
                      : activeOsd === "volume" ? osdWidth
                      : activeOsd === "brightness" ? osdWidth
-                     : (notificationModule.active && !notifFullscreenMode) ? 305
+                     : (notificationModule.active && !notifFullscreenMode) ? 320
                      : controlCenter ? 390
                      : mediaAutoOpened ? 340
                      : appLauncher ? 390
                      : miniDashboard ? 420
+                     : (cliphistOpen && cliphistPreviewing) ? 400
                      : cliphistOpen ? 460
                      : wallpaperSwitcherOpen ? 600
                      : row.implicitWidth + (12 * Config.paddingScale) + (hovered ? 68 : 56) * Config.paddingScale
@@ -214,6 +217,7 @@ ShellRoot {
                   : controlCenter
                       ? (118 + notifBump)
                   : mediaAutoOpened ? 90
+                  : (cliphistOpen && cliphistPreviewing) ? 380
                   : cliphistOpen ? 270
                   : miniDashboard ? 155
                   : appLauncher ? 410
@@ -222,6 +226,7 @@ ShellRoot {
 
       readonly property real baseRadius: notificationModule.active ? 99
         : mediaAutoOpened ? 22
+        : cliphistOpen && cliphistPreviewing ? 35
         : cliphistOpen ? 28
         : controlCenter ? (notificationModule.notifications.length > 0
           ? (mprisModule.hasPlayer ? 27 : 25)
@@ -416,13 +421,15 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 26
-        height: box.cliphistOpen ? box.implicitHeight - 26 : 0
+        height: (box.cliphistOpen ? box.implicitHeight - 26 : 0) + cliphistExtraHeight
         opacity: box.cliphistOpen
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !mediaAutoOpened
                  && !box.controlCenter ? 1 : 0
         visible: opacity > 0
+
+        property real cliphistExtraHeight: 0
 
         Behavior on opacity {
           SequentialAnimation {
@@ -436,6 +443,7 @@ ShellRoot {
           shown: box.cliphistOpen
           anchors.fill: parent
           onCloseRequested: box.cliphistOpen = false
+          onPreviewToggled: (active) => box.cliphistPreviewing = active
         }
       }
 

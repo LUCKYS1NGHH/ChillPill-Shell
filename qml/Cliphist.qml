@@ -13,8 +13,10 @@ Item {
     property string searchQuery: ""
     property string deletingId: ""
     property string collapsingId: ""
+    property bool imgFullPreview: false
 
     signal closeRequested()
+    signal previewToggled(bool active)
 
     visible: shown
     opacity: shown ? 1 : 0
@@ -68,6 +70,14 @@ Item {
         deleteProc.running = true
         holdRedTimer.entryId = entry.id
         holdRedTimer.restart()
+    }
+
+    function imgFullPreviewSelected() {
+        let entry = listModel.count > 0 ? listModel.get(root.selectedIndex) : null
+        if (!entry || !entry.imagePath) return
+
+        imgFullPreview = !imgFullPreview
+        root.previewToggled(imgFullPreview)
     }
 
     Timer {
@@ -166,7 +176,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 18
+        radius: imgFullPreview ? 24 : 18
         color: "#1a1a1a"
         border.color: "#333"
         border.width: 1
@@ -181,6 +191,7 @@ Item {
 
         RowLayout {
           width: parent.width
+          visible: !imgFullPreview
 
           Text {
               text: "Clipboard History"
@@ -210,6 +221,7 @@ Item {
             color: "#252525"
             border.color: searchInput.activeFocus ? "#555" : "#333"
             border.width: 1
+            visible: !imgFullPreview
 
             TextInput {
                 id: searchInput
@@ -220,6 +232,7 @@ Item {
                 color: Theme.fg
                 font { family: Theme.fontFamily; pixelSize: 10 }
                 clip: true
+                readOnly: imgFullPreview
 
                 onTextChanged: root.searchQuery = text
 
@@ -250,11 +263,43 @@ Item {
                         event.accepted = true
                     } else if (event.key === Qt.Key_Escape) {
                         event.accepted = true
-                        root.closeRequested()
+                        if (imgFullPreview) {
+                            imgFullPreview = false
+                            previewToggled(false)
+                        } else {
+                            root.closeRequested()
+                        }
                     } else if (event.key === Qt.Key_Delete) {
                         root.deleteSelected()
                         event.accepted = true
+                    } else if (event.key === Qt.Key_Tab) {
+                        console.log("Tab key clicked for clipboard image full preview")
+                        root.imgFullPreviewSelected()
+                        event.accepted = true
                     }
+                }
+            }
+        }
+
+        // image wrapped in item to align in center
+        Item {
+            width: parent.width
+            height: parent.height
+            visible: imgFullPreview
+
+            Image {
+                id: previewImage
+                anchors.centerIn: parent
+                width: parent.width - 15
+                height: parent.height - 15
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                sourceSize: Qt.size(500, 500)
+                opacity: status === Image.Ready ? 1 : 0
+                Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                source: {
+                    let entry = listModel.count > 0 ? listModel.get(root.selectedIndex) : null
+                    return entry && entry.imagePath ? ("file://" + entry.imagePath) : ""
                 }
             }
         }
@@ -268,6 +313,7 @@ Item {
             currentIndex: root.selectedIndex
             highlightFollowsCurrentItem: false
             highlightMoveDuration: 80
+            visible: !imgFullPreview
 
             removeDisplaced: Transition { NumberAnimation { properties: "y"; duration: 150; easing.type: Easing.OutCubic } }
 
@@ -303,7 +349,7 @@ Item {
                     anchors.leftMargin: 12
                     anchors.rightMargin: 8
                     text: model.label
-                    visible: !model.imagePath
+                    visible: !model.imagePath && !imgFullPreview
                     color: Theme.fg
                     font { family: Theme.fontFamily; pixelSize: 10 }
                     elide: Text.ElideRight
