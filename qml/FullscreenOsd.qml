@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
+import QtQuick.Layouts
 
 PanelWindow {
   id: root
@@ -51,7 +52,7 @@ PanelWindow {
       NumberAnimation { duration: root.animDuration * 0.6; easing.type: Easing.OutExpo }
     }
 
-    Row {
+    RowLayout {
       id: cardRow
       anchors.centerIn: parent
       spacing: 10

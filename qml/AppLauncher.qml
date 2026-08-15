@@ -98,8 +98,8 @@ Item {
               text: "Applications"
               color: Theme.fg
               font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
-              anchors.left: parent.left
-              anchors.leftMargin: 5
+              Layout.alignment: Qt.AlignLeft
+              Layout.leftMargin: 5
           }
 
           Text {
@@ -109,8 +109,8 @@ Item {
                      + " / " + appList.count + " (" + appList.count + ")"
               color: "#999999"
               font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
-              anchors.right: parent.right
-              anchors.rightMargin: 6
+              Layout.alignment: Qt.AlignRight
+              Layout.rightMargin: 6
             }
         }
 
