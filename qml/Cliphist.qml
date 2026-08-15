@@ -80,6 +80,17 @@ Item {
         root.previewToggled(imgFullPreview)
     }
 
+    function findAdjacentImageIndex(direction) {
+        if (listModel.count === 0) return -1
+        let idx = root.selectedIndex
+        for (let i = 0; i < listModel.count; i++) {
+            idx = (idx + direction + listModel.count) % listModel.count
+            let e = listModel.get(idx)
+            if (e.imagePath) return idx
+        }
+        return -1
+    }
+
     Timer {
         id: holdRedTimer
         property string entryId: ""
@@ -246,16 +257,23 @@ Item {
 
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Down) {
-                        if (listModel.count > 0) {
+                        if (imgFullPreview) {
+                            let next = root.findAdjacentImageIndex(1)
+                            if (next !== -1) root.selectedIndex = next
+                        } else if (listModel.count > 0) {
                             root.selectedIndex = (root.selectedIndex + 1) % listModel.count
                         }
                         listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Up) {
-                        if (listModel.count > 0)
-                            root.selectedIndex = root.selectedIndex <= 0
-                                ? listModel.count - 1
-                                : root.selectedIndex - 1
+                        if (imgFullPreview) {
+                            let prev = root.findAdjacentImageIndex(-1)
+                            if (prev !== -1) root.selectedIndex = prev
+                        } else if (listModel.count > 0) {
+                            root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1
+                        }
+                        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+                        event.accepted = true
                         listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
@@ -296,10 +314,20 @@ Item {
                 asynchronous: true
                 sourceSize: Qt.size(500, 500)
                 opacity: status === Image.Ready ? 1 : 0
+                scale: 1
                 Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+
                 source: {
                     let entry = listModel.count > 0 ? listModel.get(root.selectedIndex) : null
                     return entry && entry.imagePath ? ("file://" + entry.imagePath) : ""
+                }
+
+                onSourceChanged: swapAnim.restart()
+
+                SequentialAnimation {
+                    id: swapAnim
+                    NumberAnimation { target: previewImage; property: "scale"; to: 0.9; duration: 100; easing.type: Easing.OutQuad }
+                    NumberAnimation { target: previewImage; property: "scale"; to: 1.0; duration: 160; easing.type: Easing.OutBack }
                 }
             }
         }
