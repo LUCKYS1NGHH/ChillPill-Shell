@@ -14,6 +14,7 @@ Item {
     property string deletingId: ""
     property string collapsingId: ""
     property bool imgFullPreview: false
+    property int previewSlideDir: 1  // 1 = down/next, -1 = up/prev
 
     signal closeRequested()
     signal previewToggled(bool active)
@@ -259,7 +260,10 @@ Item {
                     if (event.key === Qt.Key_Down) {
                         if (imgFullPreview) {
                             let next = root.findAdjacentImageIndex(1)
-                            if (next !== -1) root.selectedIndex = next
+                            if (next !== -1) {
+                                root.previewSlideDir = 1
+                                root.selectedIndex = next
+                            }
                         } else if (listModel.count > 0) {
                             root.selectedIndex = (root.selectedIndex + 1) % listModel.count
                         }
@@ -268,7 +272,10 @@ Item {
                     } else if (event.key === Qt.Key_Up) {
                         if (imgFullPreview) {
                             let prev = root.findAdjacentImageIndex(-1)
-                            if (prev !== -1) root.selectedIndex = prev
+                            if (prev !== -1) {
+                                root.previewSlideDir = -1
+                                root.selectedIndex = prev
+                            }
                         } else if (listModel.count > 0) {
                             root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1
                         }
@@ -307,14 +314,15 @@ Item {
 
             Image {
                 id: previewImage
-                anchors.centerIn: parent
                 width: parent.width - 15
-                height: parent.height - 15
+                height: parent.height - 25
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 25
+                anchors.horizontalCenter: parent.horizontalCenter
                 fillMode: Image.PreserveAspectFit
                 asynchronous: true
                 sourceSize: Qt.size(500, 500)
                 opacity: status === Image.Ready ? 1 : 0
-                scale: 1
                 Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
 
                 source: {
@@ -322,13 +330,31 @@ Item {
                     return entry && entry.imagePath ? ("file://" + entry.imagePath) : ""
                 }
 
-                onSourceChanged: swapAnim.restart()
+                property real slideY: 0
+                transform: Translate { y: previewImage.slideY }
 
-                SequentialAnimation {
-                    id: swapAnim
-                    NumberAnimation { target: previewImage; property: "scale"; to: 0.9; duration: 100; easing.type: Easing.OutQuad }
-                    NumberAnimation { target: previewImage; property: "scale"; to: 1.0; duration: 160; easing.type: Easing.OutBack }
+                onSourceChanged: {
+                    slideY = root.previewSlideDir * 26
+                    slideAnim.restart()
                 }
+
+                NumberAnimation {
+                    id: slideAnim
+                    target: previewImage
+                    property: "slideY"
+                    to: 0
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            Text {
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.margins: 2
+                text: (root.selectedIndex + 1) + " / " + listModel.count
+                color: "#b4b4b4"
+                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
             }
         }
 
