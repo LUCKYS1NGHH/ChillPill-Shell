@@ -627,7 +627,6 @@ ShellRoot {
                 radius: box.sliderRadius
                 color: box.sliderColor
                 Behavior on width {
-                  enabled: !mouseArea.pressed
                   SpringAnimation {
                     spring: 15.5
                     damping: 1.8
@@ -701,7 +700,6 @@ ShellRoot {
                 radius: box.sliderRadius
                 color: box.sliderColor
                 Behavior on width {
-                  enabled: !mouseArea.pressed
                   SpringAnimation {
                     spring: 15.5
                     damping: 1.8
