@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.5.0](https://img.shields.io/badge/CPShell-0.5.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.6.0](https://img.shields.io/badge/CP--Shell-0.5.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -25,6 +25,7 @@ into your session at all times. It's not bound to any dotfiles.
 [![Installation](https://img.shields.io/badge/Installation-2d2d2d?style=flat-square)](#install)
 [![Auto Startup](https://img.shields.io/badge/Auto%20Startup-2d2d2d?style=flat-square)](#auto-startup)
 [![Key Bindings](https://img.shields.io/badge/Key%20Bindings-2d2d2d?style=flat-square)](#key-bindings)
+[![Contributors](https://img.shields.io/badge/Contributors-2d2d2d?style=flat-square)](#contributors)
 [![Thanks](https://img.shields.io/badge/Thanks-2d2d2d?style=flat-square)](#thanks)
 [![Author](https://img.shields.io/badge/Author-2d2d2d?style=flat-square)](#author)
 
@@ -106,6 +107,10 @@ into your session at all times. It's not bound to any dotfiles.
       <p align="center"><b>Wallpaper switcher</b></p>
       <img src="screenshots/image_11.webp" width="100%" alt="Wallpaper switcher with opened with previews">
     </td>
+    <td width="50%">
+      <p align="center"><b>Cliphist - Image full preview tab</b></p>
+      <img src="screenshots/image_12.webp" width="100%" alt="Cliphist image full preview tab">
+    </td>
   </tr>
 </table>
 
@@ -113,7 +118,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume and brightness sliders, notification stack
-- **Cliphist (Clipboard History)** - Search, clipboard image preview, item index status, `Delete` key to delete any item
+- **Cliphist (Clipboard History)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst entirely now)
 - **OSD**                          - Battery, volume, brightness, timer
@@ -141,6 +146,8 @@ into your session at all times. It's not bound to any dotfiles.
   - case 3: device wants a yes/no confirmation of a shown passkey
 
 - Cliphist shows image previews from `~/.cache/chillpill-shell/cliphist-imgs` by converting image binaries into real images and save there.
+
+- In Cliphist image full preview (which opens through `Tab` key), you can switch to other image by `Up`/`Down` keys, and can also delete the image in full preview.
 
 - Notifications are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.
@@ -226,6 +233,7 @@ into your session at all times. It's not bound to any dotfiles.
 - [inotify-tools](https://github.com/inotify-tools/inotify-tools)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
+- [pipewire](https://github.com/PipeWire/pipewire)
 - [blueman](https://github.com/blueman-project/blueman)
 - [awww](https://codeberg.org/LGFae/awww)
 - Qt Multimedia (`qt6-multimedia` on Arch)
