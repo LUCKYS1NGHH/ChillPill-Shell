@@ -102,17 +102,25 @@ info "Setting up right permissions"
 
 chmod 755 /usr/share/chillpill-shell
 chmod 755 /usr/share/chillpill-shell/share
-chmod 755 /usr/share/chillpill-shell/share/*
+chmod 644 /usr/share/chillpill-shell/share/*
 chmod 755 /usr/share/chillpill-shell/scripts
 chmod 755 /usr/share/chillpill-shell/scripts/*
-chmod 755 /usr/share/chillpill-shell/IslandBackend
-chmod 755 /usr/share/chillpill-shell/IslandBackend/*
+chmod 655 /usr/share/chillpill-shell/IslandBackend
+chmod 644 /usr/share/chillpill-shell/IslandBackend/*
 
-# place config file if it not exists
-if [[ ! -f "$REAL_HOME/.config/chillpill-shell/config.jsonc" ]]; then
-   info "Copying config file to ~/.config/chillpill-shell and /usr/share/chillpill-shell"
+# setup config file
+info "Setting up config file"
+install -m 644 config.jsonc /usr/share/chillpill-shell/config.jsonc.example
+
+if [[ -f "$REAL_HOME/.config/chillpill-shell/config.jsonc" ]]; then
+   info "Updating your config file..."
+   if [[ -f config_update.py ]] && bin_exists python3; then
+      python3 config_update.py "$SUDO_USER" || warn "Config file update failed."
+   else
+      warn "config_update.py missing OR python not installed, skipping config update."
+   fi
+else
    install -m 644 config.jsonc "$REAL_HOME/.config/chillpill-shell/config.jsonc"
-   install -m 644 config.jsonc /usr/share/chillpill-shell/config.jsonc.example
 fi
 
 # place systemd file
