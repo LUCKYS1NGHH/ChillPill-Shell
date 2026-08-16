@@ -312,49 +312,94 @@ Item {
             height: parent.height
             visible: imgFullPreview
 
-            Image {
-                id: previewImage
-                width: parent.width - 15
-                height: parent.height - 25
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 25
-                anchors.horizontalCenter: parent.horizontalCenter
-                fillMode: Image.PreserveAspectFit
+            Loader {
+                anchors.fill: parent
+                active: imgFullPreview
                 asynchronous: true
-                sourceSize: Qt.size(500, 500)
-                opacity: status === Image.Ready ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
 
-                source: {
-                    let entry = listModel.count > 0 ? listModel.get(root.selectedIndex) : null
-                    return entry && entry.imagePath ? ("file://" + entry.imagePath) : ""
+                sourceComponent: Component {
+                    Item {
+                        anchors.fill: parent
+
+                        readonly property string currentEntryId: {
+                            let idx = root.selectedIndex
+                            if (idx < 0 || idx >= listModel.count) return ""
+                            return listModel.get(idx).id
+                        }
+
+                        Image {
+                            id: previewImage
+                            width: parent.width - 15
+                            height: parent.height - 25
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 25
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            fillMode: Image.PreserveAspectFit
+                            asynchronous: true
+                            sourceSize: Qt.size(500, 500)
+
+                            opacity: currentEntryId === root.collapsingId ? 0 : (status === Image.Ready ? 1 : 0)
+                            scale: currentEntryId === root.collapsingId ? 0.8 : 1
+                            Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+                            source: {
+                                let idx = root.selectedIndex
+                                if (idx < 0 || idx >= listModel.count) return ""
+                                let entry = listModel.get(idx)
+                                return entry.imagePath ? ("file://" + entry.imagePath) : ""
+                            }
+
+                            property real slideY: 0
+                            transform: Translate { y: previewImage.slideY }
+
+                            onSourceChanged: {
+                                slideY = root.previewSlideDir * 26
+                                slideAnim.restart()
+                            }
+
+                            NumberAnimation {
+                                id: slideAnim
+                                target: previewImage
+                                property: "slideY"
+                                to: 0
+                                duration: 200
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        // red tint flash on delete confirm
+                        Rectangle {
+                            anchors.topMargin: 5
+                            anchors.fill: previewImage
+                            radius: 15
+                            color: "#e32626"
+                            opacity: currentEntryId === root.deletingId ? 0.70 : 0
+                            Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                        }
+
+                        // "Deleted" pop text
+                        Text {
+                            anchors.centerIn: previewImage
+                            text: "Deleted"
+                            color: "white"
+                            font { family: Theme.fontFamily; pixelSize: 14; weight: 600 }
+                            opacity: currentEntryId === root.deletingId ? 1 : 0
+                            scale: currentEntryId === root.deletingId ? 1 : 0.80
+                            Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                            Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutBack } }
+                        }
+
+                        Text {
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.margins: 2
+                            text: (root.selectedIndex + 1) + " / " + listModel.count
+                            color: "#b4b4b4"
+                            font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+                        }
+                    }
                 }
-
-                property real slideY: 0
-                transform: Translate { y: previewImage.slideY }
-
-                onSourceChanged: {
-                    slideY = root.previewSlideDir * 26
-                    slideAnim.restart()
-                }
-
-                NumberAnimation {
-                    id: slideAnim
-                    target: previewImage
-                    property: "slideY"
-                    to: 0
-                    duration: 200
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            Text {
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.margins: 2
-                text: (root.selectedIndex + 1) + " / " + listModel.count
-                color: "#b4b4b4"
-                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
             }
         }
 
