@@ -56,7 +56,7 @@ Rectangle {
 
       Text {
         text: "\uead2"
-        color: refreshHover.containsMouse ? "#d1d1d1" : "#565656"
+        color: refreshHover.containsMouse ? Theme.focusFg : Theme.fg7
         font.family: Config.nerdFontFamily
         font.pixelSize: 13 * box.dpi
         Behavior on color { ColorAnimation { duration: 100 } }

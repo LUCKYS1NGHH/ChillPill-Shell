@@ -189,8 +189,8 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: imgFullPreview ? 24 : 18
-        color: "#1a1a1a"
-        border.color: "#333"
+        color: Theme.bgD1
+        border.color: Theme.borderBg2
         border.width: 1
         clip: true
     }
@@ -207,7 +207,7 @@ Item {
 
           Text {
               text: "Clipboard History"
-              color: Theme.fg
+              color: Theme.fg2
               font { family: Theme.fontFamily; pixelSize: 11; weight: 700 }
               Layout.alignment: Qt.AlignLeft
               Layout.leftMargin: 4
@@ -218,7 +218,7 @@ Item {
             property int total: 0
             text: (listModel.count === 0 ? 0 : root.selectedIndex + 1)
                    + " / " + listModel.count + " (" + total + ")"
-            color: "#999999"
+            color: Theme.fg4
             font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
             Layout.alignment: Qt.AlignRight
             Layout.rightMargin: 6
@@ -230,8 +230,8 @@ Item {
             width: parent.width
             height: 26
             radius: 6
-            color: "#252525"
-            border.color: searchInput.activeFocus ? "#555" : "#333"
+            color: Theme.bg4
+            border.color: searchInput.activeFocus ? Theme.borderBgFocus : Theme.borderBg
             border.width: 1
             visible: !imgFullPreview
 
@@ -250,7 +250,7 @@ Item {
 
                 Text {
                     text: "search clips..."
-                    color: "#666"
+                    color: Theme.fg3
                     font: searchInput.font
                     visible: searchInput.text.length === 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -373,7 +373,7 @@ Item {
                             anchors.topMargin: 5
                             anchors.fill: previewImage
                             radius: 15
-                            color: "#e32626"
+                            color: Theme.deleting
                             opacity: currentEntryId === root.deletingId ? 0.70 : 0
                             Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                         }
@@ -395,7 +395,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.margins: 2
                             text: (root.selectedIndex + 1) + " / " + listModel.count
-                            color: "#b4b4b4"
+                            color: Theme.fg4
                             font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
                         }
                     }
@@ -420,7 +420,7 @@ Item {
                 width: listView.width
                 height: model.id === root.collapsingId ? 5 : (model.imagePath ? 55 : 30)
                 radius: 7
-                color: model.id === root.deletingId ? "#e22d2d" : (index === root.selectedIndex ? "#313131" : "transparent")
+                color: model.id === root.deletingId ? Theme.deleting : (index === root.selectedIndex ? Theme.focusBg1 : "transparent")
                 clip: true
                 opacity: model.id === root.collapsingId ? 0 : 1
                 scale: model.id === root.collapsingId ? 0.75 : 1

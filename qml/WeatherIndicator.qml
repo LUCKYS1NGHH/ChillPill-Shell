@@ -7,7 +7,7 @@ Item {
   implicitWidth: row.implicitWidth
   implicitHeight: row.implicitHeight
 
-  property string weatherFg: "#aaaaaa"
+  property string weatherFg: Theme.fg4
 
   Row {
     id: row

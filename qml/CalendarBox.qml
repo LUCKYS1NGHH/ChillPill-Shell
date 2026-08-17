@@ -11,7 +11,7 @@ Rectangle {
   height: daysGrid.y + daysGrid.height + 12 * box.dpi
   x: (parent.width - calendarPopup.width) / 2
   y: box.y + box.height * box.dpi + 5 * box.dpi
-  color: "#1e1e1e"
+  color: Theme.bg
   radius: 18 * box.dpi
   Behavior on opacity { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
   Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutExpo } }
@@ -43,7 +43,7 @@ Rectangle {
     Repeater {
       model: datetimeItem.dayNames
       Text {
-        width: 25 * box.dpi; text: modelData; color: "#6a6a6a"
+        width: 25 * box.dpi; text: modelData; color: Theme.fg5
         font { family: Theme.fontFamily; pixelSize: 8 * box.dpi; weight: 600 }
         horizontalAlignment: Text.AlignHCenter
       }

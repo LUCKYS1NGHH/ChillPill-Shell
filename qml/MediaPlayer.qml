@@ -9,19 +9,19 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
     height: mprisModule.hasPlayer ? 118 : 0
-    radius: 12
-    color: "#1a1a1a"
+    radius: 16
+    color: Theme.bgD
     visible: mprisModule.hasPlayer
     clip: true
-    border.color: "#202020"
-    border.width: 2
+    border.color: Theme.borderBg3
+    border.width: 1
 
     property int margin: 14
 
     // artist name adjustments
     property int artistFontSize: 10
-    property string artistFontColor: "#656565"
-    property int artistFontWeight: 600
+    property string artistFontColor: Theme.fg4
+    property int artistFontWeight: 300
 
     property real mprisProgress: 0
     property string mprisTimePlayed: "0:00"
@@ -84,7 +84,7 @@ Rectangle {
                     text: "\uf001"
                     font.family: Theme.nerdFontFamily
                     font.pixelSize: 18
-                    color: "#555"
+                    color: Theme.fg4
                 }
             }
 
@@ -97,9 +97,9 @@ Rectangle {
                 Text {
                     width: parent.width
                     text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
-                    color: "#e9e9e9"
+                    color: Theme.fgL
                     font.pixelSize: 12
-                    font.bold: true
+                    font.weight: 600
                     font.family: Theme.fontFamily
                     elide: Text.ElideRight
                 }
@@ -124,7 +124,7 @@ Rectangle {
                     text: "⏮"
                     font.family: Theme.nerdFontFamily
                     font.pixelSize: 23
-                    color: prevHover.containsMouse ? "#ffffff" : "#cfcfcf"
+                    color: prevHover.containsMouse ? "white" : Theme.fg3
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
@@ -140,7 +140,7 @@ Rectangle {
                     text: mprisModule.playing ? "󰏤" : "󰐊"
                     font.family: Theme.nerdFontFamily
                     font.pixelSize: 23
-                    color: playHover.containsMouse ? "#ffffff" : "#cdcdcd"
+                    color: playHover.containsMouse ? "white" : Theme.fg2
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
@@ -156,7 +156,7 @@ Rectangle {
                     text: "⏭"
                     font.family: Theme.nerdFontFamily
                     font.pixelSize: 23
-                    color: nextHover.containsMouse ? "#ffffff" : "#b3b3b3"
+                    color: nextHover.containsMouse ? "white" : Theme.fg3
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on color { ColorAnimation { duration: 100 } }
                     MouseArea {
@@ -179,7 +179,7 @@ Rectangle {
                 width: parent.width
                 height: barHover.containsMouse ? 5 : 3
                 radius: 8
-                color: "#4d4d4d"
+                color: Theme.bg5
 
                 Behavior on height { NumberAnimation { duration: 380; easing.type: Easing.OutExpo } }
 
@@ -187,7 +187,7 @@ Rectangle {
                     width: parent.width * mediaCard.mprisProgress
                     height: parent.height
                     radius: 5
-                    color: barHover.containsMouse ? "#cdcdcd" : fg
+                    color: barHover.containsMouse ? Theme.fgL : fg
                     Behavior on width { NumberAnimation { duration: 510; easing.type: Easing.Linear } }
                 }
 
@@ -214,7 +214,7 @@ Rectangle {
                 Text {
                     anchors.left: parent.left
                     text: mediaCard.mprisTimePlayed
-                    color: "#676767"
+                    color: Theme.fg5
                     font.pixelSize: 10
                     font.family: Theme.fontFamily
                 }
@@ -222,7 +222,7 @@ Rectangle {
                 Text {
                     anchors.right: parent.right
                     text: mediaCard.mprisTimeTotal
-                    color: "#676767"
+                    color: Theme.fg5
                     font.pixelSize: 10
                     font.family: Theme.fontFamily
                 }
