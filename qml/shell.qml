@@ -51,8 +51,8 @@ ShellRoot {
   property string fontFamily: Theme.fontFamily
   property int avatarSize: 48
   property int buttonSize: 20
-  property string buttonBg: "#353535"
-  property string buttonHoverBg: "#bababa"
+  property string buttonBg: Theme.bg6
+  property string buttonHoverBg: Theme.focusFg1
   property int buttonHoverSpeed: 120
   property int buttonctlRadius: 6
 
@@ -154,15 +154,15 @@ ShellRoot {
 
       // control center UI
       property real ccButtonBorderWidth: 1
-      property string ccButtonBorderColor: "#202020"
+      property string ccButtonBorderColor: Theme.borderBg4
       property real ccButtonWidth: 85.3
       property int ccButtonHeight: 35
       property int ccButtonRadius: 10
-      property string ccButtonBgOff: "#151515"
-      property string ccButtonFgOff: "#a8a8a8"
+      property string ccButtonBgOff: Theme.bg1
+      property string ccButtonFgOff: Theme.fg3
       property int sliderHeight: 4
       property int sliderRadius: 4
-      property string sliderColor: "#c9c9c9"
+      property string sliderColor: Theme.sliderBg
       // invisible extra clickable area above/below the thin slider bars
       // (proportional to the bar height, so it scales with sliderHeight)
       property int sliderHitSlop: sliderHeight * 2
@@ -246,7 +246,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: mediaAutoOpened && !controlCenter ? Theme.bg1 : controlCenter ? "#1a1a1a" : bg
+      color: controlCenter ? Theme.bgD1 : bg
 
       onMiniDashboardChanged: {
           if (!box.miniDashboard) {
@@ -555,15 +555,7 @@ ShellRoot {
         }
 
         // media player
-        MediaPlayer {
-          margin: 14
-          artistFontSize: 10
-          artistFontWeight: 300
-          artistFontColor: "#7b7b7b"
-          color: "#151515"
-          radius: 16
-          border.width: 1
-        }
+        MediaPlayer {}
 
         // control center buttons
         CcButtons {
@@ -619,7 +611,7 @@ ShellRoot {
               Layout.fillWidth: true
               height: box.sliderHeight
               radius: box.sliderRadius
-              color: "#3a3a3a"
+              color: Theme.bg5
 
               Rectangle {
                 width: parent.width * (volumeModule.vol / 100)
@@ -692,7 +684,7 @@ ShellRoot {
               Layout.fillWidth: true
               height: box.sliderHeight
               radius: box.sliderRadius
-              color: "#3a3a3a"
+              color: Theme.bg5
 
               Rectangle {
                 width: parent.width * brightnessModule.percent
@@ -752,47 +744,44 @@ ShellRoot {
       Rectangle {
         id: headerBar
         anchors.top: notifBox.top
-        anchors.topMargin: -21
+        anchors.topMargin: -20
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 10
-        height: 35
+        height: 20
         topLeftRadius: 13
         topRightRadius: 13
         bottomLeftRadius: 0
         bottomRightRadius: 0
-        color: "#2f2f2f"
+        color: Theme.bg5
         visible: notifBox.visible
         z: 0
 
         Item {
-          Layout.fillWidth: true
-          height: 16
+          anchors.fill: parent
 
           Text {
             text: "Notifications (" + notificationModule.notifications.length + ")"
-            color: "#dddddd"
+            color: Theme.fg2
             font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
-            anchors.top: parent.top
             anchors.left: parent.left
             anchors.leftMargin: 16
-            anchors.topMargin: 4
             anchors.verticalCenter: parent.verticalCenter
+            verticalAlignment: Text.AlignVCenter
           }
 
           Rectangle {
             width: 60
             height: 16
             radius: 10
-            color: clearAllHover.containsMouse ? "#1d1d1d" : "#242424"
+            color: clearAllHover.containsMouse ? Theme.bg : Theme.bg1
             Behavior on color { ColorAnimation { duration: 100 } }
-            anchors.top: parent.top
             anchors.right: parent.right
-            anchors.topMargin: 3
-            anchors.rightMargin: -345
+            anchors.rightMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
 
             Text {
               text: "Clear all"
-              color: "#dedede"
+              color: Theme.fg3
               font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
               anchors.centerIn: parent
             }
@@ -821,11 +810,11 @@ ShellRoot {
         topRightRadius: 0
         bottomLeftRadius: 13
         bottomRightRadius: 13
-        color: "#161616"
+        color: Theme.bgD
         visible: notificationModule.notifications.length > 0 && box.controlCenter
         clip: true
         border.width: 1
-        border.color: "#2f2f2f"
+        border.color: Theme.bg2
         z: 1
 
         Behavior on height { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
@@ -944,7 +933,7 @@ ShellRoot {
 
                 Text {
                   text: modelData.receivedTime ? Qt.formatTime(modelData.receivedTime, "hh:mm") : ""
-                  color: "#858585"
+                  color: Theme.fg5
                   font { family: Theme.fontFamily; pixelSize: 8 }
                   Layout.bottomMargin: 5
                 }
@@ -954,12 +943,12 @@ ShellRoot {
                   Layout.preferredWidth: 22
                   Layout.preferredHeight: 22
                   radius: 99
-                  color: dismissHover.containsMouse ? "#333333" : "transparent"
+                  color: dismissHover.containsMouse ? Theme.focusBgL : "transparent"
                   Behavior on color { ColorAnimation { duration: 100 } }
 
                   Text {
                     text: ""
-                    color: dismissHover.containsMouse ? "#bebebe" : "#404040"
+                    color: dismissHover.containsMouse ? Theme.focusFg1 : Theme.fg7
                     anchors.centerIn: parent
                     font.pixelSize: 11
                     Behavior on color { ColorAnimation { duration: 150 } }
@@ -984,7 +973,7 @@ ShellRoot {
                 ) : ""
                 textFormat: Text.StyledText
                 linkColor: Theme.accent
-                color: "#9f9f9f"
+                color: Theme.fg4
                 font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
@@ -1004,7 +993,7 @@ ShellRoot {
               anchors.bottom: parent.bottom
               width: parent.width
               height: 1
-              color: "#333"
+              color: Theme.bg5
               visible: index < notificationModule.notifications.length - 1
             }
           }
@@ -1048,7 +1037,7 @@ ShellRoot {
             height: avatarSize
             radius: avatarSize / 2
             property string imgPath: Config.displayPicture ? "file://" + Config.displayPicture.replace("~", Quickshell.env("HOME")) : ""
-            color: (imgPath === "" || avatarImg.status !== Image.Ready) ? "#454545" : "transparent"
+            color: (imgPath === "" || avatarImg.status !== Image.Ready) ? Theme.bg5 : "transparent"
             layer.enabled: true
             layer.smooth: true
             layer.mipmap: true
@@ -1123,7 +1112,7 @@ ShellRoot {
 
               Text {
                 id: hostnameText
-                color: "#848484"
+                color: Theme.fg5
                 Layout.topMargin: 2
                 font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
               }
@@ -1166,7 +1155,7 @@ ShellRoot {
 
         // rectangle where poweroff, sleep etc. buttons placed
         Rectangle {
-          color: "#212121"
+          color: Theme.bg1
           implicitWidth: 15
           implicitHeight: 30
           radius: 8
@@ -1233,7 +1222,7 @@ ShellRoot {
 
             Item { Layout.fillWidth: true }
 
-            Datetime { id: datetimeItem; dateFg: "#aaaaaa"; }
+            Datetime { id: datetimeItem; dateFg: Theme.fg4; }
 
             Item { Layout.fillWidth: true }
 
@@ -1445,7 +1434,7 @@ ShellRoot {
           ) : ""
           textFormat: Text.StyledText
           linkColor: Theme.accent
-          color: "#9b9b9b"
+          color: Theme.fg4
           font { family: Theme.fontFamily; pixelSize: 9 * box.dpi }
           elide: Text.ElideRight
           visible: text !== ""

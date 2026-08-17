@@ -19,7 +19,7 @@ Rectangle {
     }
   }
 
-  color: "#1e1e1e"
+  color: Theme.bgD1
   radius: 18
   visible: opacity > 0
   opacity: shown ? 1 : 0
@@ -73,7 +73,7 @@ Rectangle {
       Layout.fillWidth: true
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.WordWrap
-      color: "#f9cb41"
+      color: Theme.warning
       text: "awww not found on $PATH\ninstall it to apply wallpapers"
       font { family: Theme.fontFamily; pixelSize: 12 }
     }
@@ -87,7 +87,7 @@ Rectangle {
       Layout.fillWidth: true
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.WordWrap
-      color: "#f9cb41"
+      color: Theme.warning
       text: "No wallpapers found in\n" + Config.wallpapersDir
       font { family: Theme.fontFamily; pixelSize: 12 }
     }
@@ -153,11 +153,11 @@ Rectangle {
           anchors.fill: parent
           anchors.margins: 5
           radius: 10
-          color: "#2a2a2a"
+          color: Theme.bg4
           scale: (mouseArea.containsMouse || cell.isCurrent) ? 1.03 : 1.0
           Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutExpo } }
           border.width: cell.isCurrent ? 1 : 0
-          border.color: "#6a6a6a"
+          border.color: Theme.borderBg
 
           ClippingRectangle {
             anchors.fill: parent
@@ -180,7 +180,7 @@ Rectangle {
 
             Rectangle {
               anchors.fill: parent
-              color: mouseArea.containsMouse ? "#ffffff" : "transparent"
+              color: mouseArea.containsMouse ? "white" : "transparent"
               opacity: mouseArea.containsMouse ? 0.06 : 0
               Behavior on opacity { NumberAnimation { duration: 115 } }
             }
@@ -204,7 +204,7 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.margins: 8
                 text: fileBaseName
-                color: "#ffffff"
+                color: "white"
                 elide: Text.ElideMiddle
                 font { family: Theme.fontFamily; pixelSize: 9 }
               }

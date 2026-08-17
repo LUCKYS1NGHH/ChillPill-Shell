@@ -34,7 +34,7 @@ PanelWindow {
     anchors.fill: parent
     anchors.topMargin: 40 * dpi
     anchors.rightMargin: 32 * dpi
-    color: "#1c1c1c"
+    color: Theme.bg
     radius: 26 * dpi
 
     ColumnLayout {
@@ -44,7 +44,7 @@ PanelWindow {
 
       Text {
         text: "Bluetooth"
-        color: "#d2d2d2"
+        color: Theme.fg2
         font { family: Theme.fontFamily; pixelSize: 14 * dpi; bold: true }
         Layout.leftMargin: 5 * dpi
       }
@@ -52,7 +52,7 @@ PanelWindow {
       Text {
         visible: BluetoothController.enabled && BluetoothController.adapterName.length > 0
         text: "Visible as \u201c" + BluetoothController.adapterName + "\u201d"
-        color: "#7d7d7d"
+        color: Theme.fg4
         font { family: Theme.fontFamily; pixelSize: 10 * dpi }
         wrapMode: Text.Wrap
         Layout.fillWidth: true
@@ -62,14 +62,14 @@ PanelWindow {
       Text {
         visible: BluetoothController.scanning
         text: "Scanning..."
-        color: "#949494"
+        color: Theme.fg4
         font { family: Theme.fontFamily; pixelSize: 11 * dpi }
       }
 
       Text {
         visible: !BluetoothController.enabled
         text: "Turn on Bluetooth to see devices."
-        color: "#949494"
+        color: Theme.fg4
         font { family: Theme.fontFamily; pixelSize: 11 * dpi }
         wrapMode: Text.Wrap
         Layout.fillWidth: true
@@ -96,8 +96,8 @@ PanelWindow {
               width: deviceColumn.width
               height: Math.max(45, contentRow.implicitHeight + 15)
               radius: 16 * dpi
-              color: connected ? "#4173c4" : (deviceMouse.containsMouse ? "#313131" : "#252525")
-              border.color: connected ? "" : "#2f2f2f"
+              color: connected ? "#4173c4" : (deviceMouse.containsMouse ? Theme.focusBgL : Theme.bg4)
+              border.color: connected ? "" : Theme.borderBg2
               border.width: connected ? 0 : 1
 
               MouseArea {
@@ -137,7 +137,7 @@ PanelWindow {
                   anchors.verticalCenter: parent.verticalCenter
                   text: connected ? "\uf5b0" : paired ? "\uf0c1" : "\uf294" // dynamic glyph
                   font { family: Theme.nerdFontFamily; pixelSize: 12 * dpi }
-                  color: "#b4b4b4"
+                  color: Theme.fg4
                 }
 
                 Column {
@@ -146,7 +146,7 @@ PanelWindow {
                   spacing: 2 * dpi
                   Text {
                     text: name
-                    color: "#ffffff"
+                    color: "white"
                     font { family: Theme.fontFamily; pixelSize: 11 * dpi; weight: connected ? 500 : 300 }
                   }
                   Text {
@@ -178,7 +178,7 @@ PanelWindow {
       visible: BluetoothPairingAgent.requestActive
       onVisibleChanged: if (visible && BluetoothPairingAgent.requestRequiresInput) secretField.forceActiveFocus()
       anchors.fill: parent
-      color: "#1c1c1c"
+      color: Theme.bg1
       radius: 28 * dpi
       z: 10
 
@@ -194,7 +194,7 @@ PanelWindow {
           text: BluetoothPairingAgent.promptTitle.length > 0
                   ? BluetoothPairingAgent.promptTitle
                   : ("Pair with " + BluetoothPairingAgent.deviceName)
-          color: "#e1e1e1"
+          color: Theme.fg2
           font { family: Theme.fontFamily; pixelSize: 13 * dpi; weight: 600 }
           wrapMode: Text.Wrap
         }
@@ -203,7 +203,7 @@ PanelWindow {
           visible: BluetoothPairingAgent.promptMessage.length > 0
           width: parent.width
           text: BluetoothPairingAgent.promptMessage
-          color: "#949494"
+          color: Theme.fg4
           font { family: Theme.fontFamily; pixelSize: 11 * dpi }
           wrapMode: Text.Wrap
         }
@@ -214,15 +214,15 @@ PanelWindow {
           width: parent.width
           height: 36 * dpi
           radius: 8 * dpi
-          color: "#3a3a3a"
-          border.color: "#5a5a5a"
+          color: Theme.bg4
+          border.color: Theme.borderBg1
           border.width: 1
 
           TextInput {
             id: secretField
             anchors.fill: parent
             anchors.margins: 10 * dpi
-            color: "#dadada"
+            color: Theme.fg4
             font { family: Theme.fontFamily; pixelSize: 12 * dpi }
             echoMode: TextInput.Normal
             verticalAlignment: TextInput.AlignVCenter
@@ -240,7 +240,7 @@ PanelWindow {
           width: parent.width
           horizontalAlignment: Text.AlignHCenter
           text: BluetoothPairingAgent.displayedCode
-          color: "#ffffff"
+          color: "white"
           font { family: Theme.fontFamily; pixelSize: 22 * dpi; bold: true; letterSpacing: 3 }
         }
 
@@ -250,7 +250,7 @@ PanelWindow {
           width: parent.width
           horizontalAlignment: Text.AlignHCenter
           text: BluetoothPairingAgent.displayedCode
-          color: "#ffffff"
+          color: "white"
           font { family: Theme.fontFamily; pixelSize: 22 * dpi; bold: true; letterSpacing: 3 }
         }
 
@@ -261,13 +261,13 @@ PanelWindow {
           Rectangle {
             id: pairSubmitBtn
             visible: BluetoothPairingAgent.requestRequiresInput || BluetoothPairingAgent.requestRequiresConfirmation
-            width: 80 * dpi; height: 32 * box.dpi; radius: 9 * box.dpi
+            width: 80 * dpi; height: 32 * dpi; radius: 9 * dpi
             color: pairSubmitMA.containsMouse ? "#3065be" : "#3874d7"
             signal clicked()
             Text {
               anchors.centerIn: parent
               text: BluetoothPairingAgent.requestRequiresInput ? "Pair" : "Confirm"
-              color: "#fff"
+              color: "white"
               font { family: Theme.fontFamily; pixelSize: 12 * dpi}
             }
             Behavior on color { ColorAnimation { duration: 80 } }
@@ -290,9 +290,9 @@ PanelWindow {
           // OK - shown for the passive display-only case, just acknowledges/cancels
           Rectangle {
             visible: !BluetoothPairingAgent.requestRequiresInput && !BluetoothPairingAgent.requestRequiresConfirmation
-            width: 80 * dpi; height: 32 * box.dpi; radius: 9 * box.dpi
+            width: 80 * dpi; height: 32 * dpi; radius: 9 * dpi
             color: okMA.containsMouse ? "#3065be" : "#3874d7"
-            Text { anchors.centerIn: parent; text: "OK"; color: "#fff"; font { family: Theme.fontFamily; pixelSize: 12 * dpi } }
+            Text { anchors.centerIn: parent; text: "OK"; color: "white"; font { family: Theme.fontFamily; pixelSize: 12 * dpi } }
             Behavior on color { ColorAnimation { duration: 80 } }
             MouseArea {
               id: okMA
@@ -304,12 +304,12 @@ PanelWindow {
           }
 
           Rectangle {
-            width: 80 * dpi; height: 32 * box.dpi; radius: 9 * box.dpi
-            color: cancelMA.containsMouse ? "#2f2f2f" : "#343434"
+            width: 80 * dpi; height: 32 * dpi; radius: 9 * dpi
+            color: cancelMA.containsMouse ? Theme.focusBg1 : Theme.bg5
             Text {
               anchors.centerIn: parent
               text: BluetoothPairingAgent.requestRequiresConfirmation ? "Reject" : "Cancel"
-              color: "#dadada"
+              color: Theme.fg1
               font { family: Theme.fontFamily; pixelSize: 12 * dpi }
             }
             Behavior on color { ColorAnimation { duration: 80 } }

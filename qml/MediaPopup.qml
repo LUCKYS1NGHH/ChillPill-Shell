@@ -47,7 +47,7 @@ Item {
             Layout.preferredWidth: 38
             Layout.preferredHeight: 38
             radius: 8
-            color: "#101010"
+            color: Theme.bg1
             clip: true
 
             layer.enabled: true
@@ -73,7 +73,7 @@ Item {
                 text: "\uf001"
                 font.family: Theme.nerdFontFamily
                 font.pixelSize: 18
-                color: "#555"
+                color: Theme.fg5
             }
         }
 
@@ -84,7 +84,7 @@ Item {
 
             Text {
                 text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
-                color: Theme.fg1
+                color: Theme.fgL
                 font { family: Theme.fontFamily; pixelSize: 11; weight: 700 }
                 elide: Text.ElideRight
                 Layout.fillWidth: true
@@ -92,7 +92,7 @@ Item {
 
             Text {
                 text: mprisModule.artist
-                color: Theme.fg3d
+                color: Theme.fg3D
                 font { family: Theme.fontFamily; pixelSize: 9 }
                 elide: Text.ElideRight
                 Layout.fillWidth: true
@@ -107,7 +107,7 @@ Item {
 
                 Text {
                     text: root.mprisTimePlayed
-                    color: "#767676"
+                    color: Theme.fg5
                     font { family: Theme.fontFamily; pixelSize: 8 }
                 }
 
@@ -115,7 +115,7 @@ Item {
                     Layout.fillWidth: true
                     height: 3
                     radius: 5
-                    color: "#333333"
+                    color: Theme.fg8
 
                     Rectangle {
                         width: parent.width * root.mprisProgress
@@ -128,7 +128,7 @@ Item {
 
                 Text {
                     text: root.mprisTimeTotal
-                    color: "#767676"
+                    color: Theme.fg5
                     font { family: Theme.fontFamily; pixelSize: 8 }
                 }
             }
@@ -138,8 +138,8 @@ Item {
         Rectangle {
             Layout.alignment: Qt.AlignVCenter
             width: 25; height: 25; radius: 15
-            color: playHover.containsMouse ? "#2a2a2a" : "#1e1e1e"
-            border.color: "#333333"
+            color: playHover.containsMouse ? Theme.focusBg : Theme.bg3
+            border.color: Theme.borderBg2
             border.width: 1
             Behavior on color { ColorAnimation { duration: 120 } }
 

@@ -81,8 +81,8 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: 19
-        color: "#1a1a1a"
-        border.color: "#333"
+        color: Theme.bgD1
+        border.color: Theme.borderBg2
         border.width: 1
     }
 
@@ -107,7 +107,7 @@ Item {
               property int total: 0
               text: (filteredApps.count === 0 ? 0 : root.selectedIndex + 1)
                      + " / " + appList.count + " (" + appList.count + ")"
-              color: "#999999"
+              color: Theme.fg4
               font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
               Layout.alignment: Qt.AlignRight
               Layout.rightMargin: 6
@@ -118,8 +118,8 @@ Item {
             width: parent.width
             height: 30
             radius: 8
-            color: "#222222"
-            border.color: searchInput.activeFocus ? "#666" : "#333"
+            color: Theme.bg4
+            border.color: searchInput.activeFocus ? Theme.borderBgFocus : Theme.borderBg
             border.width: 1
             Behavior on border.color { ColorAnimation { duration: 120 } }
 
@@ -137,7 +137,7 @@ Item {
 
                 Text {
                     text: "search apps..."
-                    color: "#777"
+                    color: Theme.fg4
                     font: searchInput.font
                     visible: searchInput.text.length === 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -243,7 +243,7 @@ Item {
                         Text {
                             text: modelData.comment
                             visible: text.length > 0
-                            color: "#8d8d8d"
+                            color: Theme.fg5
                             font { family: Theme.fontFamily; pixelSize: 9; weight: 500 }
                             elide: Text.ElideRight
                             Layout.fillWidth: true
@@ -269,8 +269,8 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: appList.count === 0
-                text: "no apps found"
-                color: "#666"
+                text: "No apps found"
+                color: Theme.fg3
                 font { family: Theme.fontFamily; pixelSize: 10 }
             }
         }

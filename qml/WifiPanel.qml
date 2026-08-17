@@ -39,7 +39,7 @@ PanelWindow {
     anchors.fill: parent
     anchors.topMargin: 40 * dpi
     anchors.rightMargin: 25 * dpi
-    color: "#1c1c1c"
+    color: Theme.bg
     radius: 26 * dpi
 
     ColumnLayout {
@@ -49,7 +49,7 @@ PanelWindow {
 
       Text {
         text: "Wi-Fi"
-        color: "#d2d2d2"
+        color: Theme.fg2
         font { family: Theme.fontFamily; pixelSize: 14 * dpi; bold: true }
         Layout.leftMargin: 5 * dpi
       }
@@ -57,14 +57,14 @@ PanelWindow {
       Text {
         visible: WifiController.scanning
         text: "Scanning..."
-        color: "#949494"
+        color: Theme.fg4
         font { family: Theme.fontFamily; pixelSize: 11 * dpi }
       }
 
       Text {
         visible: !WifiController.enabled
         text: "Turn on the Wi-Fi to see networks."
-        color: "#949494"
+        color: Theme.fg4
         font { family: Theme.fontFamily; pixelSize: 11 * dpi }
         wrapMode: Text.Wrap
         Layout.fillWidth: true
@@ -90,8 +90,8 @@ PanelWindow {
               width: networkColumn.width
               height: 45 * dpi
               radius: 16 * dpi
-              color: connected ? "#4173c4" : (networkMouse.containsMouse ? "#313131" : "#252525")
-              border.color: connected ? "" : "#2f2f2f"
+              color: connected ? "#4173c4" : (networkMouse.containsMouse ? Theme.focusBgL : Theme.bg2)
+              border.color: connected ? "" : Theme.borderBg2
               border.width: connected ? 0 : 1
 
               MouseArea {
@@ -123,7 +123,7 @@ PanelWindow {
                   anchors.verticalCenter: parent.verticalCenter
                   text: secure ? "\uf023" : "\uf09c"
                   font { family: Theme.nerdFontFamily; pixelSize: 12 * dpi }
-                  color: "#b4b4b4"
+                  color: Theme.fg4
                 }
 
                 Column {
@@ -131,12 +131,12 @@ PanelWindow {
                   spacing: 2 * dpi
                   Text {
                     text: displayName || ssid
-                    color: "#ffffff"
+                    color: "white"
                     font { family: Theme.fontFamily; pixelSize: 11 * dpi; weight: connected ? 500 : 300 }
                   }
                   Text {
                     text: connected ? "Connected" : (signal >= 0 ? signal + "%" : "")
-                    color: connected ? "#c8d7ef" : "#949494"
+                    color: connected ? "#c8d7ef" : Theme.fg4
                     elide: Text.ElideRight
                     font { family: Theme.fontFamily; pixelSize: 9 * dpi }
                   }
@@ -161,7 +161,7 @@ PanelWindow {
       visible: wifiListWindow.passwordPromptVisible
       onVisibleChanged: if (visible) passwordField.forceActiveFocus()
       anchors.fill: parent
-      color: "#1c1c1c"
+      color: Theme.bg1
       radius: 28 * dpi
       z: 10
 
@@ -175,7 +175,7 @@ PanelWindow {
         Text {
           width: parent.width
           text: "Password for " + wifiListWindow.passwordPromptSsid
-          color: "#e1e1e1"
+          color: Theme.fg2
           font { family: Theme.fontFamily; pixelSize: 13 * dpi; weight: 600 }
           wrapMode: Text.Wrap
         }
@@ -184,8 +184,8 @@ PanelWindow {
           width: parent.width
           height: 36 * dpi
           radius: 8 * dpi
-          color: "#3a3a3a"
-          border.color: "#5a5a5a"
+          color: Theme.bg4
+          border.color: Theme.borderBg1
           border.width: 1
 
           TextInput {
@@ -193,7 +193,7 @@ PanelWindow {
             focus: true
             anchors.fill: parent
             anchors.margins: 10 * dpi
-            color: "#dadada"
+            color: Theme.fg4
             font { family: Theme.fontFamily; pixelSize: 12 * dpi }
             echoMode: TextInput.Normal
             verticalAlignment: TextInput.AlignVCenter
@@ -209,7 +209,7 @@ PanelWindow {
             width: 80 * dpi; height: 32 * dpi; radius: 9 * dpi
             color: submitBtnMA.containsMouse ? "#3065be" : "#3874d7"
             signal clicked()
-            Text { anchors.centerIn: parent; text: "Join"; color: "#fff"; font { family: Theme.fontFamily; pixelSize: 12 * dpi } }
+            Text { anchors.centerIn: parent; text: "Join"; color: "white"; font { family: Theme.fontFamily; pixelSize: 12 * dpi } }
             Behavior on color { ColorAnimation { duration: 80 } }
             MouseArea {
               id: submitBtnMA
@@ -227,8 +227,8 @@ PanelWindow {
 
           Rectangle {
             width: 80 * dpi; height: 32 * dpi; radius: 9 * dpi
-            color: cancelBtnMA.containsMouse ? "#2f2f2f" : "#343434"
-            Text { anchors.centerIn: parent; text: "Cancel"; color: "#dadada"; font { family: Theme.fontFamily; pixelSize: 12 * dpi } }
+            color: cancelBtnMA.containsMouse ? Theme.focusBg1 : Theme.bg5
+            Text { anchors.centerIn: parent; text: "Cancel"; color: Theme.fg1; font { family: Theme.fontFamily; pixelSize: 12 * dpi } }
             Behavior on color { ColorAnimation { duration: 80 } }
             MouseArea {
               id: cancelBtnMA

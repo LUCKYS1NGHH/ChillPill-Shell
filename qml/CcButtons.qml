@@ -62,8 +62,8 @@ RowLayout {
         text: !WifiController.enabled ? "Off"
             : WifiController.currentSsid.length > 0 ? WifiController.currentSsid
             : (WifiController.statusText.length > 0 ? WifiController.statusText : "Not connected")
-        color: WifiController.enabled ? "#dedede" : root.buttonFgOff
-        font { family: Theme.fontFamily; pixelSize: 10; weight: 400 }
+        color: WifiController.enabled ? Theme.fg : root.buttonFgOff
+        font { family: Theme.fontFamily; pixelSize: 10; weight: 500 }
         elide: Text.ElideRight
         Layout.maximumWidth: 50
       }
@@ -158,7 +158,7 @@ RowLayout {
       Text {
         text: countdownModule.running || countdownModule.remainingSeconds > 0
             ? countdownModule.formatted() : timerBtn.selectedMinutes + "m"
-        color: countdownModule.running ? "#dedede" : root.buttonFgOff
+        color: countdownModule.running ? Theme.fg : root.buttonFgOff
         font { family: Theme.fontFamily; pixelSize: 10; weight: 400 }
       }
     }
@@ -213,7 +213,7 @@ RowLayout {
         text: !BluetoothController.enabled ? "Off"
             : BluetoothController.currentDeviceName.length > 0 ? BluetoothController.currentDeviceName
             : (BluetoothController.statusText.length > 0 ? BluetoothController.statusText : "Not connected")
-        color: BluetoothController.enabled ? "#dedede" : root.buttonFgOff
+        color: BluetoothController.enabled ? Theme.fg : root.buttonFgOff
         font { family: Theme.fontFamily; pixelSize: 10; weight: 400 }
         elide: Text.ElideRight
         Layout.maximumWidth: 50
