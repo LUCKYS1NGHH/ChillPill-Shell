@@ -14,6 +14,7 @@ public:
         PairedRole,
         ConnectedRole,
         SignalRole,
+        BatteryRole,
     };
 
     struct Device {
@@ -22,7 +23,8 @@ public:
         QString name;
         bool paired = false;
         bool connected = false;
-        int rssi = -1;        // -1 = unknown/not advertised
+        int rssi = -1;
+        int battery = -1;     // -1 = unknown/not advertised
     };
 
     explicit BluetoothDeviceModel(QObject *parent = nullptr);
@@ -35,6 +37,7 @@ public:
     bool upsertDevice(const Device &device);
     // returns true if a row was actually removed
     bool removeDeviceByPath(const QString &objectPath);
+    void updateBattery(const QString &objectPath, int percentage);
     void clear();
 
     int indexOfPath(const QString &objectPath) const;

@@ -96,7 +96,7 @@ PanelWindow {
               width: deviceColumn.width
               height: Math.max(45, contentRow.implicitHeight + 15)
               radius: 16 * dpi
-              color: connected ? "#4173c4" : (deviceMouse.containsMouse ? Theme.focusBgL : Theme.bg4)
+              color: connected ? "#4173c4" : (deviceMouse.containsMouse ? Theme.focusBgL : Theme.bg2)
               border.color: connected ? "" : Theme.borderBg2
               border.width: connected ? 0 : 1
 
@@ -151,7 +151,8 @@ PanelWindow {
                   }
                   Text {
                     width: parent.width
-                    text: connected ? "Connected" : (paired ? "Paired \u2022 right-click to forget" : "Not paired")
+                    text: (connected ? "Connected" : (paired ? "Paired \u2022 right-click to forget" : "Not paired"))
+                      + (battery >= 0 ? " \u2022 " + battery + "%" : "")
                     color: connected ? "#c8d7ef" : "#949494"
                     wrapMode: Text.WordWrap
                     font { family: Theme.fontFamily; pixelSize: 9 * dpi }

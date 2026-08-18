@@ -19,6 +19,7 @@ QVariant BluetoothDeviceModel::data(const QModelIndex &index, int role) const {
     case PairedRole:    return d.paired;
     case ConnectedRole: return d.connected;
     case SignalRole:    return d.rssi;
+    case BatteryRole:   return d.battery;
     default:            return {};
     }
 }
@@ -30,6 +31,7 @@ QHash<int, QByteArray> BluetoothDeviceModel::roleNames() const {
         { PairedRole,    "paired" },
         { ConnectedRole, "connected" },
         { SignalRole,    "signal" },
+        { BatteryRole,   "battery" },
     };
 }
 
@@ -76,4 +78,13 @@ void BluetoothDeviceModel::clear() {
     beginResetModel();
     m_devices.clear();
     endResetModel();
+}
+
+void BluetoothDeviceModel::updateBattery(const QString &objectPath, int percentage) {
+    const int idx = indexOfPath(objectPath);
+    if (idx < 0) return;
+    if (m_devices[idx].battery == percentage) return;
+    m_devices[idx].battery = percentage;
+    const QModelIndex mi = index(idx);
+    emit dataChanged(mi, mi, { BatteryRole });
 }
