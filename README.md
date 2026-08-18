@@ -139,7 +139,7 @@ into your session at all times. It's not bound to any dotfiles.
 - Control center has WiFi controller which has list of active networks and has password prompt. also timer minutes
   can be change by right click.
 
-- Control center has also Bluetooth controller which has list of active, pair & connected devices/networks (make sure service is running). then 3 cases to connect bluetooth:
+- Control center has also Bluetooth controller which has list of active, pair & connected devices/networks, device battery. here's 3 cases to connect a bluetooth device first time:
 
   - case 1: device wants a PIN or passkey typed in
   - case 2: device just wants us to display a code

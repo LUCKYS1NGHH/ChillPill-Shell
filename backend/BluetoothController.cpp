@@ -16,6 +16,7 @@ namespace {
 constexpr const char *kBluezService = "org.bluez";
 constexpr const char *kDeviceIface = "org.bluez.Device1";
 constexpr const char *kAdapterIface = "org.bluez.Adapter1";
+constexpr const char *kBatteryIface = "org.bluez.Battery1";
 }
 
 BluetoothController::BluetoothController(QObject *parent)
@@ -246,6 +247,7 @@ void BluetoothController::applyDeviceProperties(const QString &objectPath, const
     d.paired = props.value("Paired", false).toBool();
     d.connected = props.value("Connected", false).toBool();
     d.rssi = props.contains("RSSI") ? props.value("RSSI").toInt() : -1;
+    d.battery = -1;
     m_devices->upsertDevice(d);
     refreshCurrentDeviceName();
 }
@@ -270,8 +272,14 @@ void BluetoothController::handleInterfacesAdded(const QDBusMessage &msg) {
     }
 
     if (!path.startsWith(m_adapterPath)) return;
-    if (!interfaces.contains(kDeviceIface)) return;
 
+    if (interfaces.contains(kBatteryIface)) {
+        const QVariantMap batProps = interfaces.value(kBatteryIface);
+        if (batProps.contains("Percentage"))
+            m_devices->updateBattery(path, batProps.value("Percentage").toInt());
+    }
+
+    if (!interfaces.contains(kDeviceIface)) return;
     applyDeviceProperties(path, interfaces.value(kDeviceIface), /*insertIfMissing=*/true);
 }
 
@@ -306,6 +314,13 @@ void BluetoothController::handlePropertiesChanged(const QDBusMessage &msg) {
     if (iface == kDeviceIface && path.startsWith(m_adapterPath)) {
         const QVariantMap changed = args.size() > 1 ? qdbus_cast<QVariantMap>(args.at(1)) : QVariantMap();
         applyDeviceProperties(path, changed, /*insertIfMissing=*/false);
+    }
+
+    if (iface == kBatteryIface && path.startsWith(m_adapterPath)) {
+        const QVariantMap changed = args.size() > 1 ? qdbus_cast<QVariantMap>(args.at(1)) : QVariantMap();
+        if (changed.contains("Percentage"))
+            m_devices->updateBattery(path, changed.value("Percentage").toInt());
+        return;
     }
 }
 
