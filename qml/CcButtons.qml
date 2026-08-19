@@ -50,23 +50,20 @@ RowLayout {
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
 
-    RowLayout {
-      anchors.centerIn: parent
-      spacing: 5 * root.dpi
-      Text {
-        text: "\uf1eb" // wifi glyph
-        color: WifiController.enabled ? "#4282e9" : root.buttonFgOff
-        font { family: Theme.nerdFontFamily; pixelSize: 12 }
-      }
-      Text {
+    MarqueeText {
+        anchors.centerIn: parent
+        spacing: 5 * root.dpi
+        icon: "\uf1eb"
+        iconColor: WifiController.enabled ? "#4282e9" : root.buttonFgOff
+        iconFontFamily: Theme.nerdFontFamily
+        iconPixelSize: 12
+
         text: !WifiController.enabled ? "Off"
             : WifiController.currentSsid.length > 0 ? WifiController.currentSsid
             : (WifiController.statusText.length > 0 ? WifiController.statusText : "Not connected")
         color: WifiController.enabled ? Theme.fg : root.buttonFgOff
         font { family: Theme.fontFamily; pixelSize: 10; weight: 500 }
-        elide: Text.ElideRight
-        Layout.maximumWidth: 50
-      }
+        maxWidth: 50
     }
 
     HoverHandler { id: wifiHover }
@@ -203,20 +200,18 @@ RowLayout {
     RowLayout {
       anchors.centerIn: parent
       spacing: 5 * root.dpi
-
       Text {
         text: "\uf294"
         color: BluetoothController.enabled ? "#4282e9" : root.buttonFgOff
         font { family: Theme.nerdFontFamily; pixelSize: 15 }
       }
-      Text {
+      MarqueeText {
         text: !BluetoothController.enabled ? "Off"
             : BluetoothController.currentDeviceName.length > 0 ? BluetoothController.currentDeviceName
             : (BluetoothController.statusText.length > 0 ? BluetoothController.statusText : "Not connected")
         color: BluetoothController.enabled ? Theme.fg : root.buttonFgOff
         font { family: Theme.fontFamily; pixelSize: 10; weight: 400 }
-        elide: Text.ElideRight
-        Layout.maximumWidth: 50
+        maxWidth: 50
       }
     }
     HoverHandler { id: btHover }
