@@ -187,6 +187,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `wallpapersDir` | Wallpapers directory for wallpaper switcher | `~/Pictures/wallpapers` |
 | `wsCloseOnWallpaperSet` | Close wallpaper switcher after apply wallpaper | `true` |
 | `wsAnimation` | Wallpaper switcher open animation | `true` |
+| `deleteCliphistImgCache` | Delete cached image file on clipboard entry removal, disabled keeps it on disk | `true` |
 
 <details>
 <summary>Raw config example</summary>
@@ -216,7 +217,8 @@ into your session at all times. It's not bound to any dotfiles.
   "dpiScale": 1.0,
   "wallpapersDir": "~/Pictures/wallpapers",
   "wsCloseOnWallpaperSet": true,
-  "wsAnimation": true
+  "wsAnimation": true,
+  "deleteCliphistImgCache": true
 }
 ```
 

@@ -22,5 +22,6 @@
   "dpiScale": 1.0,
   "wallpapersDir": "~/Pictures/wallpapers",
   "wsCloseOnWallpaperSet": true,
-  "wsAnimation": true
+  "wsAnimation": true,
+  "deleteCliphistImgCache": true
 }

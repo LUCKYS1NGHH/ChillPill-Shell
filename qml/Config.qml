@@ -33,10 +33,11 @@ Singleton {
       property bool avoidDuplicateNotifications: true
       property string defaultTerminal: "kitty"
       property real pillScale: 1.0
-      property real dpiScale: 1.4
+      property real dpiScale: 1.0
       property string wallpapersDir: Quickshell.env("HOME") + "/Pictures/wallpapers"
       property bool wsCloseOnWallpaperSet: true
       property bool wsAnimation: true
+      property bool deleteCliphistImgCache: true
     }
   }
 
@@ -65,4 +66,5 @@ Singleton {
   readonly property alias wallpapersDir: adapter.wallpapersDir
   readonly property alias wsCloseOnWallpaperSet: adapter.wsCloseOnWallpaperSet
   readonly property alias wsAnimation: adapter.wsAnimation
+  readonly property alias deleteCliphistImgCache: adapter.deleteCliphistImgCache
 }

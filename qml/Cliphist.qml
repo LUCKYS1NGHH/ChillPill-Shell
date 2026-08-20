@@ -66,9 +66,11 @@ Item {
         if (listModel.count === 0) return
         let entry = listModel.get(selectedIndex)
         root.deletingId = entry.id
-        deleteProc.command = ["sh", "-c", "printf '%s\\t' \"$1\" | cliphist delete", "_", entry.id]
+
+        deleteProc.command = ["sh", "-c", "/usr/share/chillpill-shell/scripts/cliphist-img.sh delete \"$1\" \"$2\"", "_", entry.id, Config.deleteCliphistImgCache]
         deleteProc.running = false
         deleteProc.running = true
+
         holdRedTimer.entryId = entry.id
         holdRedTimer.restart()
     }
@@ -465,3 +467,5 @@ Item {
         }
     }
 }
+
+
