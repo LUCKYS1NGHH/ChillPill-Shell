@@ -49,6 +49,7 @@ REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
 info "Creating few new directories"
 mkdir -p /usr/share/chillpill-shell/IslandBackend
 mkdir -p "$REAL_HOME/.config/chillpill-shell"
+mkdir -p "$REAL_HOME/.cache/chillpill-shell"
 #mkdir -p /etc/systemd/user
 
 # build backend
