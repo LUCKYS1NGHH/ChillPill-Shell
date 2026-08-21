@@ -34,7 +34,7 @@ RowLayout {
         font {
           family: Theme.fontFamily
           pixelSize: 9 * Config.pillScale
-          weight: 300
+          weight: 400
         }
       }
 

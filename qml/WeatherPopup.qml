@@ -26,7 +26,7 @@ Rectangle {
   height: contentCol.implicitHeight + 26 * box.dpi
   x: (Screen.width - weatherPopup.width) / 2
   y: box.y + box.height * box.dpi + 5 * box.dpi
-  color: Theme.bg
+  color: Theme.bgD
   radius: 20 * box.dpi
 
   Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutExpo } }
