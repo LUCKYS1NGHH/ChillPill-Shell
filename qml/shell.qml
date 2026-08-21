@@ -153,8 +153,6 @@ ShellRoot {
       property string accent: Theme.accent
 
       // control center UI
-      property real ccButtonBorderWidth: 1
-      property string ccButtonBorderColor: Theme.borderBg4
       property real ccButtonWidth: 85.3
       property int ccButtonHeight: 35
       property int ccButtonRadius: 10
@@ -559,8 +557,6 @@ ShellRoot {
 
         // control center buttons
         CcButtons {
-          buttonBorderColor: box.ccButtonBorderColor
-          buttonBorderWidth: box.ccButtonBorderWidth
           buttonWidth: box.ccButtonWidth
           buttonHeight: box.ccButtonHeight
           buttonRadius: box.ccButtonRadius
@@ -782,7 +778,7 @@ ShellRoot {
             Text {
               text: "Clear all"
               color: Theme.fg3
-              font { family: Theme.fontFamily; pixelSize: 8; weight: 300 }
+              font { family: Theme.fontFamily; pixelSize: 8; weight: 400 }
               anchors.centerIn: parent
             }
 
@@ -926,7 +922,7 @@ ShellRoot {
                   text: modelData.summary
                   textFormat: Text.PlainText
                   color: Theme.fg
-                  font { family: Theme.fontFamily; pixelSize: 11; weight: 600 }
+                  font { family: Theme.fontFamily; pixelSize: 11; weight: 650 }
                   elide: Text.ElideRight
                   Layout.fillWidth: true
                 }
@@ -974,7 +970,7 @@ ShellRoot {
                 textFormat: Text.StyledText
                 linkColor: Theme.accent
                 color: Theme.fg4
-                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+                font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
                 Layout.bottomMargin: 2

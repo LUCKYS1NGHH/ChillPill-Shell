@@ -7,8 +7,6 @@ RowLayout {
 
   readonly property real dpi: Config.dpiScale
 
-  property real buttonBorderWidth
-  property string buttonBorderColor
   property real buttonWidth
   property real buttonHeight
   property real buttonRadius
@@ -44,8 +42,6 @@ RowLayout {
     color: WifiController.enabled
             ? (wifiHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
             : (wifiHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
-    border.width: WifiController.enabled ? 0 : buttonBorderWidth
-    border.color: buttonBorderColor
     scale: wifiMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
@@ -103,8 +99,6 @@ RowLayout {
     color: notificationModule.dndEnabled
     ? (dndHover.hovered ? Qt.lighter("#262626", 1.2) : "#262626")
     : (dndHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
-    border.width: notificationModule.dndEnabled ? 0 : buttonBorderWidth
-    border.color: buttonBorderColor
     scale: dndMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
@@ -133,8 +127,6 @@ RowLayout {
     color: countdownModule.running
            ? (timerHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
            : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
-    border.width: countdownModule.running ? 0 : buttonBorderWidth
-    border.color: buttonBorderColor
     scale: timerMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
@@ -192,8 +184,6 @@ RowLayout {
     color: BluetoothController.enabled
             ? (btHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
             : (btHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
-    border.width: BluetoothController.enabled ? 0 : buttonBorderWidth
-    border.color: buttonBorderColor
     scale: btMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
