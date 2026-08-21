@@ -38,6 +38,7 @@ Singleton {
       property bool wsCloseOnWallpaperSet: true
       property bool wsAnimation: true
       property bool deleteCliphistImgCache: true
+      property string country: "Japan"
     }
   }
 
@@ -67,4 +68,5 @@ Singleton {
   readonly property alias wsCloseOnWallpaperSet: adapter.wsCloseOnWallpaperSet
   readonly property alias wsAnimation: adapter.wsAnimation
   readonly property alias deleteCliphistImgCache: adapter.deleteCliphistImgCache
+  readonly property alias country: adapter.country
 }

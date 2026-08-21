@@ -23,5 +23,6 @@
   "wallpapersDir": "~/Pictures/wallpapers",
   "wsCloseOnWallpaperSet": true,
   "wsAnimation": true,
-  "deleteCliphistImgCache": true
+  "deleteCliphistImgCache": true,
+  "country": "IN"
 }

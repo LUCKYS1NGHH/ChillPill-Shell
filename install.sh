@@ -16,7 +16,7 @@ die()   { echo -e "${RED}[x]${NC} $*" >&2; exit 1; }
 bin_exists() { command -v "$1" >/dev/null; }
 
 if [[ ! "$EUID" -eq 0 ]]; then
-    die "Please run this script as root to install chillpill-shell. i have to setup some files."
+    die "Please run this script as root to install chillpill-shell. i have to setup some things."
 fi
 
 if [[ "$1" != "--skip-deps" ]]; then
@@ -24,6 +24,29 @@ if [[ "$1" != "--skip-deps" ]]; then
       info "Installing dependencies in your Arch Linux."
       pacman -S --noconfirm --needed quickshell cliphist brightnessctl wl-clipboard \
              inotify-tools cmake qt6-multimedia python-psutil awww blueman pipewire
+
+      PY=/usr/bin/python3
+
+      if ! sudo -u "$SUDO_USER" "$PY" -m pip show holidays >/dev/null 2>/dev/null; then
+         read -p "Do you want event dates in calendar popup? It just needs a python lib `holidays` to run [y/N]: " ask
+
+         if [[ "$ask" == "y" || "$ask" == "Y" ]]; then
+            if ! sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
+               read -p "Pip not exists in your system. install? [Y/n]: " pip_install
+               if [[ "$pip_install" != "n" && "$pip_install" != "N" ]]; then
+                  pacman -S --noconfirm python-pip
+               fi
+            fi
+
+            if sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
+               sudo -u "$SUDO_USER" "$PY" -m pip install holidays --break-system-packages 2>/dev/null \
+                 || warn "something wrong with pip, 'holidays' python lib fail to install."
+
+               sudo -u "$SUDO_USER" "$PY" -c "import holidays" 2>/dev/null \
+                 || warn "holidays installed but failing to import. check the dependency manually."
+            fi
+         fi
+      fi
 
       info "Installing nusgmon (to record your bandwidth) through git"
       git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
