@@ -21,16 +21,69 @@ Rectangle {
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    anchors.margins: 12 * box.dpi
+    anchors.leftMargin: 16 * box.dpi
+    anchors.rightMargin: 16 * box.dpi
     anchors.topMargin: 8 * box.dpi
     height: 25 * box.dpi
+
+    Text {
+      id: prevBtn
+      text: "\uf053"
+      color: prevArea.pressed ? Theme.fg : Theme.fg5
+      font { family: "Symbols Nerd Font"; pixelSize: 11 * box.dpi }
+      Layout.alignment: Qt.AlignVCenter
+      scale: prevArea.pressed ? 0.85 : 1.0
+      Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
+      Behavior on color { ColorAnimation { duration: 100 } }
+      MouseArea {
+        id: prevArea
+        anchors.fill: parent
+        anchors.margins: -8 * box.dpi
+        cursorShape: Qt.PointingHandCursor
+        onClicked: {
+          if (datetimeItem.viewMonth === 0) {
+            datetimeItem.viewMonth = 11
+            datetimeItem.viewYear -= 1
+          } else {
+            datetimeItem.viewMonth -= 1
+          }
+        }
+      }
+    }
+
     Item { Layout.fillWidth: true }
     Text {
       text: datetimeItem.monthNames[datetimeItem.viewMonth] + " " + datetimeItem.viewYear
       color: Theme.fg
       font { family: Theme.fontFamily; pixelSize: 11 * box.dpi; weight: 600 }
+      Layout.alignment: Qt.AlignVCenter
     }
     Item { Layout.fillWidth: true }
+
+    Text {
+      id: nextBtn
+      text: "\uf054"
+      color: nextArea.pressed ? Theme.fg : Theme.fg5
+      font { family: "Symbols Nerd Font"; pixelSize: 11 * box.dpi }
+      Layout.alignment: Qt.AlignVCenter
+      scale: nextArea.pressed ? 0.85 : 1.0
+      Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
+      Behavior on color { ColorAnimation { duration: 100 } }
+      MouseArea {
+        id: nextArea
+        anchors.fill: parent
+        anchors.margins: -8 * box.dpi
+        cursorShape: Qt.PointingHandCursor
+        onClicked: {
+          if (datetimeItem.viewMonth === 11) {
+            datetimeItem.viewMonth = 0
+            datetimeItem.viewYear += 1
+          } else {
+            datetimeItem.viewMonth += 1
+          }
+        }
+      }
+    }
   }
 
   Grid {
