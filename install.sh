@@ -68,6 +68,21 @@ bin_exists wl-copy || die "Wl-clipabord not installed."
 
 REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
 
+if [[ -z "$REAL_HOME" ]]; then
+   warn "Your home directory not found."
+   while true; do
+     read -p "Enter your home directory manually: " REAL_HOME
+     if [[ -z "$REAL_HOME" ]]; then
+        continue
+     fi
+     if [[ ! -d "$REAL_HOME" ]]; then
+        warn "Directory not found."
+        continue
+     fi
+     break
+   done
+fi
+
 # make directories
 info "Creating few new directories"
 mkdir -p /usr/share/chillpill-shell/IslandBackend
