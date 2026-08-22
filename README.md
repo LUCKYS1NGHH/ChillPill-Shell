@@ -308,11 +308,11 @@ Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste thi
 > Adjust key combinations by your preferences
 
 ```
-hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
-hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
-hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call appLauncher toggle"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call wallpaperSwitcher toggle"))
+hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("chillpill-shell-ipc call controlCenter toggle"))
+hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("chillpill-shell-ipc call cliphist toggle"))
+hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("chillpill-shell-ipc call miniDashboard toggle"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call appLauncher toggle"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSwitcher toggle"))
 ```
 
 ---
