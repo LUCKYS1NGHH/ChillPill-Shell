@@ -1103,21 +1103,20 @@ ShellRoot {
                 id: whoamiText
                 color: Theme.fg
                 Layout.leftMargin: 10
-                font { family: Theme.fontFamily; pixelSize: 13; weight: 600 }
+                font { family: Theme.fontFamily; pixelSize: 14; weight: 600 }
               }
 
               Text {
                 id: hostnameText
                 color: Theme.fg5
                 Layout.topMargin: 2
-                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+                font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
               }
             }
 
             Text {
               id: uptimeText
-              color: Theme.fg
-              opacity: 0.6
+              color: Theme.fg4
               Layout.leftMargin: 10
               font { family: Theme.fontFamily; pixelSize: 8; weight: 400 }
             }
