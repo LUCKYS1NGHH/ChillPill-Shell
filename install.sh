@@ -48,10 +48,24 @@ if [[ "$1" != "--skip-deps" ]]; then
          fi
       fi
 
-      info "Installing nusgmon (to record your bandwidth) through git"
-      git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
-      (cd /tmp/nusgmon-build && ./setup.sh)
-      rm -rf /tmp/nusgmon-build
+      # install nusgmon based on version update
+      if [[ ! -d /tmp/nusgmon-build ]]; then
+         git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
+      fi
+
+      nusgmon_install=0
+      if bin_exists nusgmon; then
+         [[ $(nusgmon --version) != $(/tmp/nusgmon-build/./nusgmon --version) ]] && nusgmon_install=1
+      else
+         nusgmon_install=1
+      fi
+
+      if (( nusgmon_install )); then
+          info "Installing nusgmon (to record your bandwidth) through git"
+          (cd /tmp/nusgmon-build && ./setup.sh)
+      else
+          info "nusgmon is already installed and up to date, skipping."
+      fi
   fi
 fi
 
