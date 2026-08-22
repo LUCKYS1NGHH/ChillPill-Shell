@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Networking
 import QtQuick
 import QtQuick.Layouts
 import IslandBackend
@@ -30,6 +31,9 @@ PanelWindow {
   implicitHeight: 348 * dpi
   color: "transparent"
 
+  property var tetherDevice: Networking.devices.values.find(d => d.type === DeviceType.Wired && d.connected)
+  readonly property bool tethered: tetherDevice !== undefined
+
   // auto hide if control center close
   onVisibleChanged: {
     if (visible && WifiController.enabled) WifiController.refreshNetworks(true)
@@ -52,6 +56,45 @@ PanelWindow {
         color: Theme.fg2
         font { family: Theme.fontFamily; pixelSize: 14 * dpi; bold: true }
         Layout.leftMargin: 5 * dpi
+      }
+
+      Rectangle {
+        Layout.fillWidth: true
+        height: 42 * dpi
+        radius: 15 * dpi
+        color: wifiListWindow.tethered ? "#4173c4" : Theme.bg2
+        border.color: wifiListWindow.tethered ? "" : Theme.borderBg2
+        border.width: wifiListWindow.tethered ? 0 : 1
+
+        Row {
+          anchors.fill: parent
+          anchors.margins: 10 * dpi
+          anchors.leftMargin: 17 * dpi
+          spacing: 20 * dpi
+
+          Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: String.fromCodePoint(0xf287) // nf-fa-usb
+            font { family: Theme.nerdFontFamily; pixelSize: 12 * dpi }
+            color: wifiListWindow.tethered ? "white" : Theme.fg4
+          }
+
+          Column {
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 2 * dpi
+            Text {
+              text: "USB Tethering"
+              color: wifiListWindow.tethered ? "white" : Theme.fg1
+              font { family: Theme.fontFamily; pixelSize: 11 * dpi; weight: wifiListWindow.tethered ? 500 : 300 }
+            }
+            Text {
+              text: wifiListWindow.tethered ? (wifiListWindow.tetherDevice.name || "Connected") : "Not connected"
+              color: wifiListWindow.tethered ? "#c8d7ef" : Theme.fg4
+              elide: Text.ElideRight
+              font { family: Theme.fontFamily; pixelSize: 9 * dpi }
+            }
+          }
+        }
       }
 
       Text {
