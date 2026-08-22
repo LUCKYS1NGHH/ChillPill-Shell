@@ -109,7 +109,7 @@ SRC_FILES=$(find . -name '*.cpp' -o -name '*.h' -o -name 'CMakeLists.txt')
 HASH_FILE='.builds_hash'
 
 needs_build=true
-if [[ -d /usr/share/chillpill-shell/IslandBackend ]] && [[ -f "$HASH_FILE" ]]; then
+if [[ -f /usr/share/chillpill-shell/IslandBackend/libIslandBackend.so ]] && [[ -f "$HASH_FILE" ]]; then
     if sha256sum -c "$HASH_FILE" --status 2>/dev/null; then
         needs_build=false
     fi

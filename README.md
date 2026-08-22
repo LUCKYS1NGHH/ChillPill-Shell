@@ -2,13 +2,13 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.6.0](https://img.shields.io/badge/CP--Shell-0.6.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.7.0](https://img.shields.io/badge/CP--Shell-0.7.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ChillPill-Shell is a **lightweight**, feature rich dynamic pill bar for Hyprland, built with **Quickshell**.
-It's aimed squarely at users running without a dedicated GPU (like me) — Eye candy for **No-GPU users**.
+It's aimed squarely at users running without a dedicated GPU (like me) — Eye candy for **Integrated-GPU users**.
 
 It runs as a **standalone app**: launch it from your terminal or app launcher when you want it, rather than having it baked
 into your session at all times. It's not bound to any dotfiles.
@@ -120,6 +120,8 @@ into your session at all times. It's not bound to any dotfiles.
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume and brightness sliders, notification stack
 - **Cliphist (Clipboard History)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
+  - **Calendar Popup**             - Previous/Next month buttons, event dates
+  - **Weather Popup**              - Feels, humidity, wind, sunrise and sunset, upcoming 2 days weather forecast, manual refresh button
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst entirely now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher
@@ -188,6 +190,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `wsCloseOnWallpaperSet` | Close wallpaper switcher after apply wallpaper | `true` |
 | `wsAnimation` | Wallpaper switcher open animation | `true` |
 | `deleteCliphistImgCache` | Delete cached image file on clipboard entry removal, disabled keeps it on disk | `true` |
+| `country` | Country for calendar events. accepts country name (India) or ISO 3166-1 alpha-2 (IN) but recommended is country code | `IN` |
 
 <details>
 <summary>Raw config example</summary>
@@ -218,7 +221,8 @@ into your session at all times. It's not bound to any dotfiles.
   "wallpapersDir": "~/Pictures/wallpapers",
   "wsCloseOnWallpaperSet": true,
   "wsAnimation": true,
-  "deleteCliphistImgCache": true
+  "deleteCliphistImgCache": true,
+  "country": "IN"
 }
 ```
 
@@ -226,9 +230,9 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Dependencies
 > [!NOTE]
-> It's an initial release, tested only on **Arch Linux** + **Hyprland**. other setups unsupported for now.
+> Currently it's tested only on **Arch Linux** + **Hyprland**. other setups unsupported for now.
 > Packages below are Arch's; find the equivalent for your distro.
-> `brightnessctl` and `cliphist` are likely already installed on most systems.
+> common utilities like `brightnessctl` and `blueman` are likely already installed on most systems.
 
 - [cliphist](https://github.com/sentriz/cliphist)
 - [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (AUR package; non-Arch users can use the setup script instead)
@@ -242,9 +246,11 @@ into your session at all times. It's not bound to any dotfiles.
 
 > [!TIP]
 > `install.sh` auto-installs all of the above for Arch users, **except** these optional packages:
-> - Monocraft Font (`ttf-monocraft-git` / `ttf-monocraft-nerd` on AUR)
-> - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
-> - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
+
+- Monocraft Font (`ttf-monocraft-git` / `ttf-monocraft-nerd` on AUR)
+- JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
+- `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
+- `holidays` (Python lib) event dates in calendar; `install.sh` prompts to install this one
 
 ## Install
 
@@ -271,7 +277,7 @@ sudo ./install.sh
 
 ---
 
-#### Arch
+#### AUR
 ```
 paru -R chillpill-shell
 ```
