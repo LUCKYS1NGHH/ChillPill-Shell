@@ -22,7 +22,7 @@ RowLayout {
   property real playerHeight: 0
 
   anchors.top: parent.top
-  anchors.topMargin: hasPlayer ? playerHeight + 92 : 5
+  anchors.topMargin: hasPlayer ? playerHeight + 93 : 5
   anchors.left: parent.left
   anchors.right: parent.right
   anchors.leftMargin: 3 * dpi

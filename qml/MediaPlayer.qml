@@ -16,7 +16,7 @@ Rectangle {
     border.color: Theme.borderBg3
     border.width: 1
 
-    property int margin: 14
+    property int margin: 16
 
     // artist name adjustments
     property int artistFontSize: 10
@@ -187,7 +187,7 @@ Rectangle {
                     width: parent.width * mediaCard.mprisProgress
                     height: parent.height
                     radius: 5
-                    color: barHover.containsMouse ? Theme.fgL : fg
+                    color: barHover.containsMouse ? Theme.fg2 : Theme.fgL
                     Behavior on width { NumberAnimation { duration: 510; easing.type: Easing.Linear } }
                 }
 
