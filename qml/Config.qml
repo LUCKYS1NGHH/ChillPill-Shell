@@ -39,6 +39,7 @@ Singleton {
       property bool wsAnimation: true
       property bool deleteCliphistImgCache: true
       property string country: "Japan"
+      property bool showAudioVisuals: true
     }
   }
 
@@ -69,4 +70,5 @@ Singleton {
   readonly property alias wsAnimation: adapter.wsAnimation
   readonly property alias deleteCliphistImgCache: adapter.deleteCliphistImgCache
   readonly property alias country: adapter.country
+  readonly property alias showAudioVisuals: adapter.showAudioVisuals
 }

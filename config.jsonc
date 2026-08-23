@@ -24,5 +24,6 @@
   "wsCloseOnWallpaperSet": true,
   "wsAnimation": true,
   "deleteCliphistImgCache": true,
-  "country": "IN"
+  "country": "IN",
+  "showAudioVisuals": true
 }

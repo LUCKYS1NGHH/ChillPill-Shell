@@ -191,6 +191,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `wsAnimation` | Wallpaper switcher open animation | `true` |
 | `deleteCliphistImgCache` | Delete cached image file on clipboard entry removal, disabled keeps it on disk | `true` |
 | `country` | Country for calendar events. accepts country name (India) or ISO 3166-1 alpha-2 (IN) but recommended is country code | `IN` |
+| `showAudioVisuals` | Show audio visuals in media player (depends on cava) | true |
 
 <details>
 <summary>Raw config example</summary>
@@ -222,7 +223,8 @@ into your session at all times. It's not bound to any dotfiles.
   "wsCloseOnWallpaperSet": true,
   "wsAnimation": true,
   "deleteCliphistImgCache": true,
-  "country": "IN"
+  "country": "IN",
+  "showAudioVisuals": true
 }
 ```
 
@@ -251,6 +253,7 @@ into your session at all times. It's not bound to any dotfiles.
 - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
 - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
 - `holidays` (Python lib) event dates in calendar; `install.sh` prompts to install this one
+- `cava` for showing audio visuals in media player
 
 ## Install
 
