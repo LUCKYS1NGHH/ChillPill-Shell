@@ -10,6 +10,7 @@ import Quickshell.Services.UPower
 import Quickshell.Services.Notifications
 
 ShellRoot {
+  id: shellRoot
 
   IpcHandler {
       target: "cliphist"
@@ -71,6 +72,15 @@ ShellRoot {
 
   // media player related
   property bool mediaAutoOpened: false
+  property var visualizerValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  property bool cavaAvailable: false
+
+  Process {
+    id: cavaCheckProc
+    command: ["sh", "-c", "which cava"]
+    running: true
+    onExited: (exitCode) => { shellRoot.cavaAvailable = (exitCode === 0) }
+  }
 
   PanelWindow {
     id: panelWindow
@@ -1450,6 +1460,25 @@ ShellRoot {
     }
     function onCurrentChanged() {
       if (notificationModule.current) fsNotif.displayNotif = notificationModule.current
+    }
+  }
+
+  // audio visualizer spectrum process
+  Process {
+    id: cavaProc
+    command: ["sh", "-c", "cava -p ~/.cache/chillpill-shell/cava.conf"]
+    running: Config.showAudioVisuals && box.controlCenter && shellRoot.cavaAvailable
+    stdout: SplitParser {
+      splitMarker: "\n"
+      onRead: data => {
+        let parts = data.trim().split(";")
+        let vals = []
+        for (let i = 0; i < 16; i++) {
+          let v = Number(parts[i])
+          vals.push(isNaN(v) ? 0 : Math.min(100, Math.max(0, v)))
+        }
+        shellRoot.visualizerValues = vals
+      }
     }
   }
 
