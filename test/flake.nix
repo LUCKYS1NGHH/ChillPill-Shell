@@ -14,7 +14,7 @@
           home.homeDirectory = "/home/testuser";
           home.stateVersion = "26.05";
 
-          programs.chillpillshell = {
+          programs.chillpill-shell = {
             enable = true;
             settings = {
               clockFormat = "HH:mm";
