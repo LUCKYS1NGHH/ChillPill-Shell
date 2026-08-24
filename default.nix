@@ -30,13 +30,13 @@ nusgmon = pkgs.stdenv.mkDerivation {
     makeWrapper ${nusgmonPython}/bin/python3 $out/bin/nusgmon \
       --add-flags "$out/share/nusgmon/nusgmon"
 
-    # config.toml по умолчанию для копирования при первом запуске
     install -Dm644 config.toml $out/share/nusgmon/config.toml.example
   '';
 };
 
    runtimeDeps = with pkgs; [
-     quickshell     # даёт бинарь qs
+     cava
+     quickshell
      cliphist
      brightnessctl
      wl-clipboard
