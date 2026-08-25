@@ -23,13 +23,12 @@ RowLayout {
     if (root.tethered) return String.fromCodePoint(0xf287) // nf-fa-usb
     if (!Networking.wifiEnabled) return String.fromCodePoint(0xf092d)
     if (!active) return String.fromCodePoint(0xf092d)
-
-    let tier = signal >= 0.75 ? 4
-             : signal >= 0.50 ? 3
-             : signal >= 0.25 ? 2
+    let s = signal / 100
+    let tier = s >= 0.75 ? 4
+             : s >= 0.50 ? 3
+             : s >= 0.25 ? 2
              : 1
-
-      return String.fromCodePoint(0xf091f + (tier + 1) * 3)
+    return String.fromCodePoint(0xf091f + (tier + 1) * 3)
   }
 
   Text {
