@@ -209,7 +209,7 @@ Rectangle {
 
             Item {
                 width: parent.width
-                height: 10
+                height: 12
 
                 Text {
                     anchors.left: parent.left
@@ -229,4 +229,12 @@ Rectangle {
             }
         }
     }
+
+    AudioVisualizer {
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      anchors.bottomMargin: 10
+      values: shellRoot.visualizerValues ? shellRoot.visualizerValues.slice(1, barCount) : []
+      visible: Config.showAudioVisuals && shellRoot.cavaAvailable && mprisModule.hasPlayer
+  }
 }

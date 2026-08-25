@@ -24,5 +24,7 @@
   "wsCloseOnWallpaperSet": true,
   "wsAnimation": true,
   "deleteCliphistImgCache": true,
-  "country": "IN"
+  "country": "IN",
+  "showAudioVisuals": true,
+  "pillModules": ["battery", "volume", "workspaces", "network", "clock"]
 }

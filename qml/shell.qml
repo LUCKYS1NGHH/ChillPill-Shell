@@ -10,6 +10,7 @@ import Quickshell.Services.UPower
 import Quickshell.Services.Notifications
 
 ShellRoot {
+  id: shellRoot
 
   IpcHandler {
       target: "cliphist"
@@ -46,6 +47,10 @@ ShellRoot {
     function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
   }
 
+  function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
@@ -71,6 +76,15 @@ ShellRoot {
 
   // media player related
   property bool mediaAutoOpened: false
+  property var visualizerValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  property bool cavaAvailable: false
+
+  Process {
+    id: cavaCheckProc
+    command: ["sh", "-c", "which cava"]
+    running: true
+    onExited: (exitCode) => { shellRoot.cavaAvailable = (exitCode === 0) }
+  }
 
   PanelWindow {
     id: panelWindow
@@ -121,6 +135,8 @@ ShellRoot {
       opacity: (!fullscreenActive && !notifFullscreenMode) ? 1 : 0
       visible: opacity > 0
       clip: true
+
+      property var volumeModule: null
 
       property bool appLauncher: false
       property bool hovered: false
@@ -174,7 +190,6 @@ ShellRoot {
         id: osdHideTimer
         onTriggered: box.activeOsd = ""
       }
-      Timer { id: brightnessThrottle; interval: 80; repeat: false }
 
       onImplicitHeightChanged: {
           heightAnim.stop()
@@ -353,29 +368,35 @@ ShellRoot {
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
-        Battery {}
-        Volume {
-          id: volumeModule
-          onVolumeChanged: {
-            if (!box.controlCenter) box.activeOsd = "volume"
-            osdHideTimer.interval = Config.osdDuration
-            osdHideTimer.restart()
+        Repeater {
+          model: Config.pillModules   // e.g. ["battery", "bolume","workspaces","network","clock"]
+          delegate: Loader {
+            id: moduleLoader
+            source: capitalize(modelData) + ".qml"
+            onLoaded: {
+              if (capitalize(modelData) === "Volume") box.volumeModule = item
             }
+            Connections {
+              target: capitalize(modelData) === "Volume" ? moduleLoader.item : null
+              function onVolumeChanged() {
+                if (!box.controlCenter) box.activeOsd = "volume"
+                osdHideTimer.interval = Config.osdDuration
+                osdHideTimer.restart()
+              }
+            }
+          }
         }
-        Workspaces {}
-        Network {}
-        Clock {}
       }
 
       // volume
       OsdBar {
           active: box.activeOsd === "volume"
-          icon: volumeModule.icon
-          iconColor: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
-          percent: volumeModule.vol / 100
-          muted: volumeModule.muted
-          barWidth: volumeModule.mutedFg ? 90 : 110
-          valueText: volumeModule.muted ? "muted" : volumeModule.vol + "%"
+          icon: box.volumeModule ? box.volumeModule.icon : ""
+          iconColor: box.volumeModule && box.volumeModule.muted ? box.volumeModule.mutedFg : Theme.fg
+          percent: box.volumeModule ? box.volumeModule.vol / 100 : 0
+          muted: box.volumeModule ? box.volumeModule.muted : false
+          barWidth: box.volumeModule && box.volumeModule.mutedFg ? 80 : 90
+          valueText: box.volumeModule ? (box.volumeModule.muted ? "muted" : box.volumeModule.vol + "%") : ""
       }
 
       // brightness
@@ -569,8 +590,7 @@ ShellRoot {
           notificationPopup: notificationModule.active
         } 
 
-        // control center sliders
-        Column {
+        CcSliders {
           id: sliderColumn
           anchors.top: parent.top
           anchors.left: parent.left
@@ -578,163 +598,27 @@ ShellRoot {
           anchors.topMargin: mprisModule.hasPlayer ? box.ccButtonHeight + 137 : 50
           anchors.leftMargin: 15
           anchors.rightMargin: 2
-          spacing: 5
 
-          // volume
-          RowLayout {
-            width: parent.width
-            spacing: 14
+          sliderHeight: box.sliderHeight
+          sliderRadius: box.sliderRadius
+          sliderColor: box.sliderColor
+          sliderHitSlop: box.sliderHitSlop
+          volIcon: box.volumeModule.icon
+          volMuted: box.volumeModule.muted
+          volPercent: box.volumeModule.vol
+          brightnessIcon: brightnessModule.icon
+          brightnessPercent: brightnessModule.percent
 
-            Text {
-              id: volIcon
-              text: volumeModule.icon
-              color: volumeModule.muted ? "#fd2222" : Theme.fg
-              font.family: Theme.nerdFontFamily
-              font.pixelSize: 13
-              Behavior on color { ColorAnimation { duration: 100 } }
-
-              // fade + scale pulse on every text change
-              onTextChanged: volPulse.restart()
-              scale: 1.0
-              SequentialAnimation {
-                  id: volPulse
-                  NumberAnimation { target: volIcon; property: "scale"; to: 1.15; duration: 60 }
-                  NumberAnimation { target: volIcon; property: "scale"; to: 1.0; duration: 100 }
-              }
-            }
-
-            Rectangle {
-              Layout.fillWidth: true
-              height: box.sliderHeight
-              radius: box.sliderRadius
-              color: Theme.bg5
-
-              Rectangle {
-                width: parent.width * (volumeModule.vol / 100)
-                height: parent.height
-                radius: box.sliderRadius
-                color: box.sliderColor
-                Behavior on width {
-                  SpringAnimation {
-                    spring: 15.5
-                    damping: 1.8
-                    epsilon: 0.40
-                  }
-                }
-              }
-
-              MouseArea {
-                anchors.fill: parent
-                // negative margins extend the clickable area beyond the thin bar
-                anchors.topMargin: -box.sliderHitSlop
-                anchors.bottomMargin: -box.sliderHitSlop
-                onClicked: (mouse) => {
-                  volumeModule.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width))
-                }
-                onPositionChanged: (mouse) => {
-                  if (pressed)
-                    volumeModule.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width))
-                }
-              }
-            }
-
-            Text {
-              id: volVal
-              text: volumeModule.muted ? "muted" : volumeModule.vol + "%"
-              color: Theme.fg
-              font.family: Theme.fontFamily
-              font.pixelSize: 10
-              Layout.minimumWidth: 35
-              onTextChanged: valPulse.restart()
-              SequentialAnimation {
-                id: valPulse
-                NumberAnimation { target: volVal; property: "scale"; to: 0.9; duration: 60; easing.type: Easing.OutQuad }
-                NumberAnimation { target: volVal; property: "scale"; to: 1.0; duration: 120; easing.type: Easing.OutQuad }
-              }
-            }
+          onVolumeChangeRequested: (fraction) => {
+            if (box.volumeModule) box.volumeModule.sink.audio.volume = Math.max(0, Math.min(1, fraction))
           }
-
-          // brightness
-          RowLayout {
-            width: parent.width
-            spacing: 14
-
-            Text {
-              id: blIcon
-              text: brightnessModule.icon
-              color: Theme.fg
-              font.family: Theme.nerdFontFamily
-              font.pixelSize: 13
-
-              // fade+scale pulse on every text change
-              onTextChanged: blPulse.restart()
-              scale: 1.0
-              SequentialAnimation {
-                  id: blPulse
-                  NumberAnimation { target: blIcon; property: "scale"; to: 1.15; duration: 60 }
-                  NumberAnimation { target: blIcon; property: "scale"; to: 1.0; duration: 100 }
-              }
-            }
-
-            Rectangle {
-              Layout.fillWidth: true
-              height: box.sliderHeight
-              radius: box.sliderRadius
-              color: Theme.bg5
-
-              Rectangle {
-                width: parent.width * brightnessModule.percent
-                height: parent.height
-                radius: box.sliderRadius
-                color: box.sliderColor
-                Behavior on width {
-                  SpringAnimation {
-                    spring: 15.5
-                    damping: 1.8
-                    epsilon: 0.40
-                  }
-                }
-              }
-
-              MouseArea {
-                anchors.fill: parent
-                // negative margins extend the clickable area beyond the thin bar
-                anchors.topMargin: -box.sliderHitSlop
-                anchors.bottomMargin: -box.sliderHitSlop
-                onClicked: (mouse) => {
-                  let pct = Math.round(Math.max(0, Math.min(1, mouse.x / width)) * 100)
-                  brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
-                  brightnessSetProc.running = false
-                  brightnessSetProc.running = true
-                }
-                onPositionChanged: (mouse) => {
-                  if (pressed && !brightnessThrottle.running) {
-                    let pct = Math.round(Math.max(0, Math.min(1, mouse.x / width)) * 100)
-                    brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
-                    brightnessSetProc.running = false
-                    brightnessSetProc.running = true
-                    brightnessThrottle.start()
-                  }
-                }
-              }
-            }
-
-            Text {
-              id: btVal
-              text: Math.round(brightnessModule.percent * 100) + "%"
-              color: Theme.fg
-              font.family: Theme.fontFamily
-              font.pixelSize: 10
-              Layout.minimumWidth: 35
-              onTextChanged: btPulse.restart()
-              SequentialAnimation {
-                  id: btPulse
-                  NumberAnimation { target: btVal; property: "scale"; to: 0.9; duration: 60; easing.type: Easing.OutQuad }
-                  NumberAnimation { target: btVal; property: "scale"; to: 1.0; duration: 120; easing.type: Easing.OutQuad }
-              }
-            }
+          onBrightnessChangeRequested: (fraction) => {
+            let pct = Math.round(Math.max(0, Math.min(1, fraction)) * 100)
+            brightnessSetProc.command = ["brightnessctl", "set", pct + "%"]
+            brightnessSetProc.running = false
+            brightnessSetProc.running = true
           }
-        } 
+        }
 
       // notifications stack popped header
       Rectangle {
@@ -1450,6 +1334,25 @@ ShellRoot {
     }
     function onCurrentChanged() {
       if (notificationModule.current) fsNotif.displayNotif = notificationModule.current
+    }
+  }
+
+  // audio visualizer spectrum process
+  Process {
+    id: cavaProc
+    command: ["sh", "-c", "cava -p ~/.cache/chillpill-shell/cava.conf"]
+    running: Config.showAudioVisuals && box.controlCenter && shellRoot.cavaAvailable
+    stdout: SplitParser {
+      splitMarker: "\n"
+      onRead: data => {
+        let parts = data.trim().split(";")
+        let vals = []
+        for (let i = 0; i < 16; i++) {
+          let v = Number(parts[i])
+          vals.push(isNaN(v) ? 0 : Math.min(100, Math.max(0, v)))
+        }
+        shellRoot.visualizerValues = vals
+      }
     }
   }
 
