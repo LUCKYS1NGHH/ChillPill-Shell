@@ -25,5 +25,6 @@
   "wsAnimation": true,
   "deleteCliphistImgCache": true,
   "country": "IN",
-  "showAudioVisuals": true
+  "showAudioVisuals": true,
+  "pillModules": ["battery", "volume", "workspaces", "network", "clock"]
 }

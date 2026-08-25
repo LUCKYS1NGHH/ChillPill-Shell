@@ -47,6 +47,10 @@ ShellRoot {
     function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
   }
 
+  function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
@@ -131,6 +135,8 @@ ShellRoot {
       opacity: (!fullscreenActive && !notifFullscreenMode) ? 1 : 0
       visible: opacity > 0
       clip: true
+
+      property var volumeModule: null
 
       property bool appLauncher: false
       property bool hovered: false
@@ -362,29 +368,35 @@ ShellRoot {
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
-        Battery {}
-        Volume {
-          id: volumeModule
-          onVolumeChanged: {
-            if (!box.controlCenter) box.activeOsd = "volume"
-            osdHideTimer.interval = Config.osdDuration
-            osdHideTimer.restart()
+        Repeater {
+          model: Config.pillModules   // e.g. ["battery", "bolume","workspaces","network","clock"]
+          delegate: Loader {
+            id: moduleLoader
+            source: capitalize(modelData) + ".qml"
+            onLoaded: {
+              if (capitalize(modelData) === "Volume") box.volumeModule = item
             }
+            Connections {
+              target: capitalize(modelData) === "Volume" ? moduleLoader.item : null
+              function onVolumeChanged() {
+                if (!box.controlCenter) box.activeOsd = "volume"
+                osdHideTimer.interval = Config.osdDuration
+                osdHideTimer.restart()
+              }
+            }
+          }
         }
-        Workspaces {}
-        Network {}
-        Clock {}
       }
 
       // volume
       OsdBar {
           active: box.activeOsd === "volume"
-          icon: volumeModule.icon
-          iconColor: volumeModule.muted ? volumeModule.mutedFg : Theme.fg
-          percent: volumeModule.vol / 100
-          muted: volumeModule.muted
-          barWidth: volumeModule.mutedFg ? 90 : 110
-          valueText: volumeModule.muted ? "muted" : volumeModule.vol + "%"
+          icon: box.volumeModule ? box.volumeModule.icon : ""
+          iconColor: box.volumeModule && box.volumeModule.muted ? box.volumeModule.mutedFg : Theme.fg
+          percent: box.volumeModule ? box.volumeModule.vol / 100 : 0
+          muted: box.volumeModule ? box.volumeModule.muted : false
+          barWidth: box.volumeModule && box.volumeModule.mutedFg ? 80 : 90
+          valueText: box.volumeModule ? (box.volumeModule.muted ? "muted" : box.volumeModule.vol + "%") : ""
       }
 
       // brightness
@@ -591,14 +603,14 @@ ShellRoot {
           sliderRadius: box.sliderRadius
           sliderColor: box.sliderColor
           sliderHitSlop: box.sliderHitSlop
-          volIcon: volumeModule.icon
-          volMuted: volumeModule.muted
-          volPercent: volumeModule.vol
+          volIcon: box.volumeModule.icon
+          volMuted: box.volumeModule.muted
+          volPercent: box.volumeModule.vol
           brightnessIcon: brightnessModule.icon
           brightnessPercent: brightnessModule.percent
 
           onVolumeChangeRequested: (fraction) => {
-            volumeModule.sink.audio.volume = Math.max(0, Math.min(1, fraction))
+            if (box.volumeModule) box.volumeModule.sink.audio.volume = Math.max(0, Math.min(1, fraction))
           }
           onBrightnessChangeRequested: (fraction) => {
             let pct = Math.round(Math.max(0, Math.min(1, fraction)) * 100)

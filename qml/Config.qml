@@ -40,6 +40,7 @@ Singleton {
       property bool deleteCliphistImgCache: true
       property string country: "Japan"
       property bool showAudioVisuals: true
+      property list<string> pillModules: ["battery", "volume", "workspaces", "network", "clock"]
     }
   }
 
@@ -71,4 +72,5 @@ Singleton {
   readonly property alias deleteCliphistImgCache: adapter.deleteCliphistImgCache
   readonly property alias country: adapter.country
   readonly property alias showAudioVisuals: adapter.showAudioVisuals
+  readonly property alias pillModules: adapter.pillModules
 }
