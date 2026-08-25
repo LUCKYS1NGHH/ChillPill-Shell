@@ -10,6 +10,7 @@ qmlImportPath = pkgs.lib.concatMapStringsSep ":" (m: "${m}/lib/qt-6/qml") qtModu
 qtPluginPath  = pkgs.lib.concatMapStringsSep ":" (m: "${m}/lib/qt-6/plugins") qtModules;
 
 nusgmonPython = pkgs.python3.withPackages (ps: [ ps.psutil ]);
+scriptsPython = pkgs.python3.withPackages (ps: [ ps.holidays ]);
 
 nusgmon = pkgs.stdenv.mkDerivation {
   pname = "nusgmon";
@@ -42,6 +43,7 @@ nusgmon = pkgs.stdenv.mkDerivation {
      wl-clipboard
      inotify-tools
      pipewire
+     pulseaudio
      blueman
      awww
      nusgmon
@@ -64,7 +66,7 @@ pkgs.stdenv.mkDerivation rec {
     qt6.qtbase
     qt6.qtdeclarative
     qt6.qttools
-    qt6.qtmultimedia   # был в pacman-списке (qt6-multimedia)
+    qt6.qtmultimedia
   ];
 
   cmakeFlags = [
@@ -81,8 +83,6 @@ pkgs.stdenv.mkDerivation rec {
       --replace '/usr/share/chillpill-shell' "$out/share/chillpill-shell" \
       --replace '$HOME/.config/quickshell/chillpill-shell/IslandBackend' "$out/lib/qt6/qml/IslandBackend"
 
-    # IPC-обёртка: фиксирует правильный -p путь и абсолютный путь к qs,
-    # чтобы пользователю не нужно было хардкодить /nix/store-пути в своём WM-конфиге
     cat > $out/bin/chillpill-shell-ipc <<'WRAPPER'
   #!/usr/bin/env bash
   exec REPLACE_QS ipc -p REPLACE_CONFIG_PATH "$@"
@@ -97,6 +97,13 @@ pkgs.stdenv.mkDerivation rec {
     cp -r $src/share   $out/share/chillpill-shell/
     cp -r $src/scripts $out/share/chillpill-shell/
     install -Dm644 $src/config.jsonc $out/share/chillpill-shell/config.jsonc.example
+
+    chmod +x $out/share/chillpill-shell/scripts/*
+    PATH="${scriptsPython}/bin:$PATH" patchShebangs $out/share/chillpill-shell/scripts
+
+    grep -rl '/usr/share/chillpill-shell' $out/share/chillpill-shell | while read -r f; do
+      substituteInPlace "$f" --replace '/usr/share/chillpill-shell' "$out/share/chillpill-shell"
+    done
 
     install -Dm644 $src/chillpill.desktop $out/share/applications/chillpill.desktop
     substituteInPlace $out/share/applications/chillpill.desktop \
