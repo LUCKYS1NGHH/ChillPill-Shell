@@ -47,11 +47,12 @@ RowLayout {
   onSinkChanged: checkPort()
 
   property string icon: {
-    if (!ready || muted) return isHeadphone ? "\uf025" : String.fromCodePoint(0xf0581)
-    if (isHeadphone) return "\uee58"
-    if (vol === 0) return String.fromCodePoint(0xf0581)
-    if (vol < 40) return String.fromCodePoint(0xf0580)
-    return String.fromCodePoint(0xf057e)
+      const r = ready, m = muted, h = isHeadphone, v = vol   // force-read all deps
+      if (!r || m) return h ? "\uf025" : String.fromCodePoint(0xf0581)
+      if (h) return "\uee58"
+      if (v === 0) return String.fromCodePoint(0xf0581)
+      if (v < 40) return String.fromCodePoint(0xf0580)
+      return String.fromCodePoint(0xf057e)
   }
 
   // icon
