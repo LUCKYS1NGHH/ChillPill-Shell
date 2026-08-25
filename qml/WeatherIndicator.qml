@@ -7,7 +7,8 @@ Item {
   implicitWidth: row.implicitWidth
   implicitHeight: row.implicitHeight
 
-  property string weatherFg: Theme.fg4
+  property string fg: Theme.fg
+  property bool clickable: false
 
   Row {
     id: row
@@ -16,20 +17,20 @@ Item {
 
     Text {
       text: WeatherModule.iconGlyph
-      color: weatherFg
+      color: clickable ? fg : WeatherModule.iconColor
       font { family: Config.nerdFontFamily; pixelSize: 12 }
       anchors.verticalCenter: parent.verticalCenter
     }
     Text {
       text: WeatherModule.loading ? "--" : Math.round(WeatherModule.temp) + "°" + (Config.weatherUnits === "metric" ? "C" : "F")
-      color: weatherFg
+      color: fg
       font { family: Theme.fontFamily; pixelSize: 10; weight: 400 }
       anchors.verticalCenter: parent.verticalCenter
     }
   }
 
   MouseArea {
-    anchors.fill: parent
+    anchors.fill: clickable ? parent : null
     cursorShape: Qt.PointingHandCursor
     onClicked: { console.log("weather clicked"); root.toggleWeather() }
   }

@@ -114,7 +114,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Features
 
-- **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable)
+- **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see "Know more" below for additional module options
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
 - **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
@@ -129,6 +129,8 @@ into your session at all times. It's not bound to any dotfiles.
 
 ---
 - Main pill width expands on hover.
+
+- Extra modules available for the pill bar beyond the defaults: `weatherIndicator`
 
 - DPI and Pill scale is available in config if you need it.
 

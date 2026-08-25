@@ -1105,7 +1105,7 @@ ShellRoot {
 
             Item { Layout.fillWidth: true }
 
-            WeatherIndicator { id: weatherIndicatorItem }
+            WeatherIndicator { id: weatherIndicatorItem; fg: Theme.fg4; clickable: true }
 
             Item { Layout.fillWidth: true }
 
