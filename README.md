@@ -7,8 +7,8 @@
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-ChillPill-Shell is a **lightweight**, feature rich dynamic pill bar for Hyprland, built with **Quickshell**.
-It's aimed squarely at users running without a dedicated GPU (like me) — Eye candy for **Integrated-GPU users**.
+ChillPill-Shell is a **lightweight**, feature-rich dynamic pill bar for Hyprland, built with **Quickshell**.
+It's aimed squarely at users running without a dedicated GPU (like me) — eye candy that doesn't cost you a discrete card. Runs great on integrated graphics.
 
 It runs as a **standalone app**: launch it from your terminal or app launcher when you want it, rather than having it baked
 into your session at all times. It's not bound to any dotfiles.
@@ -17,17 +17,15 @@ into your session at all times. It's not bound to any dotfiles.
 
 <div align="center">
 
-[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-2d2d2d?style=flat-square)](#resource-usage)
-[![Showcase](https://img.shields.io/badge/Showcase-2d2d2d?style=flat-square)](#showcase)
-[![Features](https://img.shields.io/badge/Features-2d2d2d?style=flat-square)](#features)
-[![Configuration](https://img.shields.io/badge/Configuration-2d2d2d?style=flat-square)](#configurable-options)
-[![Dependencies](https://img.shields.io/badge/Dependencies-2d2d2d?style=flat-square)](#dependencies)
-[![Installation](https://img.shields.io/badge/Installation-2d2d2d?style=flat-square)](#install)
-[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-2d2d2d?style=flat-square)](#auto-startup)
-[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-2d2d2d?style=flat-square)](#key-bindings)
-[![Contributors](https://img.shields.io/badge/Contributors-2d2d2d?style=flat-square)](#contributors)
-[![Thanks](https://img.shields.io/badge/Thanks-2d2d2d?style=flat-square)](#thanks)
-[![Author](https://img.shields.io/badge/Author-2d2d2d?style=flat-square)](#author)
+[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-252525?style=flat-square)](#resource-usage)
+[![Showcase](https://img.shields.io/badge/Showcase-252525?style=flat-square)](#showcase)
+[![Features](https://img.shields.io/badge/Features-252525?style=flat-square)](#features)
+[![Configuration](https://img.shields.io/badge/Configuration-252525?style=flat-square)](#configurable-options)
+[![Dependencies](https://img.shields.io/badge/Dependencies-252525?style=flat-square)](#dependencies)
+[![Installation](https://img.shields.io/badge/Installation-252525?style=flat-square)](#install)
+[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-252525?style=flat-square)](#auto-startup)
+[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-252525?style=flat-square)](#key-bindings)
+[![Acknoledgements](https://img.shields.io/badge/Acknoledgements-252525?style=flat-square)](#contributors)
 
 </div>
 
@@ -116,13 +114,13 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Features
 
-- **Main Pill Bar**                - Battery, volume, workspaces, network, clock
-- **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume and brightness sliders, notification stack
-- **Cliphist (Clipboard History)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
+- **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable)
+- **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
+- **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feels, humidity, wind, sunrise and sunset, upcoming 2 days weather forecast, manual refresh button
-- **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst entirely now)
+- **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher
 
@@ -136,10 +134,11 @@ into your session at all times. It's not bound to any dotfiles.
 
 - Audio (to mute/unmute) and workspaces (to switch) in the main pill are clickable.
 
-- Control center's media player progress bar is not only for status, it's usable to control the media you playing.
+- Control center's media player progress bar is not only for status, it's usable to control the media you playing. also timer minutes can be change by right click.
 
-- Control center has WiFi controller which has list of active networks and has password prompt. also timer minutes
-  can be change by right click.
+- Control center has WiFi controller (panel) which has list of active networks and has password prompt.
+
+- The wifi panel also includes the USB tethering toggle.
 
 - Control center has also Bluetooth controller which has list of active, pair & connected devices/networks, device battery. here's 3 cases to connect a bluetooth device first time:
 
@@ -147,7 +146,9 @@ into your session at all times. It's not bound to any dotfiles.
   - case 2: device just wants us to display a code
   - case 3: device wants a yes/no confirmation of a shown passkey
 
-- Cliphist shows image previews from `~/.cache/chillpill-shell/cliphist-imgs` by converting image binaries into real images and save there.
+- Cliphist shows image previews from `~/.cache/chillpill-shell/cliphist-imgs` by converting image binaries into real images and save there. if
+  you want these images cache to auto delete when you delete the cliphist (clipboard manager) image item, then there's `deleteCliphistImgCache` config
+  option (enabled by default).
 
 - In Cliphist image full preview (which opens through `Tab` key), you can switch to other image by `Up`/`Down` keys, and can also delete the image in full preview.
 
@@ -170,6 +171,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `pillTopMargin` | Top spacing of pill bar | `9` |
 | `pillBottomMargin` | Bottom spacing of pill bar | `26` |
 | `pillScale` | Scale factor for pill bar size | `1.0` |
+| `pillModules` | Pill bar modules order/add/remove | `["battery", "volume", "workspaces", "network", "clock"]` |
 | `dpiScale` | DPI Scaling | `1.0` |
 | `textFontFamily` | Font family for general text | `Monocraft` |
 | `nerdFontFamily` | Font family for icons (Nerd Fonts) | `JetBrainsMono Nerd Font Propo` |
@@ -191,7 +193,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `wsAnimation` | Wallpaper switcher open animation | `true` |
 | `deleteCliphistImgCache` | Delete cached image file on clipboard entry removal, disabled keeps it on disk | `true` |
 | `country` | Country for calendar events. accepts country name (India) or ISO 3166-1 alpha-2 (IN) but recommended is country code | `IN` |
-| `showAudioVisuals` | Show audio visuals in media player (depends on cava) | true |
+| `showAudioVisuals` | Show audio visuals in media player (depends on cava) | `true` |
 
 <details>
 <summary>Raw config example</summary>
@@ -224,7 +226,8 @@ into your session at all times. It's not bound to any dotfiles.
   "wsAnimation": true,
   "deleteCliphistImgCache": true,
   "country": "IN",
-  "showAudioVisuals": true
+  "showAudioVisuals": true,
+  "pillModules": ["battery", "volume", "workspaces", "network", "clock"]
 }
 ```
 
@@ -263,7 +266,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 #### Arch users (AUR)
 
-```
+```bash
 paru -S chillpill-shell
 ```
 
@@ -281,7 +284,7 @@ sudo ./install.sh
 ---
 
 #### AUR
-```
+```bash
 paru -R chillpill-shell
 ```
 
@@ -298,7 +301,7 @@ sudo ./uninstall.sh
 
 To auto-run at every time you start your Hyprland, paste this code in your `~/.config/hypr/hyprland.lua` config file
 
-```
+```lua
 hl.on("hyprland.start", function()
    hl.exec_cmd("chillpill-shell")
 end)
@@ -310,7 +313,7 @@ Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste thi
 
 > Adjust key combinations by your preferences
 
-```
+```lua
 hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
 hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
