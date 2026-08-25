@@ -270,6 +270,40 @@ into your session at all times. It's not bound to any dotfiles.
 paru -S chillpill-shell
 ```
 
+#### NixOS users (flake with Home Manager)
+
+Add this repository as an input to your flake:
+
+```nix
+{
+  inputs = {
+    chillpill-shell = {
+      url = "github:LUCKYS1NGHH/chillpill-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+}
+```
+
+Enable and configure it in your Home Manager configuration:
+
+```nix
+{ chillpill-shell, ... }:
+{
+  imports = [
+    chillpill-shell.homeManagerModules.default
+  ];
+
+  programs.chillpill-shell = {
+    enable = true;
+    settings = {
+      clockFormat = "HH:mm";
+      # Other options from config.jsonc
+    };
+  };
+}
+```
+
 #### Other
 ```bash
 git clone --depth=1 https://github.com/LUCKYS1NGHH/ChillPill-Shell.git
@@ -313,21 +347,22 @@ Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste thi
 
 > Adjust key combinations by your preferences
 
-<<<<<<< HEAD
-```
-hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("chillpill-shell-ipc call controlCenter toggle"))
-hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("chillpill-shell-ipc call cliphist toggle"))
-hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("chillpill-shell-ipc call miniDashboard toggle"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call appLauncher toggle"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSwitcher toggle"))
-=======
 ```lua
 hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
 hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call appLauncher toggle"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call wallpaperSwitcher toggle"))
->>>>>>> main
+```
+
+NixOS version
+
+```lua
+hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("chillpill-shell-ipc call controlCenter toggle"))
+hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("chillpill-shell-ipc call cliphist toggle"))
+hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("chillpill-shell-ipc call miniDashboard toggle"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call appLauncher toggle"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSwitcher toggle"))
 ```
 
 ---
