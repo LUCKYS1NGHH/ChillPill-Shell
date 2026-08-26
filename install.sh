@@ -79,6 +79,7 @@ bin_exists cmake || die "Cmake not installed."
 bin_exists blueman-manager || warn "Blueman not installed." # warn here because not everyone use bluetooth
 bin_exists pipewire || die "Pipewire not installed."
 bin_exists wl-copy || die "Wl-clipabord not installed."
+(bin_exists NetworkManager || bin_exists iwd) || die "Need a network manager: install NetworkManager or iwd"
 
 REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
 

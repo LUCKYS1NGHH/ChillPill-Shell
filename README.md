@@ -25,7 +25,7 @@ into your session at all times. It's not bound to any dotfiles.
 [![Installation](https://img.shields.io/badge/Installation-252525?style=flat-square)](#install)
 [![Auto Startup](https://img.shields.io/badge/Auto%20Startup-252525?style=flat-square)](#auto-startup)
 [![Key Bindings](https://img.shields.io/badge/Key%20Bindings-252525?style=flat-square)](#key-bindings)
-[![Acknoledgements](https://img.shields.io/badge/Acknoledgements-252525?style=flat-square)](#contributors)
+[![Acknowledgements](https://img.shields.io/badge/Acknoledgements-252525?style=flat-square)](#contributors)
 
 </div>
 
@@ -114,12 +114,12 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Features
 
-- **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see "Know more" below for additional module options
+- **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see "Know more" below for additional modules option
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
 - **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
-  - **Weather Popup**              - Feels, humidity, wind, sunrise and sunset, upcoming 2 days weather forecast, manual refresh button
+  - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher
@@ -128,11 +128,20 @@ into your session at all times. It's not bound to any dotfiles.
 <summary>Know more</summary>
 
 ---
-- Main pill width expands on hover.
+- Main pill bar modules has tooltip
 
-- Extra modules available for the pill bar beyond the defaults: `weatherIndicator`
+- 3 pill states are open-able with mouse:
 
-- DPI and Pill scale is available in config if you need it.
+  - Control center: `Left click`
+  - Cliphist: `Middle click`
+  - Mini Dashboard: `Right click`
+
+  For the rest of states, you have to call the IPC through keybinds in Hyprland, which are provided in [Keybinds](#key-bindings)
+  section (including the mouse open-able states)
+
+- Extra modules available for the pill bar beyond the defaults: `weatherIndicator`, `bluetooth`
+
+- DPI and Pill scaling is available in the config if you need it.
 
 - Audio (to mute/unmute) and workspaces (to switch) in the main pill are clickable.
 
@@ -206,6 +215,7 @@ into your session at all times. It's not bound to any dotfiles.
   "clockFormat": "hh:mm",
   "pillTopMargin": 9,
   "pillBottomMargin": 26,
+  "pillModules": ["battery", "volume", "workspaces", "network", "clock"],
   "textFontFamily": "Monocraft",
   "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
   "timerPresets": [1, 5, 10, 15, 30],
@@ -228,8 +238,7 @@ into your session at all times. It's not bound to any dotfiles.
   "wsAnimation": true,
   "deleteCliphistImgCache": true,
   "country": "IN",
-  "showAudioVisuals": true,
-  "pillModules": ["battery", "volume", "workspaces", "network", "clock"]
+  "showAudioVisuals": true
 }
 ```
 
@@ -277,7 +286,7 @@ paru -S chillpill-shell
 git clone --depth=1 https://github.com/LUCKYS1NGHH/ChillPill-Shell.git
 cd ChillPill-Shell
 chmod +x install.sh
-sudo ./install.sh
+sudo ./install.sh # use --skip-deps to skip dependencies installation (arch currently)
 ```
 
 <details>
