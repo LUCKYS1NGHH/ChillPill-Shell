@@ -350,11 +350,9 @@ ShellRoot {
       }
 
       // modules in bar
-      RowLayout {
+      Row {
         id: row
         anchors.centerIn: parent
-        anchors.leftMargin: 28
-        anchors.rightMargin: 28
         spacing: 13 * Config.paddingScale
         opacity: !box.cliphistOpen
                  && !notificationModule.active
@@ -368,11 +366,19 @@ ShellRoot {
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
+        move: Transition {
+          NumberAnimation { properties: "x,y"; duration: 180; easing.type: Easing.OutCubic }
+        }
+        populate: Transition {
+          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 150 }
+        }
+
         Repeater {
-          model: Config.pillModules   // e.g. ["battery", "bolume","workspaces","network","clock"]
+          model: Config.pillModules // ["battery", "volume", "workspaces", "network", "clock"]
           delegate: Loader {
             id: moduleLoader
             source: capitalize(modelData) + ".qml"
+            anchors.verticalCenter: parent.verticalCenter
             onLoaded: {
               if (capitalize(modelData) === "Volume") box.volumeModule = item
             }

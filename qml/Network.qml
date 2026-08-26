@@ -36,7 +36,7 @@ RowLayout {
     color: root.tethered ? root.iconFg : (Networking.wifiEnabled ? iconFg : disconIconFg)
 
     font {
-      family: "FiraCode Nerd Font Propo"
+      family: Theme.nerdFontFamily
       pixelSize: 10 * Config.pillScale
     }
   }
