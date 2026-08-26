@@ -138,6 +138,11 @@ ShellRoot {
 
       property var volumeModule: null
 
+      property bool tooltipVisible: false
+      property string tooltipModule: ""
+      property real tooltipX: 0
+      property real tooltipY: 0
+
       property bool appLauncher: false
       property bool hovered: false
       property bool miniDashboard: false
@@ -374,25 +379,55 @@ ShellRoot {
         }
 
         Repeater {
-          model: Config.pillModules // ["battery", "volume", "workspaces", "network", "clock"]
-          delegate: Loader {
-            id: moduleLoader
-            source: capitalize(modelData) + ".qml"
+          model: Config.pillModules
+          delegate: Item {
+            id: wrapper
             anchors.verticalCenter: parent.verticalCenter
-            onLoaded: {
-              if (capitalize(modelData) === "Volume") box.volumeModule = item
-            }
-            Connections {
-              target: capitalize(modelData) === "Volume" ? moduleLoader.item : null
-              function onVolumeChanged() {
-                if (!box.controlCenter) box.activeOsd = "volume"
-                osdHideTimer.interval = Config.osdDuration
-                osdHideTimer.restart()
+            implicitWidth: moduleLoader.implicitWidth
+            implicitHeight: moduleLoader.implicitHeight
+
+            Loader {
+              id: moduleLoader
+              anchors.fill: parent
+              source: capitalize(modelData) + ".qml"
+              onLoaded: {
+                if (capitalize(modelData) === "Volume") box.volumeModule = item
               }
+              Connections {
+                target: capitalize(modelData) === "Volume" ? moduleLoader.item : null
+                function onVolumeChanged() {
+                  if (!box.controlCenter) box.activeOsd = "volume"
+                  osdHideTimer.interval = Config.osdDuration
+                  osdHideTimer.restart()
+                }
+              }
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              hoverEnabled: true
+              acceptedButtons: Qt.NoButton // purely for hover, doesn't eat clicks
+              cursorShape: modelData === "workspaces" ? Qt.PointingHandCursor : Qt.ArrowCursor
+              propagateComposedEvents: true
+              onEntered: {
+                box.tooltipModule = modelData
+                if (tooltipPopup.content === "") {
+                  box.tooltipVisible = false
+                  return
+                }
+                var xPos = wrapper.mapToGlobal(wrapper.width / 2, 0).x
+                var yPos = row.mapToGlobal(0, row.height).y
+                box.tooltipX = xPos
+                box.tooltipY = yPos
+                box.tooltipVisible = true
+              }
+              onExited: box.tooltipVisible = false
             }
           }
         }
       }
+
+      TooltipPopup { id: tooltipPopup }
 
       // volume
       OsdBar {
