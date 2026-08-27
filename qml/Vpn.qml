@@ -16,6 +16,7 @@ RowLayout {
 
   property string publicIp: ""
   property string country: ""
+  property string region: ""
   property var responseLines: []
 
   property real connectedSince: 0
@@ -60,6 +61,7 @@ RowLayout {
       connectedSince = 0
       publicIp = ""
       country = ""
+      region = ""
     }
   }
 
@@ -99,6 +101,7 @@ RowLayout {
         const info = JSON.parse(body)
         root.publicIp = info.ip ?? ""
         root.country = info.country ?? "Unknown"
+        root.region = info.region ?? ""
       } catch (e) {
         root.country = "Unknown"
       }
@@ -127,6 +130,7 @@ RowLayout {
   Text {
     text: {
       if (!root.connected) return "off"
+      if (!Config.showSensitiveInfo) return "on"
       if (root.country.length > 0) return root.country
       return ".."
     }

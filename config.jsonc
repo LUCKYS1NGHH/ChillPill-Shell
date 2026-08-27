@@ -26,5 +26,6 @@
   "deleteCliphistImgCache": true,
   "country": "IN",
   "showAudioVisuals": true,
+  "showSensitiveInfo": true,
   "pillModules": ["battery", "volume", "workspaces", "network", "clock"]
 }

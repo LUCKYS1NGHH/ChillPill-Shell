@@ -89,11 +89,17 @@ PanelWindow {
         if (m.todayEvent !== "") s += " • " + m.todayEvent
         return s
       }
-      case "vpn":
-        if (!box.vpnModule || !box.vpnModule.connected) return "VPN off"
-        return "Connected • " + box.vpnModule.formattedUptime()
-             + (box.vpnModule.country ? "\nServer: " + box.vpnModule.country : "")
-             + (box.vpnModule.publicIp ? "\nIP: " + box.vpnModule.publicIp : "")
+      case "vpn": {
+        const m = box.vpnModule   // force-read
+        if (!m || !m.connected) return "VPN off"
+        let s = "Connected"
+        if (m.formattedUptime()) s += " • " + m.formattedUptime()
+        if (Config.showSensitiveInfo) {
+          if (m.country) s += "\nRegion: " + m.region
+          if (m.publicIp) s += "\nIP: " + m.publicIp
+        }
+        return s
+      }
       default:
         return ""
     }
