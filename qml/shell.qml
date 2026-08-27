@@ -137,6 +137,7 @@ ShellRoot {
       clip: true
 
       property var volumeModule: null
+      property var networkModule: null
 
       property bool tooltipVisible: false
       property string tooltipModule: ""
@@ -391,10 +392,11 @@ ShellRoot {
               anchors.fill: parent
               source: capitalize(modelData) + ".qml"
               onLoaded: {
-                if (capitalize(modelData) === "Volume") box.volumeModule = item
+                if (modelData === "volume") box.volumeModule = item
+                if (modelData === "network") box.networkModule = item
               }
               Connections {
-                target: capitalize(modelData) === "Volume" ? moduleLoader.item : null
+                target: modelData === "volume" ? moduleLoader.item : null
                 function onVolumeChanged() {
                   if (!box.controlCenter) box.activeOsd = "volume"
                   osdHideTimer.interval = Config.osdDuration

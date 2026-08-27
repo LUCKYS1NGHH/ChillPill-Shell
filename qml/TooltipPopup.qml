@@ -43,6 +43,14 @@ PanelWindow {
         if (m.muted) return "Muted" + (m.isHeadphone ? " • Headphones" : "")
         return m.vol + "%" + (m.isHeadphone ? " • Headphones" : " • Speakers")
       }
+      case "network": {
+        const m = box.networkModule
+        if (!m) return "No network info"
+        if (m.tethered) return "Wired • Connected"
+        if (!m.wifiEnabled) return "Wi-Fi off"
+        if (!m.active) return "Wi-Fi on • Not connected"
+        return m.active.name + " • " + Math.round(m.signal) + "% signal"
+      }
       default:
         return ""
     }

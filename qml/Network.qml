@@ -11,6 +11,7 @@ RowLayout {
   property string iconFg: "#6791dc"
   property string disconIconFg: "#9ea9bd"
 
+  readonly property bool wifiEnabled: Networking.wifiEnabled
   property var wifiDevice: Networking.devices.values.find(d => d.type === DeviceType.Wifi)
   property var active: wifiDevice ? wifiDevice.networks.values.find(n => n.connected) : null
 
