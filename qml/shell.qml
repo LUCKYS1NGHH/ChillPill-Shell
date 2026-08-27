@@ -139,6 +139,7 @@ ShellRoot {
       property var volumeModule: null
       property var networkModule: null
       property var bluetoothModule: null
+      property var clockModule: clock
 
       property bool tooltipVisible: false
       property string tooltipModule: ""
@@ -396,6 +397,7 @@ ShellRoot {
                 if (modelData === "volume") box.volumeModule = item
                 if (modelData === "network") box.networkModule = item
                 if (modelData === "bluetooth") box.bluetoothModule = item
+                if (modelData === "clock") box.clockModule = item
               }
               Connections {
                 target: modelData === "volume" ? moduleLoader.item : null

@@ -1,7 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
-import "./WeatherModule"
+import "./WeatherModule.qml"
 
 PanelWindow {
   id: tooltipWindow
@@ -70,6 +70,14 @@ PanelWindow {
         if (!m.btEnabled) return "Bluetooth off"
         if (!m.connected) return "Bluetooth on • Not connected"
         return m.connectedName + " • " + Math.round(m.connectedSignal) + "% signal"
+      }
+      case "clock": {
+        const m = box.clockModule   // force-read
+        if (!m) return "No date info"
+        const d = new Date()
+        let s = Qt.formatDate(d, "dddd, MMM d yyyy")
+        if (m.todayEvent !== "") s += " • " + m.todayEvent
+        return s
       }
       default:
         return ""
