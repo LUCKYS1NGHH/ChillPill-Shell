@@ -140,6 +140,7 @@ ShellRoot {
       property var networkModule: null
       property var bluetoothModule: null
       property var clockModule: clock
+      property var vpnModule: null
 
       property bool tooltipVisible: false
       property string tooltipModule: ""
@@ -398,6 +399,7 @@ ShellRoot {
                 if (modelData === "network") box.networkModule = item
                 if (modelData === "bluetooth") box.bluetoothModule = item
                 if (modelData === "clock") box.clockModule = item
+                if (modelData === "vpn") box.vpnModule = item
               }
               Connections {
                 target: modelData === "volume" ? moduleLoader.item : null

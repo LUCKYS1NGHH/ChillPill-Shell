@@ -27,8 +27,18 @@ PanelWindow {
 
   readonly property var tooltipExcluded: ["workspaces"]
 
-  readonly property string content: {
+  property int refreshTick: 0
+  Timer {
+    id: refreshTimer
+    interval: 1000
+    repeat: true
+    running: box.tooltipVisible && box.tooltipModule === "vpn"
+    onTriggered: tooltipWindow.refreshTick++
+  }
+
+  property string content: {
     if (tooltipExcluded.includes(box.tooltipModule)) return ""
+    if (refreshTick < 0) return "" // force dependency on refreshTick so content re-evaluates
     switch (box.tooltipModule) {
       case "battery": {
         if (!box.hasBattery) return "No battery • Plugged in"
@@ -79,6 +89,11 @@ PanelWindow {
         if (m.todayEvent !== "") s += " • " + m.todayEvent
         return s
       }
+      case "vpn":
+        if (!box.vpnModule || !box.vpnModule.connected) return "VPN off"
+        return "Connected • " + box.vpnModule.formattedUptime()
+             + (box.vpnModule.country ? "\nServer: " + box.vpnModule.country : "")
+             + (box.vpnModule.publicIp ? "\nIP: " + box.vpnModule.publicIp : "")
       default:
         return ""
     }
