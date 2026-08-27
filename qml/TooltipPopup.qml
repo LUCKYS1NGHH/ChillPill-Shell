@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
+import "./WeatherModule"
 
 PanelWindow {
   id: tooltipWindow
@@ -50,6 +51,17 @@ PanelWindow {
         if (!m.wifiEnabled) return "Wi-Fi off"
         if (!m.active) return "Wi-Fi on • Not connected"
         return m.active.name + " • " + Math.round(m.signal) + "% signal"
+      }
+      case "weather": {
+        const w = WeatherModule.condition, t = WeatherModule.temp, f = WeatherModule.feelsLike,
+              l = WeatherModule.loading, e = WeatherModule.errorMessage   // force-read
+        if (l) return "Loading weather…"
+        if (e !== "") return e
+        if (w === "") return "No weather info"
+        const unit = Config.weatherUnits === "metric" ? "°C" : "°F"
+        return w + "• " + Math.round(t) + unit
+             + (Math.round(f) !== Math.round(t) ? " (feels " + Math.round(f) + unit + ")" : "")
+             + " • " + Config.weatherLocation
       }
       default:
         return ""

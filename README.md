@@ -139,7 +139,7 @@ into your session at all times. It's not bound to any dotfiles.
   For the rest of states, you have to call the IPC through keybinds in Hyprland, which are provided in [Keybinds](#key-bindings)
   section (including the mouse open-able states)
 
-- Extra modules available for the pill bar beyond the defaults: `weatherIndicator`, `bluetooth`
+- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`
 
 - DPI and Pill scaling is available in the config if you need it.
 
