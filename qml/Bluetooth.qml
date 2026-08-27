@@ -10,6 +10,7 @@ RowLayout {
     property string iconFg: "#6791dc"
     property string disconIconFg: "#9ea9bd"
 
+    readonly property bool btEnabled: BluetoothController.enabled
     property bool connected: false
     property string connectedName: ""
     property real connectedSignal: 0

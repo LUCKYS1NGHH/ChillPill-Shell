@@ -138,6 +138,7 @@ ShellRoot {
 
       property var volumeModule: null
       property var networkModule: null
+      property var bluetoothModule: null
 
       property bool tooltipVisible: false
       property string tooltipModule: ""
@@ -394,6 +395,7 @@ ShellRoot {
               onLoaded: {
                 if (modelData === "volume") box.volumeModule = item
                 if (modelData === "network") box.networkModule = item
+                if (modelData === "bluetooth") box.bluetoothModule = item
               }
               Connections {
                 target: modelData === "volume" ? moduleLoader.item : null

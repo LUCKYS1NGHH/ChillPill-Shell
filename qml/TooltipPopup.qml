@@ -63,6 +63,14 @@ PanelWindow {
              + (Math.round(f) !== Math.round(t) ? " (feels " + Math.round(f) + unit + ")" : "")
              + " • " + Config.weatherLocation
       }
+      case "bluetooth": {
+        const m = box.bluetoothModule   // force-read
+        if (!m) return "No Bluetooth info"
+        if (!m.btEnabled && !m.connected) return "Bluetooth off • Not connected"
+        if (!m.btEnabled) return "Bluetooth off"
+        if (!m.connected) return "Bluetooth on • Not connected"
+        return m.connectedName + " • " + Math.round(m.connectedSignal) + "% signal"
+      }
       default:
         return ""
     }
