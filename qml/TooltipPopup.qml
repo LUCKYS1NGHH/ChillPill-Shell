@@ -37,6 +37,12 @@ PanelWindow {
           return box.batteryLevel + "% • " + formatMinutes(box.battery.timeToEmpty) + " remaining"
         return box.batteryLevel + "%"
       }
+      case "volume": {
+        const m = box.volumeModule
+        if (!m || !m.ready) return "No audio sink"
+        if (m.muted) return "Muted" + (m.isHeadphone ? " • Headphones" : "")
+        return m.vol + "%" + (m.isHeadphone ? " • Headphones" : " • Speakers")
+      }
       default:
         return ""
     }
