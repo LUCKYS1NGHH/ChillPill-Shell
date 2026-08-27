@@ -4,6 +4,10 @@ isfile = os.path.isfile
 exists = os.path.exists
 username = sys.argv[1] if len(sys.argv) == 2 else os.environ.get("SUDO_USER")
 
+if not username:
+    print(f"SUDO_USER is empty, need your username manually for the config directory:\n  {sys.argv[0]} <username>")
+    sys.exit(1)
+
 ROOT_CFG = "/usr/share/chillpill-shell/config.jsonc.example"
 HOME_CFG = f"/home/{username}/.config/chillpill-shell/config.jsonc"
 
