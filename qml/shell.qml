@@ -374,11 +374,12 @@ ShellRoot {
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
-        move: Transition {
+        add: Transition {
+          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 150 }
           NumberAnimation { properties: "x,y"; duration: 180; easing.type: Easing.OutCubic }
         }
-        populate: Transition {
-          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 150 }
+        move: Transition {
+          NumberAnimation { properties: "x,y"; duration: 180; easing.type: Easing.OutCubic }
         }
 
         Repeater {
