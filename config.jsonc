@@ -10,7 +10,7 @@
   "maxWorkspaces": 5,
   "notificationDisplayTime": 3000,
   "maxNotificationsInStack": 20,
-  "bandwidthRefreshInterval": 300000,
+  "dataUsageRefreshInterval": 300000,
   "screenLockAppCommand": "hyprlock",
   "osdDuration": 800,
   "weatherLocation": "Delhi",

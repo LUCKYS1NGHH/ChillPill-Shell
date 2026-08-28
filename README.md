@@ -117,7 +117,7 @@ into your session at all times. It's not bound to any dotfiles.
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see "Know more" below for additional modules option
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
 - **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
-- **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's bandwidth usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
+- **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
@@ -166,7 +166,7 @@ into your session at all times. It's not bound to any dotfiles.
 - Notifications are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.
 
-- Your today's bandwidth status in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
+- Your today's data usage in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
 
 - Wallpaper switcher shows you the filename of the image on hover. uses `awww` in backend to update the wallpaper.
 ---
@@ -192,7 +192,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `notificationDisplayTime` | Notification popup duration (ms) | `3000` |
 | `maxNotificationsInStack` | Max notifications shown in stack | `20` |
 | `avoidDuplicateNotifications` | Skip appending duplicate notifications to stack | `true` |
-| `bandwidthRefreshInterval` | Bandwidth usage refresh interval (ms) | `300000` (5 min) |
+| `dataUsageRefreshInterval` | Data usage refresh interval (ms) | `300000` (5 min) |
 | `screenLockAppCommand` | Screen lock command for mini dashboard's lock button | `hyprlock` |
 | `osdDuration` | OSD (on-screen display) duration (ms) | `800` |
 | `weatherLocation` | City for weather widget | `Delhi` |
@@ -223,7 +223,7 @@ into your session at all times. It's not bound to any dotfiles.
   "maxWorkspaces": 5,
   "notificationDisplayTime": 3000,
   "maxNotificationsInStack": 20,
-  "bandwidthRefreshInterval": 300000,
+  "dataUsageRefreshInterval": 300000,
   "screenLockAppCommand": "hyprlock",
   "osdDuration": 800,
   "weatherLocation": "Delhi",

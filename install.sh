@@ -61,7 +61,7 @@ if [[ "$1" != "--skip-deps" ]]; then
       fi
 
       if (( nusgmon_install )); then
-          info "Installing nusgmon (to record your bandwidth) through git"
+          info "Installing nusgmon (to record your data usage) through git"
           (cd /tmp/nusgmon-build && ./setup.sh)
       else
           info "nusgmon is already installed and up to date, skipping."

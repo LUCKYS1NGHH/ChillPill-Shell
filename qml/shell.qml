@@ -1071,8 +1071,8 @@ ShellRoot {
           anchors.bottomMargin: 42
         }
 
-        // bandwidth usage status
-        Bandwidth {
+        // data usage status
+        DataUsage {
           anchors.right: parent.right
           anchors.rightMargin: 4
           anchors.bottom: parent.bottom
