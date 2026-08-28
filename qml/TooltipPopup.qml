@@ -27,8 +27,18 @@ PanelWindow {
 
   readonly property var tooltipExcluded: ["workspaces"]
 
-  readonly property string content: {
+  property int refreshTick: 0
+  Timer {
+    id: refreshTimer
+    interval: 1000
+    repeat: true
+    running: box.tooltipVisible && box.tooltipModule === "vpn"
+    onTriggered: tooltipWindow.refreshTick++
+  }
+
+  property string content: {
     if (tooltipExcluded.includes(box.tooltipModule)) return ""
+    if (refreshTick < 0) return "" // force dependency on refreshTick so content re-evaluates
     switch (box.tooltipModule) {
       case "battery": {
         if (!box.hasBattery) return "No battery • Plugged in"
@@ -77,6 +87,17 @@ PanelWindow {
         const d = new Date()
         let s = Qt.formatDate(d, "dddd, MMM d yyyy")
         if (m.todayEvent !== "") s += " • " + m.todayEvent
+        return s
+      }
+      case "vpn": {
+        const m = box.vpnModule   // force-read
+        if (!m || !m.connected) return "VPN off"
+        let s = "Connected"
+        if (m.formattedUptime()) s += " • " + m.formattedUptime()
+        if (Config.showSensitiveInfo) {
+          if (m.country) s += "\nRegion: " + m.region
+          if (m.publicIp) s += "\nIP: " + m.publicIp
+        }
         return s
       }
       default:
