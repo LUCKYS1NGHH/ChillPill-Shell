@@ -375,14 +375,6 @@ ShellRoot {
 
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
-        add: Transition {
-          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 150 }
-          NumberAnimation { properties: "x,y"; duration: 180; easing.type: Easing.OutCubic }
-        }
-        move: Transition {
-          NumberAnimation { properties: "x,y"; duration: 180; easing.type: Easing.OutCubic }
-        }
-
         Repeater {
           model: Config.pillModules
           delegate: Item {
