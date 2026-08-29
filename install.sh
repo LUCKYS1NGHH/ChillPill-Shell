@@ -79,7 +79,7 @@ bin_exists cmake || die "Cmake not installed."
 bin_exists blueman-manager || warn "Blueman not installed." # warn here because not everyone use bluetooth
 bin_exists pipewire || die "Pipewire not installed."
 bin_exists wl-copy || die "Wl-clipboard not installed."
-(bin_exists NetworkManager || bin_exists diw) || die "Need a network manager: NetworkManager or iw (recommended is NetworkManager, for bar's extra vpn module)"
+(bin_exists NetworkManager || bin_exists iw) || die "Need a network manager: NetworkManager or iw (recommended is NetworkManager, for bar's extra vpn module)"
 bin_exists nmcli || warn "nmcli not installed. if you will use vpn module in bar, nmcli is needed."
 
 REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
