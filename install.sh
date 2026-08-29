@@ -9,9 +9,12 @@ BLUE_BG='\e[1;44m'
 BLACK='\e[1;30m'
 NC='\e[0m'
 
-info()  { echo -e "${GREEN}[+]${NC} $*"; }
-warn()  { echo -e "${YELLOW}[!]${NC} $*"; }
-die()   { echo -e "${RED}[x]${NC} $*" >&2; exit 1; }
+info() { echo -e "${GREEN}[+]${NC} $*"; }
+warn() { echo -e "${YELLOW}[!]${NC} $*"; }
+die() {
+    echo -e "${RED}[x]${NC} $*" >&2
+    exit 1
+}
 
 bin_exists() { command -v "$1" >/dev/null; }
 
@@ -20,53 +23,53 @@ if [[ ! "$EUID" -eq 0 ]]; then
 fi
 
 if [[ "$1" != "--skip-deps" ]]; then
-  if command -v pacman &>/dev/null; then
-      info "Installing dependencies in your Arch Linux."
-      pacman -S --noconfirm --needed quickshell cliphist brightnessctl wl-clipboard \
-             inotify-tools cmake qt6-multimedia python-psutil awww blueman pipewire
+    if command -v pacman &>/dev/null; then
+        info "Installing dependencies in your Arch Linux."
+        pacman -S --noconfirm --needed quickshell cliphist brightnessctl wl-clipboard \
+            inotify-tools cmake qt6-multimedia python-psutil awww blueman pipewire
 
-      PY=/usr/bin/python3
+        PY=/usr/bin/python3
 
-      if ! sudo -u "$SUDO_USER" "$PY" -m pip show holidays >/dev/null 2>/dev/null; then
-         read -p "Do you want event dates in calendar popup? It just needs a python lib `holidays` to run [y/N]: " ask
+        if ! sudo -u "$SUDO_USER" "$PY" -m pip show holidays >/dev/null 2>/dev/null; then
+            read -p "Do you want event dates in calendar popup? It just needs a python lib $(holidays) to run [y/N]: " ask
 
-         if [[ "$ask" == "y" || "$ask" == "Y" ]]; then
-            if ! sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
-               read -p "Pip not exists in your system. install? [Y/n]: " pip_install
-               if [[ "$pip_install" != "n" && "$pip_install" != "N" ]]; then
-                  pacman -S --noconfirm python-pip
-               fi
+            if [[ "$ask" == "y" || "$ask" == "Y" ]]; then
+                if ! sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
+                    read -p "Pip not exists in your system. install? [Y/n]: " pip_install
+                    if [[ "$pip_install" != "n" && "$pip_install" != "N" ]]; then
+                        pacman -S --noconfirm python-pip
+                    fi
+                fi
+
+                if sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
+                    sudo -u "$SUDO_USER" "$PY" -m pip install holidays --break-system-packages 2>/dev/null ||
+                        warn "something wrong with pip, 'holidays' python lib fail to install."
+
+                    sudo -u "$SUDO_USER" "$PY" -c "import holidays" 2>/dev/null ||
+                        warn "holidays installed but failing to import. check the dependency manually."
+                fi
             fi
+        fi
 
-            if sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
-               sudo -u "$SUDO_USER" "$PY" -m pip install holidays --break-system-packages 2>/dev/null \
-                 || warn "something wrong with pip, 'holidays' python lib fail to install."
+        # install nusgmon based on version update
+        if [[ ! -d /tmp/nusgmon-build ]]; then
+            git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
+        fi
 
-               sudo -u "$SUDO_USER" "$PY" -c "import holidays" 2>/dev/null \
-                 || warn "holidays installed but failing to import. check the dependency manually."
-            fi
-         fi
-      fi
+        nusgmon_install=0
+        if bin_exists nusgmon; then
+            [[ $(nusgmon --version) != $(/tmp/nusgmon-build/./nusgmon --version) ]] && nusgmon_install=1
+        else
+            nusgmon_install=1
+        fi
 
-      # install nusgmon based on version update
-      if [[ ! -d /tmp/nusgmon-build ]]; then
-         git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
-      fi
-
-      nusgmon_install=0
-      if bin_exists nusgmon; then
-         [[ $(nusgmon --version) != $(/tmp/nusgmon-build/./nusgmon --version) ]] && nusgmon_install=1
-      else
-         nusgmon_install=1
-      fi
-
-      if (( nusgmon_install )); then
-          info "Installing nusgmon (to record your data usage) through git"
-          (cd /tmp/nusgmon-build && ./setup.sh)
-      else
-          info "nusgmon is already installed and up to date, skipping."
-      fi
-  fi
+        if ((nusgmon_install)); then
+            info "Installing nusgmon (to record your data usage) through git"
+            (cd /tmp/nusgmon-build && ./setup.sh)
+        else
+            info "nusgmon is already installed and up to date, skipping."
+        fi
+    fi
 fi
 
 bin_exists awww || die "Awww not installed."
@@ -79,24 +82,24 @@ bin_exists cmake || die "Cmake not installed."
 bin_exists blueman-manager || warn "Blueman not installed." # warn here because not everyone use bluetooth
 bin_exists pipewire || die "Pipewire not installed."
 bin_exists wl-copy || die "Wl-clipboard not installed."
-(bin_exists NetworkManagder || bin_exists diw) || die "Need a network manager: NetworkManager or iw (recommended is NetworkManager, for bar's extra vpn module)"
+(bin_exists NetworkManager || bin_exists diw) || die "Need a network manager: NetworkManager or iw (recommended is NetworkManager, for bar's extra vpn module)"
 bin_exists nmcli || warn "nmcli not installed. if you will use vpn module in bar, nmcli is needed."
 
 REAL_HOME=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
 
 if [[ -z "$REAL_HOME" ]]; then
-   warn "Your home directory not found."
-   while true; do
-     read -p "Enter your home directory manually: " REAL_HOME
-     if [[ -z "$REAL_HOME" ]]; then
-        continue
-     fi
-     if [[ ! -d "$REAL_HOME" ]]; then
-        warn "Directory not found."
-        continue
-     fi
-     break
-   done
+    warn "Your home directory not found."
+    while true; do
+        read -p "Enter your home directory manually: " REAL_HOME
+        if [[ -z "$REAL_HOME" ]]; then
+            continue
+        fi
+        if [[ ! -d "$REAL_HOME" ]]; then
+            warn "Directory not found."
+            continue
+        fi
+        break
+    done
 fi
 
 # make directories
@@ -124,13 +127,13 @@ if $needs_build; then
 
     info "Copying backend files"
     install -m 644 \
-       build/libIslandBackend.so \
-       build/libIslandBackendPlugin.so \
-       build/qmldir \
-       build/IslandBackend.qmltypes \
-         /usr/share/chillpill-shell/IslandBackend
+        build/libIslandBackend.so \
+        build/libIslandBackendPlugin.so \
+        build/qmldir \
+        build/IslandBackend.qmltypes \
+        /usr/share/chillpill-shell/IslandBackend
 
-    sha256sum $SRC_FILES > "$HASH_FILE"
+    sha256sum $SRC_FILES >"$HASH_FILE"
 else
     info "No backend source changes, skipping backend build"
 fi
@@ -168,14 +171,14 @@ info "Setting up config file"
 install -m 644 config.jsonc /usr/share/chillpill-shell/config.jsonc.example
 
 if [[ -f "$REAL_HOME/.config/chillpill-shell/config.jsonc" ]]; then
-   info "Updating your config file..."
-   if [[ -f config_update.py ]] && bin_exists python3; then
-      python3 config_update.py "$SUDO_USER" || warn "Config file update failed."
-   else
-      warn "config_update.py missing OR python not installed, skipping config update."
-   fi
+    info "Updating your config file..."
+    if [[ -f config_update.py ]] && bin_exists python3; then
+        python3 config_update.py "$SUDO_USER" || warn "Config file update failed."
+    else
+        warn "config_update.py missing OR python not installed, skipping config update."
+    fi
 else
-   install -m 644 config.jsonc "$REAL_HOME/.config/chillpill-shell/config.jsonc"
+    install -m 644 config.jsonc "$REAL_HOME/.config/chillpill-shell/config.jsonc"
 fi
 
 # place systemd file
