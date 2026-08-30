@@ -18,7 +18,7 @@ RowLayout {
   property var tetherDevice: Networking.devices.values.find(d => d.type === DeviceType.Wired && d.connected)
   readonly property bool tethered: tetherDevice !== undefined
 
-  readonly property real signal: active ? active.signalStrength : 0
+  readonly property real signal: active ? active.signalStrength * 100 : 0
 
   readonly property string icon: {
     if (root.tethered) return String.fromCodePoint(0xf287) // nf-fa-usb
@@ -29,7 +29,7 @@ RowLayout {
              : s >= 0.50 ? 3
              : s >= 0.25 ? 2
              : 1
-    return String.fromCodePoint(0xf091f + (tier + 1) * 3)
+    return String.fromCodePoint(0xf091f + (tier - 1) * 3)
   }
 
   Text {
