@@ -17,6 +17,15 @@ Row {
 
   Behavior on opacity { NumberAnimation { duration: 100 } }
 
+  // single hover source for the whole row, gaps included
+  // for eating hover-able gaps between modules which expands the bar
+  // width while hovering or sliding the cursor between bar's modules
+  HoverHandler {
+    id: rowHover
+    target: row
+    onHoveredChanged: box.hovered = hovered
+  }
+
   Repeater {
     model: Config.pillModules
     delegate: Item {
@@ -47,6 +56,7 @@ Row {
         }
       }
 
+      // per-module hover: ONLY drives tooltip targeting now, not bar width
       HoverHandler {
         id: hoverHandler
         cursorShape: modelData === "workspaces" ? Qt.PointingHandCursor : Qt.ArrowCursor
