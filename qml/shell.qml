@@ -498,12 +498,18 @@ ShellRoot {
           }
         }
 
-        Cliphist {
-          id: cliphistPanel
-          shown: box.cliphistOpen
+        Loader {
+          id: cliphistLoader
           anchors.fill: parent
-          onCloseRequested: box.cliphistOpen = false
-          onPreviewToggled: (active) => box.cliphistPreviewing = active
+          active: box.cliphistOpen
+          asynchronous: true
+
+          sourceComponent: Cliphist {
+            id: cliphistPanel
+            shown: box.cliphistOpen
+            onCloseRequested: box.cliphistOpen = false
+            onPreviewToggled: (active) => box.cliphistPreviewing = active
+          }
         }
       }
 

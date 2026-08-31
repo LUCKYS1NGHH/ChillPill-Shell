@@ -40,6 +40,10 @@ Item {
         selectedIndex = 0
     }
 
+    onImgFullPreviewChanged: {
+        if (!imgFullPreview) previewImage.source = ""
+    }
+
     function rebuildFilteredModel() {
         listModel.clear()
         let list = searchQuery.length === 0 ? allEntries : allEntries.filter(e => e.label.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -353,6 +357,7 @@ Item {
                             fillMode: Image.PreserveAspectFit
                             asynchronous: true
                             sourceSize: Qt.size(500, 500)
+                            cache: false
 
                             opacity: currentEntryId === root.collapsingId ? 0 : (status === Image.Ready ? 1 : 0)
                             scale: currentEntryId === root.collapsingId ? 0.8 : 1
@@ -429,6 +434,7 @@ Item {
             highlightFollowsCurrentItem: false
             highlightMoveDuration: 80
             visible: !imgFullPreview
+            cacheBuffer: 0
 
             removeDisplaced: Transition { NumberAnimation { properties: "y"; duration: 150; easing.type: Easing.OutCubic } }
 
@@ -454,6 +460,7 @@ Item {
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
                     sourceSize: Qt.size(80, 50)
+                    cache: false
                 }
 
                 // text label
