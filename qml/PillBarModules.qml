@@ -30,41 +30,42 @@ Row {
         anchors.fill: parent
         source: capitalize(modelData) + ".qml"
         onLoaded: {
-          if (modelData === "volume") box.volumeModule = item
-          if (modelData === "network") box.networkModule = item
-          if (modelData === "bluetooth") box.bluetoothModule = item
-          if (modelData === "clock") box.clockModule = item
-          if (modelData === "vpn") box.vpnModule = item
-        }
-        Connections {
-          target: modelData === "volume" ? moduleLoader.item : null
-          function onVolumeChanged() {
-            if (!box.controlCenter) box.activeOsd = "volume"
-            osdHideTimer.interval = Config.osdDuration
-            osdHideTimer.restart()
+          switch (modelData) {
+            case "volume":
+              box.volumeModule = item
+              item.volumeChanged.connect(function() {
+                if (!box.controlCenter) box.activeOsd = "volume"
+                osdHideTimer.interval = Config.osdDuration
+                osdHideTimer.restart()
+              })
+              break
+            case "network":   box.networkModule = item; break
+            case "bluetooth": box.bluetoothModule = item; break
+            case "clock":     box.clockModule = item; break
+            case "vpn":       box.vpnModule = item; break
           }
         }
       }
 
-      MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-        acceptedButtons: Qt.NoButton // purely for hover, doesn't eat clicks
+      HoverHandler {
+        id: hoverHandler
         cursorShape: modelData === "workspaces" ? Qt.PointingHandCursor : Qt.ArrowCursor
-        propagateComposedEvents: true
-        onEntered: {
-          box.tooltipModule = modelData
-          if (tooltipPopup.content === "") {
+        onHoveredChanged: {
+          if (hovered) {
+            box.tooltipModule = modelData
+            if (tooltipPopup.content === "") {
+              box.tooltipVisible = false
+              return
+            }
+            var xPos = wrapper.mapToGlobal(wrapper.width / 2, 0).x
+            var yPos = row.mapToGlobal(0, row.height).y
+            box.tooltipX = xPos
+            box.tooltipY = yPos
+            box.tooltipVisible = true
+          } else {
             box.tooltipVisible = false
-            return
           }
-          var xPos = wrapper.mapToGlobal(wrapper.width / 2, 0).x
-          var yPos = row.mapToGlobal(0, row.height).y
-          box.tooltipX = xPos
-          box.tooltipY = yPos
-          box.tooltipVisible = true
         }
-        onExited: box.tooltipVisible = false
       }
     }
   }
