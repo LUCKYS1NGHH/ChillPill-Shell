@@ -69,7 +69,7 @@ PanelWindow {
         if (e !== "") return e
         if (w === "") return "No weather info"
         const unit = Config.weatherUnits === "metric" ? "°C" : "°F"
-        return w + "• " + Math.round(t) + unit
+        return w + " • " + Math.round(t) + unit
              + (Math.round(f) !== Math.round(t) ? " (feels " + Math.round(f) + unit + ")" : "")
              + " • " + Config.weatherLocation
       }

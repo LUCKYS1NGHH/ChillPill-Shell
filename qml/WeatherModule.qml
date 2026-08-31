@@ -21,6 +21,8 @@ Singleton {
   property bool loading: false
   property string errorMessage: ""
   property var lastUpdated: new Date()
+  property bool hasData: false
+  property bool isStale: false
 
   function iconForCode(code) {
     const c = parseInt(code)
@@ -37,8 +39,6 @@ Singleton {
 
   function refresh() {
     root.loading = true
-    root.errorMessage = ""
-
     const url = "https://wttr.in/" + encodeURIComponent(Config.weatherLocation) + "?format=j1"
     const xhr = new XMLHttpRequest()
     xhr.onreadystatechange = () => {
@@ -46,6 +46,7 @@ Singleton {
       root.loading = false
       if (xhr.status !== 200) {
         root.errorMessage = "Weather fetch failed."
+        root.isStale = root.hasData
         return
       }
       try {
@@ -82,8 +83,12 @@ Singleton {
         })
 
         root.lastUpdated = new Date()
+        root.hasData = true
+        root.isStale = false
+        root.errorMessage = ""
       } catch (e) {
         root.errorMessage = "Weather parse failed"
+        root.isStale = root.hasData
       }
     }
     xhr.open("GET", url)
