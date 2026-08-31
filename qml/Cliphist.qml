@@ -109,7 +109,7 @@ Item {
     Timer {
         id: removeTimer
         property string entryId: ""
-        interval: 220  // matches the collapse animation on below
+        interval: 220
         repeat: false
         onTriggered: {
             let currentIdx = root.selectedIndex
@@ -129,6 +129,20 @@ Item {
             if (newLength === 0) root.selectedIndex = -1
             else if (currentIdx >= newLength) root.selectedIndex = newLength - 1
             else root.selectedIndex = currentIdx
+
+            // if in full preview, make sure landed index actually has an image
+            if (root.imgFullPreview && root.selectedIndex !== -1) {
+                let entry = listModel.get(root.selectedIndex)
+                if (!entry || !entry.imagePath) {
+                    let imgIdx = root.findAdjacentImageIndex(root.previewSlideDir)
+                    if (imgIdx !== -1) {
+                        root.selectedIndex = imgIdx
+                    } else {
+                        root.imgFullPreview = false
+                        root.previewToggled(false)
+                    }
+                }
+            }
 
             Qt.callLater(() => {
                 let maxY = Math.max(0, listView.contentHeight - listView.height)
