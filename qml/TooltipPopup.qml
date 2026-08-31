@@ -10,13 +10,15 @@ PanelWindow {
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
   color: "transparent"
 
+  readonly property real effectiveScale: Config.dpiScale * Config.pillScale
+
   anchors.top: true
   anchors.left: true
-  margins.top: box.tooltipY + Config.dpiScale * 18
+  margins.top: box.tooltipY + effectiveScale * 18
   margins.left: box.tooltipX - implicitWidth / 2
 
-  implicitWidth: label.implicitWidth + 16 * Config.dpiScale
-  implicitHeight: label.implicitHeight + 10 * Config.dpiScale
+  implicitWidth: label.implicitWidth + 16 * effectiveScale
+  implicitHeight: label.implicitHeight + 10 * effectiveScale
 
   function formatMinutes(seconds) {
     const mins = Math.round(seconds / 60)
@@ -107,7 +109,7 @@ PanelWindow {
 
   Rectangle {
     anchors.fill: parent
-    radius: 8 * Config.dpiScale
+    radius: 8 * effectiveScale
     color: Theme.bg1
     opacity: box.tooltipVisible ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 100 } }
@@ -117,7 +119,7 @@ PanelWindow {
       anchors.centerIn: parent
       text: tooltipWindow.content
       color: Theme.fg
-      font { family: Theme.fontFamily; pixelSize: 10 * Config.pillScale }
+      font { family: Theme.fontFamily; pixelSize: 10 * effectiveScale; }
     }
   }
 }

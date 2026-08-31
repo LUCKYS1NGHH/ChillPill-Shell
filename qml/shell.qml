@@ -153,6 +153,7 @@ ShellRoot {
       property bool controlCenter: false
       property bool cliphistOpen: false
       property bool wallpaperSwitcherOpen: false
+      property bool cliphistPreviewing: false
 
       property var battery: UPower.displayDevice
       property bool hasBattery: battery.isLaptopBattery && battery.isPresent
@@ -213,8 +214,6 @@ ShellRoot {
       // adjust box shape conditionally
       readonly property real dpi: Config.dpiScale
 
-      property bool cliphistPreviewing: false
-
       readonly property real baseWidth: activeOsd === "battery" ? osdWidth
                      : activeOsd === "timer" ? osdWidth
                      : activeOsd === "volume" ? osdWidth
@@ -227,7 +226,7 @@ ShellRoot {
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : cliphistOpen ? 460
                      : wallpaperSwitcherOpen ? 600
-                     : row.implicitWidth + (12 * Config.paddingScale) + (hovered ? 68 : 56) * Config.paddingScale
+                     : row.implicitWidth + (12 * Config.pillScale) + (hovered ? 68 : 56) * Config.pillScale
 
       readonly property real baseHeight: activeOsd === "battery" ? osdHeight
                   : activeOsd === "timer" ? osdHeight
@@ -362,7 +361,7 @@ ShellRoot {
       Row {
         id: row
         anchors.centerIn: parent
-        spacing: 13 * Config.paddingScale
+        spacing: 13 * Config.pillScale
         opacity: !box.cliphistOpen
                  && !notificationModule.active
                  && !mediaAutoOpened
