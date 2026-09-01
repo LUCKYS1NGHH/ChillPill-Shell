@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.7.0](https://img.shields.io/badge/CP--Shell-0.7.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.8.1](https://img.shields.io/badge/CP--Shell-0.8.1-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -25,7 +25,7 @@ into your session at all times. It's not bound to any dotfiles.
 [![Installation](https://img.shields.io/badge/Installation-252525?style=flat-square)](#install)
 [![Auto Startup](https://img.shields.io/badge/Auto%20Startup-252525?style=flat-square)](#auto-startup)
 [![Key Bindings](https://img.shields.io/badge/Key%20Bindings-252525?style=flat-square)](#key-bindings)
-[![Acknowledgements](https://img.shields.io/badge/Acknoledgements-252525?style=flat-square)](#contributors)
+[![Acknowledgements](https://img.shields.io/badge/Acknowledgements-252525?style=flat-square)](#contributors)
 
 </div>
 
@@ -248,8 +248,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Dependencies
 > [!NOTE]
-> Currently it's tested only on:
-> **Arch Linux** and **NixOS** + **Hyprland**.
+> Currently it's tested only on: **Arch Linux** and **NixOS** + **Hyprland**.
 > other setups unsupported for now.
 > Packages below are Arch's; find the equivalent for your distro.
 > common utilities like `brightnessctl` and `blueman` are likely already installed on most systems.
@@ -358,7 +357,7 @@ end)
 
 ## Key Bindings
 
-Keybindings are recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland (Lua) config file.
+Keybindings are highly recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland (Lua) config file.
 
 > Adjust key combinations by your preferences
 
@@ -370,7 +369,8 @@ hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call wallpaperSwitcher toggle"))
 ```
 
-NixOS version
+<details>
+<summary>NixOS version</summary>
 
 ```lua
 hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("chillpill-shell-ipc call controlCenter toggle"))
@@ -379,13 +379,14 @@ hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("chillpill-shell-ipc call min
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call appLauncher toggle"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSwitcher toggle"))
 ```
+</details>
 
 ---
 
 ### Contributors
 
 <a href="https://github.com/LUCKYS1NGHH/chillpill-shell/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="100" />
+  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="130" />
 </a>
 
 ### Thanks
