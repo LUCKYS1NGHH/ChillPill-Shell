@@ -169,10 +169,10 @@ install -m 644 config.jsonc /usr/share/chillpill-shell/config.jsonc.example
 
 if [[ -f "$REAL_HOME/.config/chillpill-shell/config.jsonc" ]]; then
    info "Updating your config file..."
-   if [[ -f config_update.py ]] && bin_exists python3; then
-      python3 config_update.py "$SUDO_USER" || warn "Config file update failed."
+   if [[ -f scripts/config_update.py ]] && bin_exists python3; then
+      python3 scripts/config_update.py "$SUDO_USER" || warn "Config file update failed."
    else
-      warn "config_update.py missing OR python not installed, skipping config update."
+      warn "scripts/config_update.py missing OR python not installed, skipping config update."
    fi
 else
    install -m 644 config.jsonc "$REAL_HOME/.config/chillpill-shell/config.jsonc"
