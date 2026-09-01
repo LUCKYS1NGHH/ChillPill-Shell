@@ -212,7 +212,7 @@ Item {
               Behavior on color { ColorAnimation { duration: 100 } }
 
               Text {
-                text: ""
+                text: "\uf00d"
                 color: dismissHover.containsMouse ? Theme.focusFg1 : Theme.fg7
                 anchors.centerIn: parent
                 font.pixelSize: 11

@@ -605,7 +605,7 @@ ShellRoot {
           anchors.topMargin: 32
           anchors.left: parent.left
           anchors.right: parent.right
-          notifMaxHeight: notifMaxHeight
+          notifMaxHeight: 98
           dpi: box.dpi
           controlCenterOpen: box.controlCenter
         }
