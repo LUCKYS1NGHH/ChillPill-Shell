@@ -19,11 +19,27 @@ if [[ ! "$EUID" -eq 0 ]]; then
     die "Please run this script as root to install chillpill-shell. i have to setup some things."
 fi
 
+needed_pkgs=(quickshell cliphist brightnessctl
+             wl-clipboard inotify-tools cmake
+             qt6-multimedia python-psutil awww
+             blueman pipewire
+)
+
+missing_pkgs=()
+
 if [[ "$1" != "--skip-deps" ]]; then
   if command -v pacman &>/dev/null; then
-      info "Installing dependencies in your Arch Linux."
-      pacman -S --noconfirm --needed quickshell cliphist brightnessctl wl-clipboard \
-             inotify-tools cmake qt6-multimedia python-psutil awww blueman pipewire
+
+      for pkg in "${needed_pkgs[@]}"; do
+          pacman -Qi "$pkg" &>/dev/null || missing_pkgs+=("$pkg")
+      done
+
+      if [[ ${#missing_pkgs[@]} -gt 0 ]]; then
+         info "Installing dependencies in your Arch Linux."
+         pacman -S --needed --noconfirm "${missing_pkgs[@]}"
+      else
+         info "All dependencies installed, skipping."
+      fi
 
       PY=/usr/bin/python3
 
