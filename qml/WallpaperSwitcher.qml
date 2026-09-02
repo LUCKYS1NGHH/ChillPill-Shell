@@ -95,7 +95,7 @@ Rectangle {
       wrapMode: Text.WordWrap
       color: Theme.warning
       text: "awww not found on $PATH\ninstall it to apply wallpapers\nor use your own customWallpaperScript"
-      font { family: Theme.fontFamily; pixelSize: 12 }
+      font { family: Theme.fontFamily; pixelSize: 11 }
     }
 
     // fallback: cws missing
@@ -107,7 +107,7 @@ Rectangle {
       wrapMode: Text.WordWrap
       color: Theme.warning
       text: "Custom wallpaper script not found\nMake sure '" + Config.customWallpaperScript.replace("{path}", "").trim() + "' exists"
-      font { family: Theme.fontFamily; pixelSize: 12 }
+      font { family: Theme.fontFamily; pixelSize: 11 }
     }
 
     // fallback: no wallpapers found
@@ -121,7 +121,7 @@ Rectangle {
       wrapMode: Text.WordWrap
       color: Theme.warning
       text: "No wallpapers found in\n" + Config.wallpapersDir
-      font { family: Theme.fontFamily; pixelSize: 12 }
+      font { family: Theme.fontFamily; pixelSize: 11 }
     }
 
     GridView {
@@ -137,10 +137,19 @@ Rectangle {
       focus: true
       keyNavigationEnabled: true
       keyNavigationWraps: true
-
+      cacheBuffer: 400
       Keys.onEscapePressed: wallpaperPopup.closeRequested()
       Keys.onReturnPressed: wallpaperPopup.activateCurrent()
       Keys.onEnterPressed: wallpaperPopup.activateCurrent()
+
+      Keys.onPressed: (event) => {
+        switch (event.key) {
+          case Qt.Key_W: wallGrid.moveCurrentIndexUp();    event.accepted = true; break
+          case Qt.Key_S: wallGrid.moveCurrentIndexDown();  event.accepted = true; break
+          case Qt.Key_A: wallGrid.moveCurrentIndexLeft();  event.accepted = true; break
+          case Qt.Key_D: wallGrid.moveCurrentIndexRight(); event.accepted = true; break
+        }
+      }
 
       delegate: Item {
         id: cell
@@ -156,7 +165,7 @@ Rectangle {
         property real totalRows: Math.ceil(wallGrid.count / columns)
         property real centerRow: (totalRows - 1) / 2
         property real centerCol: (columns - 1) / 2
-        property real distFromCenter: Math.sqrt(Math.pow(rowIdx - centerRow, 2) + Math.pow(colIdx - centerCol, 2))
+        property real distFromCenter: Math.sqrt((rowIdx - centerRow) * (rowIdx - centerRow) + (colIdx - centerCol) * (colIdx - centerCol))
 
         opacity: 0
         scale: 0.4

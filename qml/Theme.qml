@@ -57,7 +57,7 @@ Singleton {
     property string fontFamily: Config.textFontFamily
     property string nerdFontFamily: Config.nerdFontFamily
 
-    property string warning: "#f9cb41"
+    property string warning: "#fac94a"
     property string deleting: "#e32626"
 
     property string accent: "#979797"
