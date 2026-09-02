@@ -21,6 +21,7 @@
   "pillScale": 1.0,
   "dpiScale": 1.0,
   "wallpapersDir": "~/Pictures/wallpapers",
+  "customWallpaperScript": "",
   "wsCloseOnWallpaperSet": true,
   "wsAnimation": true,
   "deleteCliphistImgCache": true,

@@ -21,8 +21,7 @@ fi
 
 needed_pkgs=(quickshell cliphist brightnessctl
              wl-clipboard inotify-tools cmake
-             qt6-multimedia python-psutil awww
-             blueman pipewire
+             qt6-multimedia python-psutil blueman pipewire
 )
 
 missing_pkgs=()
@@ -85,7 +84,7 @@ if [[ "$1" != "--skip-deps" ]]; then
   fi
 fi
 
-bin_exists awww || die "Awww not installed."
+bin_exists awww || warn "Awww not installed. it will be needed if you don't use custom wallpaper script."
 bin_exists quickshell || die "Quickshell not installed."
 bin_exists cliphist || die "Cliphist not installed."
 bin_exists nusgmon || die "Nusgmon not installed."

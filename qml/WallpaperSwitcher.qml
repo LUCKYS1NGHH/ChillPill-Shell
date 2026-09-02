@@ -10,6 +10,7 @@ Rectangle {
   property bool shown: false
   property string selectedWallpaper: ""
   property bool awwwMissing: false
+  property bool cwsMissing: false
   anchors.fill: parent
 
   onShownChanged: {
@@ -28,7 +29,16 @@ Rectangle {
 
   function applyWallpaper(path) {
     wallpaperPopup.selectedWallpaper = "file://" + path
-    Quickshell.execDetached(["awww", "img", "--transition-type", "random", path])
+    if (Config.customWallpaperScript.trim() === "") {
+      Quickshell.execDetached(["awww", "img", "--transition-type", "random", path])
+    }
+    else {
+      let script = Config.customWallpaperScript
+      let cmd = script.includes("{path}")
+          ? script.replace("{path}", "").trim()
+          : script + " \"$1\"" // fallback for old-style configs without the placeholder
+      Quickshell.execDetached(["sh", "-c", cmd, "_", path])
+    }
   }
 
   function activateCurrent() {
@@ -37,12 +47,22 @@ Rectangle {
     if (Config.wsCloseOnWallpaperSet) closeRequested()
   }
 
-  // check once whether awww exists on PATH
+  // check once whether awww exists on PATH, only if customWallpaperScript is empty string
   Process {
     id: awwwCheck
     command: ["sh", "-c", "command -v awww"]
     running: true
-    onExited: (code) => { wallpaperPopup.awwwMissing = (code !== 0) }
+    onExited: (code) => { wallpaperPopup.awwwMissing = (code !== 0 && Config.customWallpaperScript === "") }
+  }
+
+  Process {
+    id: cwsCheck
+    property string resolvedPath: Config.customWallpaperScript
+        .replace("{path}", "").trim()
+        .replace(/^~/, Quickshell.env("HOME") || "")
+    command: ["test", "-f", resolvedPath]
+    running: Config.customWallpaperScript.trim() !== ""
+    onExited: (code) => { wallpaperPopup.cwsMissing = Config.customWallpaperScript.trim() !== "" && code !== 0 }
   }
 
   FolderListModel {
@@ -74,13 +94,25 @@ Rectangle {
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.WordWrap
       color: Theme.warning
-      text: "awww not found on $PATH\ninstall it to apply wallpapers"
+      text: "awww not found on $PATH\ninstall it to apply wallpapers\nor use your own customWallpaperScript"
+      font { family: Theme.fontFamily; pixelSize: 12 }
+    }
+
+    // fallback: cws missing
+    Text {
+      visible: wallpaperPopup.cwsMissing
+      Layout.alignment: Qt.AlignHCenter
+      Layout.fillWidth: true
+      horizontalAlignment: Text.AlignHCenter
+      wrapMode: Text.WordWrap
+      color: Theme.warning
+      text: "Custom wallpaper script not found\nMake sure '" + Config.customWallpaperScript.replace("{path}", "").trim() + "' exists"
       font { family: Theme.fontFamily; pixelSize: 12 }
     }
 
     // fallback: no wallpapers found
     Text {
-      visible: !wallpaperPopup.awwwMissing
+      visible: (!wallpaperPopup.awwwMissing && !wallpaperPopup.cwsMissing)
                 && wallpaperModel.status === FolderListModel.Ready
                 && wallpaperModel.count === 0
       Layout.alignment: Qt.AlignHCenter
@@ -94,7 +126,7 @@ Rectangle {
 
     GridView {
       id: wallGrid
-      visible: !wallpaperPopup.awwwMissing && wallpaperModel.count > 0
+      visible: (!wallpaperPopup.awwwMissing && !wallpaperPopup.cwsMissing) && wallpaperModel.count > 0
       Layout.fillWidth: true
       Layout.fillHeight: true
       cellWidth: width / 3

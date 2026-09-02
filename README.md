@@ -168,7 +168,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - Your today's data usage in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
 
-- Wallpaper switcher shows you the filename of the image on hover. uses `awww` in backend to update the wallpaper.
+- Wallpaper switcher shows you the filename of the image on hover. uses `awww` in backend to update the wallpaper by default (optional dep).
 ---
 </details>
 
@@ -206,6 +206,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `country` | Country for calendar events. accepts country name (India) or ISO 3166-1 alpha-2 (IN) but recommended is country code | `IN` |
 | `showAudioVisuals` | Show audio visuals in media player (depends on cava) | `true` |
 | `showSensitiveInfo` | Show sensitive VPN info in tooltip (IP, server, region, uptime) | `true` |
+| `customWallpaperScript` | Use your own wallpaper script with {path} placeholder | `""` |
 
 <details>
 <summary>Raw config example</summary>
@@ -237,6 +238,7 @@ into your session at all times. It's not bound to any dotfiles.
   "wallpapersDir": "~/Pictures/wallpapers",
   "wsCloseOnWallpaperSet": true,
   "wsAnimation": true,
+  "customWallpaperScript": "",
   "deleteCliphistImgCache": true,
   "country": "IN",
   "showAudioVisuals": true,
@@ -260,7 +262,6 @@ into your session at all times. It's not bound to any dotfiles.
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
 - [pipewire](https://github.com/PipeWire/pipewire)
 - [blueman](https://github.com/blueman-project/blueman)
-- [awww](https://codeberg.org/LGFae/awww)
 - Qt Multimedia (`qt6-multimedia` on Arch)
 
 > [!TIP]
@@ -271,6 +272,7 @@ into your session at all times. It's not bound to any dotfiles.
 - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
 - `holidays` (Python lib) event dates in calendar; `install.sh` prompts to install this one
 - `cava` for showing audio visuals in media player
+- `awww` for wallpaper switcher if you don't use custom wallpaper script
 
 ## Install
 
