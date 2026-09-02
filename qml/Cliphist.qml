@@ -60,9 +60,9 @@ Item {
     function copySelected() {
         if (listModel.count === 0) return
         let entry = listModel.get(selectedIndex)
+        console.log("cliphist entry id:", entry.id)
         copyProc.command = ["sh", "-c", "cliphist decode " + entry.id + " | wl-copy"]
-        copyProc.running = false
-        copyProc.running = true
+        copyProc.startDetached()
         root.closeRequested()
     }
 
