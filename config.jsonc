@@ -3,6 +3,8 @@
   "clockFormat": "hh:mm",
   "pillTopMargin": 9,
   "pillBottomMargin": 26,
+  "pillModules": ["battery", "volume", "workspaces", "network", "clock"],
+  "pillOnHover": false,
   "textFontFamily": "Monocraft",
   "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
   "timerPresets": [1, 5, 10, 15, 30],
@@ -27,6 +29,5 @@
   "deleteCliphistImgCache": true,
   "country": "IN",
   "showAudioVisuals": true,
-  "showSensitiveInfo": true,
-  "pillModules": ["battery", "volume", "workspaces", "network", "clock"]
+  "showSensitiveInfo": true
 }

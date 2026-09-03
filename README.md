@@ -183,6 +183,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `pillBottomMargin` | Bottom spacing of pill bar | `26` |
 | `pillScale` | Scale factor for pill bar size | `1.0` |
 | `pillModules` | Pill bar modules order/add/remove | `["battery", "volume", "workspaces", "network", "clock"]` |
+| `pillOnHover` | Auto hide the pill bar and only show on hover | `false` |
 | `dpiScale` | DPI Scaling | `1.0` |
 | `textFontFamily` | Font family for general text | `Monocraft` |
 | `nerdFontFamily` | Font family for icons (Nerd Fonts) | `JetBrainsMono Nerd Font Propo` |
@@ -218,6 +219,7 @@ into your session at all times. It's not bound to any dotfiles.
   "pillTopMargin": 9,
   "pillBottomMargin": 26,
   "pillModules": ["battery", "volume", "workspaces", "network", "clock"],
+  "pillOnHover": false,
   "textFontFamily": "Monocraft",
   "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
   "timerPresets": [1, 5, 10, 15, 30],

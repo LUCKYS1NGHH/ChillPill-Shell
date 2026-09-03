@@ -43,6 +43,7 @@ Singleton {
       property bool showSensitiveInfo: true
       property list<string> pillModules: ["battery", "volume", "workspaces", "network", "clock"]
       property string customWallpaperScript: ""
+      property bool pillOnHover: false
     }
   }
 
@@ -76,4 +77,5 @@ Singleton {
   readonly property alias showSensitiveInfo: adapter.showSensitiveInfo
   readonly property alias pillModules: adapter.pillModules
   readonly property alias customWallpaperScript: adapter.customWallpaperScript
+  readonly property alias pillOnHover: adapter.pillOnHover
 }

@@ -12,6 +12,9 @@ Item {
     opacity: active ? 1 : 0
     visible: opacity > 0
     Behavior on opacity { NumberAnimation { duration: 180 } }
+    scale: active ? 1 : 0.96
+    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    transformOrigin: Item.Center
 
     property real mprisProgress: 0
     property string mprisTimePlayed: "0:00"

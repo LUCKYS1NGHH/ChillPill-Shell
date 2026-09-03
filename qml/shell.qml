@@ -51,6 +51,8 @@ ShellRoot {
       return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
+  property bool pillHoverActive: false
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
@@ -100,9 +102,9 @@ ShellRoot {
       right: true
     }
 
-    // fixed gap of the active window for the top bar
-    margins.top: Config.pillTopMargin
-    exclusiveZone: Config.pillBottomMargin
+    // reserve top space only while the pill is shown
+    margins.top: box.revealed ? Config.pillTopMargin : 0
+    exclusiveZone: box.revealed ? Config.pillBottomMargin : 0
     color: "transparent"
 
     // Mask input to only the capsule
@@ -111,6 +113,13 @@ ShellRoot {
         intersection: Intersection.Combine
         x: Math.floor(box.x - box.width * (box.dpi - 1) / 2); y: Math.floor(box.y)
         width: Math.ceil(box.width * box.dpi); height: Math.ceil(box.height * box.dpi)
+      }
+      // top band to catch the cursor while the pill is hidden in pillOnHover
+      Region {
+        intersection: Intersection.Combine
+        x: 0; y: 0
+        width: (Config.pillOnHover && !box.revealed) ? Math.ceil(panelWindow.width) : 0
+        height: (Config.pillOnHover && !box.revealed) ? Math.ceil(hoverRevealAreaItem.height) : 0
       }
       Region {
         intersection: Intersection.Combine
@@ -127,12 +136,55 @@ ShellRoot {
       }
     }
 
+    // reveal the pill when hovering the top edge in pillOnHover mode.
+    // the band leaves the input mask once the pill is shown, so it cannot
+    // stay stuck under the pill and block auto-hide
+    Item {
+      id: hoverRevealAreaItem
+      anchors {
+        top: parent.top
+        topMargin: -Math.round(Config.pillTopMargin)
+        left: parent.left
+        right: parent.right
+      }
+      height: Math.max(box.implicitHeight + Config.pillTopMargin + 8, 48)
+
+      HoverHandler {
+        id: revealHover
+        onHoveredChanged: {
+          if (hovered) { shellRoot.pillHoverActive = true; hidePillTimer.stop() }
+          else if (!pillHover.hovered) hidePillTimer.start()
+        }
+      }
+    }
+
+    Timer {
+      id: hidePillTimer
+      interval: 250
+      onTriggered: shellRoot.pillHoverActive = false
+    }
+
     // main dynamic pill bar
     Rectangle {
       id: box
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
-      opacity: (!fullscreenActive && !notifFullscreenMode) ? 1 : 0
+      readonly property bool revealed: !Config.pillOnHover
+        || shellRoot.pillHoverActive
+        || controlCenter
+        || miniDashboard
+        || cliphistOpen
+        || appLauncher
+        || wallpaperSwitcherOpen
+        || mediaAutoOpened
+        || (notificationModule.active && !notifFullscreenMode)
+        || (activeOsd !== "")
+      opacity: revealed && (!fullscreenActive && !notifFullscreenMode) ? 1 : 0
+
+      Behavior on opacity {
+        NumberAnimation { duration: 220; easing.type: Easing.OutExpo }
+      }
+
       visible: opacity > 0
       clip: true
 
@@ -226,7 +278,7 @@ ShellRoot {
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : cliphistOpen ? 460
                      : wallpaperSwitcherOpen ? 600
-                     : row.implicitWidth + (12 * Config.pillScale) + (hovered ? 68 : 56) * Config.pillScale
+                     : row.implicitWidth + (12 * Config.pillScale) + (Config.pillOnHover || !hovered ? 56 : 68) * Config.pillScale
 
       readonly property real baseHeight: activeOsd === "battery" ? osdHeight
                   : activeOsd === "timer" ? osdHeight
@@ -344,6 +396,16 @@ ShellRoot {
               box.wallpaperSwitcherOpen = false
               box.miniDashboard = !box.miniDashboard
           }
+        }
+      }
+
+      // keeps the pill shown while hovered and hides it when the cursor leaves
+      HoverHandler {
+        id: pillHover
+        target: box
+        onHoveredChanged: {
+          if (hovered) { shellRoot.pillHoverActive = true; hidePillTimer.stop() }
+          else if (!revealHover.hovered) hidePillTimer.start()
         }
       }
 

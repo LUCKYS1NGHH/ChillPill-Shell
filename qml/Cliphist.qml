@@ -22,6 +22,9 @@ Item {
     visible: shown
     opacity: shown ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 180 } }
+    scale: shown ? 1 : 0.96
+    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    transformOrigin: Item.Center
 
     ListModel { id: listModel }
 

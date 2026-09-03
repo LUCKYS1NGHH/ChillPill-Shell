@@ -25,6 +25,9 @@ Rectangle {
   visible: opacity > 0
   opacity: shown ? 1 : 0
   Behavior on opacity { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
+  scale: shown ? 1 : 0.96
+  Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+  transformOrigin: Item.Center
   signal closeRequested()
 
   function applyWallpaper(path) {
