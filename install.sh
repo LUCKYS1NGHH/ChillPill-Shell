@@ -43,7 +43,7 @@ if [[ "$1" != "--skip-deps" ]]; then
       PY=/usr/bin/python3
 
       if ! sudo -u "$SUDO_USER" "$PY" -m pip show holidays >/dev/null 2>/dev/null; then
-         read -p "Do you want event dates in calendar popup? It just needs a python lib `holidays` to run [y/N]: " ask
+         read -p "Do you want event dates in calendar popup? It just needs a python lib 'holidays' to run [y/N]: " ask
 
          if [[ "$ask" == "y" || "$ask" == "Y" ]]; then
             if ! sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
