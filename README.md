@@ -49,6 +49,8 @@ into your session at all times. It's not bound to any dotfiles.
 
 ### Showcase
 
+[Watch the demo on YouTube](https://www.youtube.com/watch?v=t7ydMT4F478)
+
 <table>
   <tr>
     <td width="50%">
@@ -143,7 +145,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - DPI and Pill scaling is available in the config if you need it.
 
-- Audio (to mute/unmute) and workspaces (to switch) in the main pill are clickable.
+- Audio, workspaces, bluetooth and wifi in pill bar are clickable.
 
 - Control center's media player progress bar is not only for status, it's usable to control the media you playing. also timer minutes can be change by right click.
 
@@ -387,15 +389,14 @@ hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSw
 
 ---
 
+
 ### Contributors
 
+Thanks to the contributors who helped make the shell better, and special thanks to [enhaoswen](https://github.com/enhaoswen) for the Wi-Fi controller backend for Quickshell.
+
 <a href="https://github.com/LUCKYS1NGHH/chillpill-shell/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="130" />
+  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="150" />
 </a>
-
-### Thanks
-
-Special thanks to [enhaoswen](https://github.com/enhaoswen) for the Wi-Fi controller backend for Quickshell.
 
 ### Author
 

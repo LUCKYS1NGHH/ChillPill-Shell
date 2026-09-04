@@ -55,11 +55,31 @@ Row {
           }
         }
       }
-
-      // per-module hover: ONLY drives tooltip targeting now, not bar width
+      TapHandler {
+        acceptedButtons: Qt.LeftButton
+        enabled: modelData === "volume" || modelData === "network" || modelData === "bluetooth"
+        onTapped: {
+          switch (modelData) {
+            case "volume":
+              if (moduleLoader.item && moduleLoader.item.toggleMute)
+                moduleLoader.item.toggleMute()
+              break
+            case "network":
+              if (moduleLoader.item && moduleLoader.item.toggleWifi)
+                moduleLoader.item.toggleWifi()
+              break
+            case "bluetooth":
+              if (moduleLoader.item && moduleLoader.item.toggleBluetooth)
+                moduleLoader.item.toggleBluetooth()
+              break
+          }
+        }
+      }
       HoverHandler {
         id: hoverHandler
-        cursorShape: modelData === "workspaces" ? Qt.PointingHandCursor : Qt.ArrowCursor
+        cursorShape: (modelData === "workspaces" || modelData === "volume"
+                      || modelData === "network" || modelData === "bluetooth")
+                     ? Qt.PointingHandCursor : Qt.ArrowCursor
         onHoveredChanged: {
           if (hovered) {
             box.tooltipModule = modelData

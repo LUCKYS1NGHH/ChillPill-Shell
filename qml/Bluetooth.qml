@@ -30,6 +30,10 @@ RowLayout {
         root.connectedSignal = 0
     }
 
+    function toggleBluetooth() {
+      BluetoothController.setEnabled(!BluetoothController.enabled)
+    }
+
     Repeater {
         id: connFinder
         model: BluetoothController.enabled ? BluetoothController.devices : null

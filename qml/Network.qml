@@ -32,6 +32,10 @@ RowLayout {
     return String.fromCodePoint(0xf091f + (tier - 1) * 3)
   }
 
+  function toggleWifi() {
+    Networking.wifiEnabled = !Networking.wifiEnabled
+  }
+
   Text {
     text: root.icon
     color: root.tethered ? root.iconFg : (Networking.wifiEnabled ? iconFg : disconIconFg)
