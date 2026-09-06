@@ -102,6 +102,12 @@ PanelWindow {
         }
         return s
       }
+      case "notifications": {
+        const m = notificationModule
+        if (!m || m.notifications.length === 0) return "No Notifications"
+        var recent = m.notifications[m.notifications.length - 1]
+        return "Notifications " + m.notifications.length + " (recent by " + recent.summary + " at " + Qt.formatTime(recent.receivedTime, Config.clockFormat) + ")"
+      }
       default:
         return ""
     }
