@@ -27,6 +27,13 @@ PanelWindow {
     return h > 0 ? h + "h " + m + "m" : m + "m"
   }
 
+  // time-to-full/time-to-empty are meaningless when plugged in and the charge
+  // controller has stopped charging (e.g. battery protection at 80%): at ~0W
+  // the estimate jumps to thousands of hours.
+  function isUsableEstimate(sec) {
+    return sec > 0 && sec <= 24 * 3600
+  }
+
   readonly property var tooltipExcluded: ["workspaces"]
 
   property int refreshTick: 0
@@ -44,11 +51,14 @@ PanelWindow {
     switch (box.tooltipModule) {
       case "battery": {
         if (!box.hasBattery) return "No battery • Plugged in"
-        if (box.charging && box.battery.timeToFull > 0)
+        // discriminate by device state instead of UPower.onBattery, which is
+        // unreliable on some laptops; UPower zeroes out the metric that doesn't
+        // apply (timeToFull=0 when discharging, timeToEmpty=0 when charging).
+        if (box.charging && isUsableEstimate(box.battery.timeToFull))
           return "Charging • " + box.batteryLevel + "% • " + formatMinutes(box.battery.timeToFull) + " until full"
-        if (!box.charging && box.battery.timeToEmpty > 0)
+        if (!box.charging && isUsableEstimate(box.battery.timeToEmpty))
           return box.batteryLevel + "% • " + formatMinutes(box.battery.timeToEmpty) + " remaining"
-        return box.batteryLevel + "%"
+        return box.batteryLevel + "% • Plugged in"
       }
       case "volume": {
         const m = box.volumeModule
