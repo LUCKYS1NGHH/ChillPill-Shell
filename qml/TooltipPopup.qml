@@ -107,7 +107,7 @@ PanelWindow {
         let s = "Connected"
         if (m.formattedUptime()) s += " • " + m.formattedUptime()
         if (Config.showSensitiveInfo) {
-          if (m.country) s += "\nRegion: " + m.region
+          if (m.region !== "") s += "\nRegion: " + m.region
           if (m.publicIp) s += "\nIP: " + m.publicIp
         }
         return s

@@ -229,7 +229,7 @@ Item {
           visible: !imgFullPreview
 
           Text {
-              text: "Clipboard History"
+              text: "Clipboard Manager"
               color: Theme.fg2
               font { family: Theme.fontFamily; pixelSize: 11; weight: 700 }
               Layout.alignment: Qt.AlignLeft

@@ -86,7 +86,7 @@ RowLayout {
     interval: 2200
     running: true
     onTriggered: {
-      if (root.connected && root.country.length === 0 && !ipInfoCheck.running) {
+      if (root.connected && root.country.length === 0 && !ipInfoCheck.running && Config.showSensitiveInfo) {
         console.log("startupRetry: connected but country empty refetching")
         root.fetchIpInfo()
       }
@@ -118,6 +118,14 @@ RowLayout {
       ipRetry.stop()
       routeCheck.running = false
       ipInfoCheck.running = false
+    }
+  }
+
+  // if sensitive info gets re-enabled while connected, populate it without a reconnect
+  Connections {
+    target: Config
+    function onShowSensitiveInfoChanged() {
+      if (Config.showSensitiveInfo && root.vpnName.length > 0) root.fetchIpInfo()
     }
   }
 
@@ -205,6 +213,11 @@ RowLayout {
   function fetchIpInfo() {
     console.log("fetchIpInfo attempt", ipFetchAttempts, "vpn:", vpnName)
     if (root.vpnName.length === 0) return
+    // privacy gate: never hit ipinfo when sensitive info is hidden
+    if (!Config.showSensitiveInfo) {
+      console.log("fetchIpInfo: showSensitiveInfo off, skipping ip fetch")
+      return
+    }
     // verify routing first if check is already running its completion will trigger curl
     if (routeCheck.running) {
       console.log("fetchIpInfo: routeCheck already running will retry after")
