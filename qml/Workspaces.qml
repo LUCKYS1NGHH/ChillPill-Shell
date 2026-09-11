@@ -8,7 +8,8 @@ RowLayout {
   spacing: 4 * Config.paddingScale
  
   Repeater {
-    model: Config.maxWorkspaces // max workspace buttons/texts to show
+    // Show workspaces dynamically, ignore maxWorkspaces if active workspaces are more than maxWorkspaces 
+    model: Math.max(Config.maxWorkspaces, Hyprland.workspaces.values.reduce((max, w) => Math.max(max, w.id), 0))
 
     delegate: Rectangle {
       id: wsButton
