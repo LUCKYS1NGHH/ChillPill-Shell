@@ -21,7 +21,11 @@ Rectangle {
 
   onShownChanged: if (shown) holidayLoader.ensureLoaded()
 
-  property string cachePath: `${Quickshell.env("HOME")}/.cache/chillpill-shell/events_${Config.country}_${datetimeItem.viewYear}.json`
+  property bool holidaysEnabled: Config.country.trim() !== "" && Config.country.toLowerCase() !== "none"
+  property bool fetchFailed: false
+  property string cachePath: holidaysEnabled
+    ? `${Quickshell.env("HOME")}/.cache/chillpill-shell/events_${Config.country}_${datetimeItem.viewYear}.json`
+    : ""
 
   FileView {
     id: holidaysFile
@@ -31,7 +35,11 @@ Rectangle {
       try { holidays = JSON.parse(text()) }
       catch (e) { holidays = {} }
     }
-    onLoadFailed: holidayFetcher.running = true
+    onLoadFailed: {
+      if (calendarPopup.holidaysEnabled && !calendarPopup.fetchFailed) {
+        holidayFetcher.running = true
+      }
+    }
   }
 
   Process {
@@ -42,18 +50,30 @@ Rectangle {
       datetimeItem.viewYear.toString(),
       calendarPopup.cachePath
     ]
-    onExited: holidaysFile.reload()
+    onExited: (code) => {
+      if (code === 0) {
+        calendarPopup.fetchFailed = false
+        holidaysFile.reload()
+      } else {
+        calendarPopup.fetchFailed = true
+      }
+    }
   }
 
   QtObject {
     id: holidayLoader
     function ensureLoaded() {
-      holidaysFile.reload()
+      if (calendarPopup.holidaysEnabled && !calendarPopup.fetchFailed) {
+        holidaysFile.reload()
+      }
     }
   }
 
   // re-fetch whenever the visible year changes and cache isn't there yet
-  onCachePathChanged: if (shown) holidaysFile.reload()
+  onCachePathChanged: {
+    calendarPopup.fetchFailed = false
+    if (shown && holidaysEnabled) holidaysFile.reload()
+  }
 
   RowLayout {
     id: calHeader
