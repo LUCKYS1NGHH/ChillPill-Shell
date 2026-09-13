@@ -199,6 +199,7 @@ fi
 
 # chown back the files permission to real user
 chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.config/chillpill-shell"
+chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.cache/chillpill-shell"
 
 # cleaning build files
 info "Cleaning up build files"
