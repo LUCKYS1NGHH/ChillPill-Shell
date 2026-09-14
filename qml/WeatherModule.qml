@@ -23,6 +23,7 @@ Singleton {
   property var lastUpdated: new Date()
   property bool hasData: false
   property bool isStale: false
+  property bool isError: errorMessage.length > 0 && !isStale
 
   function iconForCode(code) {
     const c = parseInt(code)

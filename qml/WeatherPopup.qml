@@ -89,10 +89,10 @@ Rectangle {
         Layout.fillWidth: true
         Text {
           text: WeatherModule.loading ? "..."
-              : WeatherModule.errorMessage.length > 0 ? "—"
+              : WeatherModule.isError ? "!"
               : Math.round(WeatherModule.temp) + "°" + (Config.weatherUnits === "metric" ? "C" : "F")
-          color: "#ecebeb"
-          font.family: Theme.fontFamily
+          color: WeatherModule.isError ? Theme.warning : "#ecebeb"
+          font.family: WeatherModule.isError ? Config.nerdFontFamily : Theme.fontFamily
           font.pixelSize: 25 * box.dpi
           font.weight: 500
         }
