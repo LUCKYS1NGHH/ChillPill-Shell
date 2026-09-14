@@ -38,7 +38,7 @@ Rectangle {
     else {
       let script = Config.customWallpaperScript
       let cmd = script.includes("{path}")
-          ? script.replace("{path}", "").trim()
+          ? script.replace(/["']?\{path\}["']?/g, "\"$1\"")
           : script + " \"$1\"" // fallback for old-style configs without the placeholder
       Quickshell.execDetached(["sh", "-c", cmd, "_", path])
     }
@@ -60,12 +60,24 @@ Rectangle {
 
   Process {
     id: cwsCheck
-    property string resolvedPath: Config.customWallpaperScript
-        .replace("{path}", "").trim()
-        .replace(/^~/, Quickshell.env("HOME") || "")
-    command: ["test", "-f", resolvedPath]
-    running: Config.customWallpaperScript.trim() !== ""
-    onExited: (code) => { wallpaperPopup.cwsMissing = Config.customWallpaperScript.trim() !== "" && code !== 0 }
+    property string targetBin: {
+      let trimmed = Config.customWallpaperScript.trim()
+      let match = trimmed.match(/^"([^"]+)"|^'([^']+)'|^(\S+)/)
+      let bin = match ? (match[1] || match[2] || match[3] || "") : ""
+      return bin.replace(/^~/, Quickshell.env("HOME") || "")
+    }
+    command: ["sh", "-c", "command -v \"$1\" >/dev/null 2>&1 || test -f \"$1\"", "_", targetBin]
+    running: targetBin !== ""
+    onExited: (code) => { wallpaperPopup.cwsMissing = (targetBin !== "" && code !== 0) }
+
+    onTargetBinChanged: {
+      if (targetBin === "") {
+        wallpaperPopup.cwsMissing = false
+      } else {
+        running = false
+        running = true
+      }
+    }
   }
 
   FolderListModel {
@@ -109,7 +121,7 @@ Rectangle {
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.WordWrap
       color: Theme.warning
-      text: "Custom wallpaper script not found\nMake sure '" + Config.customWallpaperScript.replace("{path}", "").trim() + "' exists"
+      text: "Custom wallpaper script/command not found\nMake sure '" + (cwsCheck.targetBin || Config.customWallpaperScript.trim()) + "' exists"
       font { family: Theme.fontFamily; pixelSize: 11 }
     }
 
