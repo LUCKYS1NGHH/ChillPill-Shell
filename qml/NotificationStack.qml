@@ -150,7 +150,7 @@ Item {
           width: 22
           height: 22
           fillMode: Image.PreserveAspectFit
-          asynchronous: true
+          asynchronous: false
           source: {
             if (modelData.image) return modelData.image
             if (modelData.appIcon) {
