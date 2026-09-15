@@ -14,37 +14,44 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.appLauncher = false; box.wallpaperSwitcherOpen = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true; }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+      function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true; box.powerMenu = false; }
       function hide(): void { box.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
-      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false }
-      function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; }
+      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+      function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.powerMenu = false; }
       function hide(): void { box.controlCenter = false }
   }
 
   IpcHandler {
       target: "miniDashboard"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false; box.wallpaperSwitcherOpen = false }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+      function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; }
       function hide(): void { box.miniDashboard = false }
   }
 
   IpcHandler {
     target: "appLauncher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = !box.appLauncher; box.wallpaperSwitcherOpen = false}
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = true; }
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = !box.appLauncher; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = true; box.powerMenu = false; }
     function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "wallpaperSwitcher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = true }
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen; box.powerMenu = false }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = true; box.powerMenu = false; }
     function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
+  }
+
+  IpcHandler {
+    target: "powerMenu"
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = !box.powerMenu; if (!box.powerMenu) box.powerMenuInitialAction = "" }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = true }
+    function hide(): void { box.powerMenu = false; box.powerMenuInitialAction = "" }
   }
 
   function capitalize(str) {
@@ -91,7 +98,7 @@ ShellRoot {
   PanelWindow {
     id: panelWindow
     WlrLayershell.layer: WlrLayershell.Top
-    WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher || box.wallpaperSwitcherOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher || box.wallpaperSwitcherOpen || box.powerMenu) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     implicitHeight: Math.max(885 * scale, calendarPopup.visible ? calendarPopup.y + calendarPopup.height : 0)
     onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
     property real scale: screen ? screen.devicePixelRatio : 1.0
@@ -176,6 +183,7 @@ ShellRoot {
         || cliphistOpen
         || appLauncher
         || wallpaperSwitcherOpen
+        || powerMenu
         || mediaAutoOpened
         || (notificationModule.active && !notifFullscreenMode)
         || (activeOsd !== "")
@@ -206,6 +214,8 @@ ShellRoot {
       property bool cliphistOpen: false
       property bool wallpaperSwitcherOpen: false
       property bool cliphistPreviewing: false
+      property bool powerMenu: false
+      property string powerMenuInitialAction: ""
 
       property var battery: UPower.displayDevice
       property bool hasBattery: battery.isLaptopBattery && battery.isPresent
@@ -271,6 +281,7 @@ ShellRoot {
                      : activeOsd === "volume" ? osdWidth
                      : activeOsd === "brightness" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 320
+                     : powerMenu ? 340 * Config.pillScale
                      : controlCenter ? 390
                      : mediaAutoOpened ? 340
                      : appLauncher ? 390
@@ -285,6 +296,7 @@ ShellRoot {
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
                   : (notificationModule.active && !notifFullscreenMode) ? 52
+                  : powerMenu ? 90 * Config.pillScale
                   : controlCenter && mprisModule.hasPlayer
                       ? (240 + notifBump)
                   : controlCenter
@@ -299,6 +311,7 @@ ShellRoot {
 
       readonly property real baseRadius: notificationModule.active ? 99
         : mediaAutoOpened ? 22
+        : powerMenu ? 24
         : cliphistOpen && cliphistPreviewing ? 35
         : cliphistOpen ? 28
         : controlCenter ? (notificationModule.notifications.length > 0
@@ -319,7 +332,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: controlCenter ? Theme.bgD1 : bg
+      color: (controlCenter || powerMenu) ? Theme.bgD1 : bg
 
       onMiniDashboardChanged: {
           if (!box.miniDashboard) {
@@ -342,6 +355,13 @@ ShellRoot {
         onClicked: (mouse) => {
 
           if (mediaAutoOpened) return
+
+          // clicking outside power menu buttons closes it
+          if (box.powerMenu) {
+            box.powerMenu = false
+            box.powerMenuInitialAction = ""
+            return
+          }
 
           // restrict control center to only accept left click
           if (box.controlCenter) {
@@ -378,6 +398,8 @@ ShellRoot {
             mediaAutoOpened = false
             box.appLauncher = false
             box.wallpaperSwitcherOpen = false
+            box.powerMenu = false
+            box.powerMenuInitialAction = ""
             mediaPopupHideTimer.stop()
           }
 
@@ -386,6 +408,8 @@ ShellRoot {
             mediaAutoOpened = false
             box.appLauncher = false
             box.wallpaperSwitcherOpen = false
+            box.powerMenu = false
+            box.powerMenuInitialAction = ""
             box.cliphistOpen = !box.cliphistOpen
           }
 
@@ -394,6 +418,8 @@ ShellRoot {
               mediaAutoOpened = false
               box.appLauncher = false
               box.wallpaperSwitcherOpen = false
+              box.powerMenu = false
+              box.powerMenuInitialAction = ""
               box.miniDashboard = !box.miniDashboard
           }
         }
@@ -480,7 +506,8 @@ ShellRoot {
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !mediaAutoOpened
-                 && !box.controlCenter ? 1 : 0
+                 && !box.controlCenter
+                 && !box.powerMenu ? 1 : 0
         visible: opacity > 0
 
         property real cliphistExtraHeight: 0
@@ -519,7 +546,8 @@ ShellRoot {
                  && !box.controlCenter
                  && !box.miniDashboard
                  && !box.cliphistOpen
-                 && !box.appLauncher ? 1 : 0
+                 && !box.appLauncher
+                 && !box.powerMenu ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
@@ -560,7 +588,8 @@ ShellRoot {
                    && !mediaAutoOpened
                    && !box.controlCenter
                    && !box.miniDashboard
-                   && !box.cliphistOpen ? 1 : 0
+                   && !box.cliphistOpen
+                   && !box.powerMenu ? 1 : 0
           visible: opacity > 0
 
           Behavior on opacity {
@@ -578,6 +607,59 @@ ShellRoot {
               sourceComponent: AppLauncher {
                   shown: box.appLauncher
                   onCloseRequested: box.appLauncher = false
+              }
+          }
+      }
+
+      // power menu
+      Item {
+          anchors.centerIn: parent
+          width: box.implicitWidth - 24
+          height: box.powerMenu ? box.implicitHeight - 16 : 0
+          opacity: box.powerMenu
+                   && !notificationModule.active
+                   && box.activeOsd === ""
+                   && !mediaAutoOpened
+                   && !box.controlCenter
+                   && !box.miniDashboard
+                   && !box.cliphistOpen
+                   && !box.appLauncher
+                   && !box.wallpaperSwitcherOpen ? 1 : 0
+          visible: opacity > 0
+
+          Behavior on opacity {
+              SequentialAnimation {
+                  PauseAnimation { duration: box.powerMenu ? 15 : 0 }
+                  NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
+              }
+          }
+
+          Loader {
+              id: powerMenuLoader
+              anchors.fill: parent
+              active: box.powerMenu
+              asynchronous: true
+
+              sourceComponent: PowerMenu {
+                  shown: box.powerMenu
+                  initialAction: box.powerMenuInitialAction
+                  onCloseRequested: {
+                      box.powerMenu = false
+                      box.powerMenuInitialAction = ""
+                  }
+              }
+              onLoaded: item.forceActiveFocus()
+          }
+
+          Connections {
+              target: box
+              function onPowerMenuChanged() {
+                  if (box.powerMenu && powerMenuLoader.item) {
+                      powerMenuLoader.item.initialAction = box.powerMenuInitialAction
+                      powerMenuLoader.item.forceActiveFocus()
+                  } else if (!box.powerMenu) {
+                      box.powerMenuInitialAction = ""
+                  }
               }
           }
       }
@@ -603,7 +685,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && box.activeOsd === "" && !notificationModule.active ? 1 : 0
+        opacity: box.controlCenter && box.activeOsd === "" && !notificationModule.active && !box.powerMenu ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter && box.activeOsd === "" ? box.implicitHeight - 25 : 0
 
@@ -682,7 +764,8 @@ ShellRoot {
                  && !mediaAutoOpened
                  && !notificationModule.active
                  && box.activeOsd === ""
-                 && !box.cliphistOpen ? 1 : 0
+                 && !box.cliphistOpen
+                 && !box.powerMenu ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
@@ -918,7 +1001,16 @@ ShellRoot {
                 id: rebootHover
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: { rebootProc.running = false; rebootProc.running = true }
+                onClicked: {
+                  if (Config.confirmPowerActions) {
+                    box.powerMenuInitialAction = "reboot"
+                    box.miniDashboard = false
+                    box.powerMenu = true
+                  } else {
+                    rebootProc.running = false
+                    rebootProc.running = true
+                  }
+                }
                 hoverEnabled: true
               }
               Process { id: rebootProc; command: ["bash", "-c", "systemctl reboot"]; running: false }
@@ -941,7 +1033,16 @@ ShellRoot {
                 id: shutdownHover
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: { shutdownProc.running = false; shutdownProc.running = true }
+                onClicked: {
+                  if (Config.confirmPowerActions) {
+                    box.powerMenuInitialAction = "shutdown"
+                    box.miniDashboard = false
+                    box.powerMenu = true
+                  } else {
+                    shutdownProc.running = false
+                    shutdownProc.running = true
+                  }
+                }
                 hoverEnabled: true
               }
               Process { id: shutdownProc; command: ["bash", "-c", "systemctl poweroff"]; running: false }

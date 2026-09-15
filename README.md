@@ -125,6 +125,7 @@ into your session at all times. It's not bound to any dotfiles.
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher
+- **Power Menu**                   - Dedicated power pill state with 5 actions (Lock, Sleep, Logout, Restart, Shutdown) and action confirmation prompt
 
 <details>
 <summary>Know more</summary>
@@ -210,6 +211,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `showAudioVisuals` | Show audio visuals in media player (depends on cava) | `true` |
 | `showSensitiveInfo` | Show sensitive VPN info in tooltip (IP, server, region, uptime) | `true` |
 | `customWallpaperScript` | Use your own wallpaper script with {path} placeholder | `""` |
+| `confirmPowerActions` | Prompt for confirmation before critical power actions (Shutdown, Restart, Logout) | `true` |
 
 <details>
 <summary>Raw config example</summary>
@@ -246,7 +248,8 @@ into your session at all times. It's not bound to any dotfiles.
   "deleteCliphistImgCache": true,
   "country": "IN",
   "showAudioVisuals": true,
-  "showSensitiveInfo": true
+  "showSensitiveInfo": true,
+  "confirmPowerActions": true
 }
 ```
 
@@ -373,6 +376,7 @@ hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpi
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call appLauncher toggle"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call wallpaperSwitcher toggle"))
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call powerMenu toggle"))
 ```
 
 <details>
@@ -384,6 +388,7 @@ hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("chillpill-shell-ipc call cli
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("chillpill-shell-ipc call miniDashboard toggle"))
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call appLauncher toggle"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSwitcher toggle"))
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("chillpill-shell-ipc call powerMenu toggle"))
 ```
 </details>
 
