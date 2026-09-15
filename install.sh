@@ -1,5 +1,10 @@
 #!/bin/bash
 
+set -euo pipefail
+
+skip_arg=${1:-}
+
+
 # colors
 RED='\e[0;31m'
 GREEN='\e[0;32m'
@@ -19,6 +24,7 @@ if [[ ! "$EUID" -eq 0 ]]; then
     die "Please run this script as root to install chillpill-shell. i have to setup some things."
 fi
 
+
 needed_pkgs=(quickshell cliphist brightnessctl
              wl-clipboard inotify-tools cmake
              qt6-multimedia python-psutil blueman pipewire
@@ -26,7 +32,7 @@ needed_pkgs=(quickshell cliphist brightnessctl
 
 missing_pkgs=()
 
-if [[ "$1" != "--skip-deps" ]]; then
+if [[ "$skip_arg" != "--skip-deps" ]]; then
   if command -v pacman &>/dev/null; then
 
       for pkg in "${needed_pkgs[@]}"; do
@@ -78,6 +84,9 @@ if [[ "$1" != "--skip-deps" ]]; then
       if (( nusgmon_install )); then
           info "Installing nusgmon (to record your data usage) through git"
           (cd /tmp/nusgmon-build && ./setup.sh)
+          if [[ $? != 0 ]]; then
+             warn "Something wrong with nusgmon installation, try installing it manually."
+          fi
       else
           info "nusgmon is already installed and up to date, skipping."
       fi
