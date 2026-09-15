@@ -4,7 +4,6 @@ set -euo pipefail
 
 skip_arg=${1:-}
 
-
 # colors
 RED='\e[0;31m'
 GREEN='\e[0;32m'
@@ -23,7 +22,6 @@ bin_exists() { command -v "$1" >/dev/null; }
 if [[ ! "$EUID" -eq 0 ]]; then
     die "Please run this script as root to install chillpill-shell. i have to setup some things."
 fi
-
 
 needed_pkgs=(quickshell cliphist brightnessctl
              wl-clipboard inotify-tools cmake
@@ -71,22 +69,23 @@ if [[ "$skip_arg" != "--skip-deps" ]]; then
 
       # install nusgmon based on version update
       if [[ ! -d /tmp/nusgmon-build ]]; then
-         git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build
+         if ! git clone --depth=1 https://github.com/LUCKYS1NGHH/nusgmon.git /tmp/nusgmon-build; then
+            warn "Failed to clone nusgmon repository, skipping."
+         fi
       fi
 
       nusgmon_install=0
-      if bin_exists nusgmon; then
-         [[ $(nusgmon --version) != $(/tmp/nusgmon-build/./nusgmon --version) ]] && nusgmon_install=1
-      else
-         nusgmon_install=1
+      if [[ -d /tmp/nusgmon-build ]]; then
+         if bin_exists nusgmon; then
+            [[ $(nusgmon --version) != $(/tmp/nusgmon-build/./nusgmon --version) ]] && nusgmon_install=1
+         else
+            nusgmon_install=1
+         fi
       fi
 
       if (( nusgmon_install )); then
           info "Installing nusgmon (to record your data usage) through git"
-          (cd /tmp/nusgmon-build && ./setup.sh)
-          if [[ $? != 0 ]]; then
-             warn "Something wrong with nusgmon installation, try installing it manually."
-          fi
+          (cd /tmp/nusgmon-build && ./setup.sh) || warn "Something wrong with nusgmon installation, try installing it manually."
       else
           info "nusgmon is already installed and up to date, skipping."
       fi
@@ -134,10 +133,26 @@ mkdir -p "$REAL_HOME/.cache/chillpill-shell"
 SRC_FILES=$(find . -name '*.cpp' -o -name '*.h' -o -name 'CMakeLists.txt')
 HASH_FILE='.builds_hash'
 
+backend_files=(
+  IslandBackend.qmltypes
+  libIslandBackendPlugin.so
+  libIslandBackend.so
+  qmldir
+)
+
 needs_build=true
-if [[ -f /usr/share/chillpill-shell/IslandBackend/libIslandBackend.so ]] && [[ -f "$HASH_FILE" ]]; then
+if [[ -f "$HASH_FILE" ]]; then
     if sha256sum -c "$HASH_FILE" --status 2>/dev/null; then
-        needs_build=false
+        all_exist=true
+        for file in "${backend_files[@]}"; do
+            if [[ ! -f "/usr/share/chillpill-shell/IslandBackend/$file" ]]; then
+                all_exist=false
+                break
+            fi
+        done
+        if $all_exist; then
+            needs_build=false
+        fi
     fi
 fi
 
@@ -154,7 +169,7 @@ if $needs_build; then
        build/IslandBackend.qmltypes \
          /usr/share/chillpill-shell/IslandBackend
 
-    sha256sum $SRC_FILES > "$HASH_FILE"
+    echo "$SRC_FILES" | xargs sha256sum > "$HASH_FILE"
 else
     info "No backend source changes, skipping backend build"
 fi
@@ -184,7 +199,7 @@ chmod 755 /usr/share/chillpill-shell/share
 chmod 644 /usr/share/chillpill-shell/share/*
 chmod 755 /usr/share/chillpill-shell/scripts
 chmod 755 /usr/share/chillpill-shell/scripts/*
-chmod 655 /usr/share/chillpill-shell/IslandBackend
+chmod 755 /usr/share/chillpill-shell/IslandBackend
 chmod 644 /usr/share/chillpill-shell/IslandBackend/*
 
 # setup config file
