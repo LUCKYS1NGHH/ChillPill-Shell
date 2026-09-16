@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 
@@ -17,11 +16,11 @@ Item {
 
   readonly property real scaleFactor: Config.pillScale
   readonly property var actions: [
-    { id: "lock",     label: "Lock",     icon: "\uf023",       accent: "#6791dc" },
-    { id: "sleep",    label: "Sleep",    icon: "\udb82\udd04", accent: "#a277ff" },
-    { id: "logout",   label: "Logout",   icon: "\udb82\udf43", accent: "#ea9d34" },
-    { id: "reboot",   label: "Restart",  icon: "\uead2",       accent: "#f5a938" },
-    { id: "shutdown", label: "Shutdown", icon: "\udb81\udc25", accent: "#e22323" }
+    { id: "lock",     label: "Lock",     icon: "", accent: "#628ae2" },
+    { id: "sleep",    label: "Sleep",    icon: "󰤄", accent: "#9d6fff" },
+    { id: "logout",   label: "Logout",   icon: "󰍃", accent: "#f4a232" },
+    { id: "reboot",   label: "Restart",  icon: "", accent: "#ff6b35" },
+    { id: "shutdown", label: "Shutdown", icon: "", accent: "#d62828" }
   ]
 
   // Commands are launched with Quickshell.execDetached(), NOT Process items.
@@ -152,30 +151,33 @@ Item {
 
   // Mode 1: 5-Button Power Action Selection
   RowLayout {
+    id: selectionSection
     anchors.centerIn: parent
-    spacing: 14 * root.scaleFactor
-    visible: root.pendingAction === ""
+    spacing: 40 * root.scaleFactor
+    opacity: 0
+    scale: 0.92
 
     Repeater {
       model: root.actions
       delegate: Item {
-        width: 52 * root.scaleFactor
-        height: 62 * root.scaleFactor
+        width: 16 * root.scaleFactor
+        height: 16 * root.scaleFactor
         Layout.alignment: Qt.AlignVCenter
+        Layout.topMargin: 8
 
         property bool isSelected: index === root.selectedIndex
         property bool isHovered: itemMouse.containsMouse
 
         ColumnLayout {
           anchors.centerIn: parent
-          spacing: 5 * root.scaleFactor
+          spacing: 6 * root.scaleFactor
 
           Rectangle {
             Layout.alignment: Qt.AlignHCenter
-            width: 40 * root.scaleFactor
-            height: 40 * root.scaleFactor
+            width: 38 * root.scaleFactor
+            height: 38 * root.scaleFactor
             radius: 12 * root.scaleFactor
-            color: isSelected ? Theme.bg3 : (isHovered ? Theme.bg2 : Theme.bg1)
+            color: isSelected ? Theme.bg4 : (isHovered ? Theme.bg2 : Theme.bg2)
             border.color: isSelected ? modelData.accent : (isHovered ? Theme.borderBg1 : Theme.borderBg3)
             border.width: isSelected ? 2 : 1
             scale: itemMouse.pressed ? 0.92 : (isSelected ? 1.05 : (isHovered ? 1.03 : 1.0))
@@ -200,33 +202,44 @@ Item {
             font { family: Theme.fontFamily; pixelSize: 9 * root.scaleFactor; weight: isSelected ? 600 : 400 }
             Behavior on color { ColorAnimation { duration: 120 } }
           }
-        }
 
-        MouseArea {
-          id: itemMouse
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onEntered: root.selectedIndex = index
-          onClicked: root.triggerAction(modelData.id)
-        }
+          MouseArea {
+            id: itemMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onEntered: root.selectedIndex = index
+            onClicked: root.triggerAction(modelData.id)
+          }
+        } 
       }
     }
   }
 
   // Mode 2: Confirmation Prompt
   ColumnLayout {
+    id: confirmSection
     anchors.centerIn: parent
     spacing: 10 * root.scaleFactor
-    visible: root.pendingAction !== ""
+    opacity: 0
+    scale: 0.92
 
     RowLayout {
+      id: promptRow
       Layout.alignment: Qt.AlignHCenter
       spacing: 8 * root.scaleFactor
+      opacity: 0
+
+      Behavior on opacity {
+        NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+      }
+      Behavior on scale {
+        NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+      }
 
       Text {
-        text: root.pendingAction === "shutdown" ? "\udb81\udc25" : (root.pendingAction === "reboot" ? "\uead2" : "\udb82\udf43")
-        color: root.pendingAction === "shutdown" ? "#e22323" : (root.pendingAction === "reboot" ? "#f5a938" : "#ea9d34")
+        text: root.pendingAction === "shutdown" ? "\udb81\udc25" : (root.pendingAction === "reboot" ? "\uead2" : "󰍃")
+        color: root.pendingAction === "shutdown" ? "#e22323" : (root.pendingAction === "reboot" ? "#ff6b35" : "#ea9d34")
         font { family: Theme.nerdFontFamily; pixelSize: 14 * root.scaleFactor }
       }
 
@@ -240,8 +253,24 @@ Item {
     }
 
     RowLayout {
+      id: buttonsRow
       Layout.alignment: Qt.AlignHCenter
       spacing: 12 * root.scaleFactor
+      opacity: 0
+      scale: 0.96
+
+      Behavior on opacity {
+        SequentialAnimation {
+          PauseAnimation { duration: 70 }
+          NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+        }
+      }
+      Behavior on scale {
+        SequentialAnimation {
+          PauseAnimation { duration: 70 }
+          NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+        }
+      }
 
       // Cancel button
       Rectangle {
@@ -259,8 +288,10 @@ Item {
           anchors.centerIn: parent
           spacing: 4 * root.scaleFactor
           Text {
-            text: "\udb80\udf28" // nf-md-close
+            text: "\uea76" // nf-md-close
             color: Theme.fg4
+            anchors.top: parent.top
+            anchors.topMargin: 1
             font { family: Theme.nerdFontFamily; pixelSize: 11 * root.scaleFactor }
           }
           Text {
@@ -286,7 +317,7 @@ Item {
         width: 86 * root.scaleFactor
         height: 28 * root.scaleFactor
         radius: 8 * root.scaleFactor
-        color: root.pendingAction === "shutdown" ? "#e22323" : (root.pendingAction === "reboot" ? "#e08d24" : Theme.accent)
+        color: root.pendingAction === "shutdown" ? "#e22323" : (root.pendingAction === "reboot" ? "#ff6b35" : "#e08d24")
         opacity: (root.confirmIndex === 1 || root.hoveredButton === 1) ? 1.0 : 0.85
         scale: confirmMouse.pressed ? 0.94 : ((root.confirmIndex === 1 || root.hoveredButton === 1) ? 1.03 : 1.0)
         Behavior on scale { NumberAnimation { duration: 80 } }
@@ -296,15 +327,17 @@ Item {
           anchors.centerIn: parent
           spacing: 4 * root.scaleFactor
           Text {
-            text: "\udb80\udf29" // nf-md-check
-            color: "#ffffff"
+            text: "\uf00c" // nf-md-check
+            color: "white"
+            anchors.top: parent.top
+            anchors.topMargin: 1
             font { family: Theme.nerdFontFamily; pixelSize: 11 * root.scaleFactor }
           }
           Text {
             text: root.pendingAction === "shutdown" ? "Shutdown"
                 : (root.pendingAction === "reboot" ? "Restart"
                 : "Logout")
-            color: "#ffffff"
+            color: "white"
             font { family: Theme.fontFamily; pixelSize: 9 * root.scaleFactor; weight: 600 }
           }
         }
@@ -321,4 +354,68 @@ Item {
       }
     }
   }
+
+  states: [
+    State {
+      name: "selection"
+      when: root.pendingAction === ""
+      PropertyChanges {
+        target: selectionSection
+        opacity: 1
+        scale: 1
+        enabled: true
+      }
+      PropertyChanges {
+        target: confirmSection
+        opacity: 0
+        scale: 0.92
+        enabled: false
+      }
+      PropertyChanges {
+        target: promptRow
+        opacity: 0
+      }
+      PropertyChanges {
+        target: buttonsRow
+        opacity: 0
+        scale: 0.96
+      }
+    },
+    State {
+      name: "confirm"
+      when: root.pendingAction !== ""
+      PropertyChanges {
+        target: selectionSection
+        opacity: 0
+        scale: 0.92
+        enabled: false
+      }
+      PropertyChanges {
+        target: confirmSection
+        opacity: 1
+        scale: 1
+        enabled: true
+      }
+      PropertyChanges {
+        target: promptRow
+        opacity: 1
+      }
+      PropertyChanges {
+        target: buttonsRow
+        opacity: 1
+        scale: 1
+      }
+    }
+  ]
+
+  transitions: [
+    Transition {
+      reversible: true
+      NumberAnimation {
+        properties: "opacity,scale"
+        duration: 180
+        easing.type: Easing.OutCubic
+      }
+    }
+  ]
 }

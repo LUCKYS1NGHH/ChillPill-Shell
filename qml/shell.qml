@@ -281,7 +281,7 @@ ShellRoot {
                      : activeOsd === "volume" ? osdWidth
                      : activeOsd === "brightness" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 320
-                     : powerMenu ? 340 * Config.pillScale
+                     : powerMenu ? 348
                      : controlCenter ? 390
                      : mediaAutoOpened ? 340
                      : appLauncher ? 390
@@ -296,7 +296,7 @@ ShellRoot {
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
                   : (notificationModule.active && !notifFullscreenMode) ? 52
-                  : powerMenu ? 90 * Config.pillScale
+                  : powerMenu ? 98
                   : controlCenter && mprisModule.hasPlayer
                       ? (240 + notifBump)
                   : controlCenter
@@ -614,8 +614,8 @@ ShellRoot {
       // power menu
       Item {
           anchors.centerIn: parent
-          width: box.implicitWidth - 24
-          height: box.powerMenu ? box.implicitHeight - 16 : 0
+          width: box.implicitWidth - 25
+          height: box.powerMenu ? box.implicitHeight - 18 : 0
           opacity: box.powerMenu
                    && !notificationModule.active
                    && box.activeOsd === ""
@@ -1250,3 +1250,5 @@ ShellRoot {
   }
 
 }
+
+
