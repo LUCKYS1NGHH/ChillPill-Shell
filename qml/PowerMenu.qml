@@ -10,7 +10,8 @@ Item {
   property string initialAction: ""
   property string pendingAction: "" // "", "shutdown", "reboot", "logout"
   property int selectedIndex: 4     // default to shutdown
-  property int confirmIndex: 0      // 0: cancel, 1: confirm
+  property int confirmIndex: 0      // 0: cancel, 1: confirm — keyboard-only, never set by hover
+  property int hoveredButton: -1    // -1: none, 0: cancel, 1: confirm — mouse hover, cosmetic only
 
   signal closeRequested()
 
@@ -23,22 +24,20 @@ Item {
     { id: "shutdown", label: "Shutdown", icon: "\udb81\udc25", accent: "#e22323" }
   ]
 
-  Process { id: lockProc; command: ["bash", "-c", Config.screenLockAppCommand]; running: false }
-  Process { id: sleepProc; command: ["bash", "-c", "systemctl suspend"]; running: false }
-  Process { id: logoutProc; command: ["bash", "-c", "loginctl terminate-session ${XDG_SESSION_ID:-self} || hyprctl dispatch exit || pkill -KILL -u $USER"]; running: false }
-  Process { id: rebootProc; command: ["bash", "-c", "systemctl reboot"]; running: false }
-  Process { id: shutdownProc; command: ["bash", "-c", "systemctl poweroff"]; running: false }
+  // Commands are launched with Quickshell.execDetached(), NOT Process items.
+  // A Process is a child of this Item, and this Item gets destroyed the instant
+  // closeRequested() closes the menu (the Loader in shell.qml unloads it) —
+  // that was killing shutdown/reboot/lock/sleep before they ever actually ran.
+  // execDetached() spawns the command fully independent of this item's lifetime.
 
   function triggerAction(actId) {
     if (actId === "lock") {
-      lockProc.running = false
-      lockProc.running = true
+      Quickshell.execDetached(["bash", "-c", Config.screenLockAppCommand])
       closeRequested()
       return
     }
     if (actId === "sleep") {
-      sleepProc.running = false
-      sleepProc.running = true
+      Quickshell.execDetached(["bash", "-c", "systemctl suspend"])
       closeRequested()
       return
     }
@@ -54,25 +53,24 @@ Item {
   function cancelConfirmation() {
     pendingAction = ""
     initialAction = ""
+    hoveredButton = -1
     root.forceActiveFocus()
   }
 
   function confirmAction(actId) {
     pendingAction = actId
     confirmIndex = 0 // default to Cancel for safety
+    hoveredButton = -1 // ignore any stale cursor position from before the dialog opened
     root.forceActiveFocus()
   }
 
   function executeAction(actId) {
     if (actId === "shutdown") {
-      shutdownProc.running = false
-      shutdownProc.running = true
+      Quickshell.execDetached(["bash", "-c", "systemctl poweroff"])
     } else if (actId === "reboot") {
-      rebootProc.running = false
-      rebootProc.running = true
+      Quickshell.execDetached(["bash", "-c", "systemctl reboot"])
     } else if (actId === "logout") {
-      logoutProc.running = false
-      logoutProc.running = true
+      Quickshell.execDetached(["bash", "-c", "loginctl terminate-session ${XDG_SESSION_ID:-self} || hyprctl dispatch exit || pkill -KILL -u $USER"])
     }
     cancelConfirmation()
     closeRequested()
@@ -250,10 +248,10 @@ Item {
         width: 86 * root.scaleFactor
         height: 28 * root.scaleFactor
         radius: 8 * root.scaleFactor
-        color: root.confirmIndex === 0 ? Theme.focusBgL : Theme.bg1
-        border.color: root.confirmIndex === 0 ? Theme.borderBgFocus : Theme.borderBg3
+        color: (root.confirmIndex === 0 || root.hoveredButton === 0) ? Theme.focusBgL : Theme.bg1
+        border.color: (root.confirmIndex === 0 || root.hoveredButton === 0) ? Theme.borderBgFocus : Theme.borderBg3
         border.width: 1
-        scale: cancelMouse.pressed ? 0.94 : (root.confirmIndex === 0 ? 1.03 : 1.0)
+        scale: cancelMouse.pressed ? 0.94 : ((root.confirmIndex === 0 || root.hoveredButton === 0) ? 1.03 : 1.0)
         Behavior on scale { NumberAnimation { duration: 80 } }
         Behavior on color { ColorAnimation { duration: 100 } }
 
@@ -277,7 +275,8 @@ Item {
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
           hoverEnabled: true
-          onEntered: root.confirmIndex = 0
+          onEntered: root.hoveredButton = 0
+          onExited: if (root.hoveredButton === 0) root.hoveredButton = -1
           onClicked: root.cancelConfirmation()
         }
       }
@@ -288,8 +287,8 @@ Item {
         height: 28 * root.scaleFactor
         radius: 8 * root.scaleFactor
         color: root.pendingAction === "shutdown" ? "#e22323" : (root.pendingAction === "reboot" ? "#e08d24" : Theme.accent)
-        opacity: root.confirmIndex === 1 ? 1.0 : 0.85
-        scale: confirmMouse.pressed ? 0.94 : (root.confirmIndex === 1 ? 1.03 : 1.0)
+        opacity: (root.confirmIndex === 1 || root.hoveredButton === 1) ? 1.0 : 0.85
+        scale: confirmMouse.pressed ? 0.94 : ((root.confirmIndex === 1 || root.hoveredButton === 1) ? 1.03 : 1.0)
         Behavior on scale { NumberAnimation { duration: 80 } }
         Behavior on opacity { NumberAnimation { duration: 100 } }
 
@@ -315,7 +314,8 @@ Item {
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
           hoverEnabled: true
-          onEntered: root.confirmIndex = 1
+          onEntered: root.hoveredButton = 1
+          onExited: if (root.hoveredButton === 1) root.hoveredButton = -1
           onClicked: root.executeAction(root.pendingAction)
         }
       }
