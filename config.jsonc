@@ -29,5 +29,6 @@
   "deleteCliphistImgCache": true,
   "country": "IN",
   "showAudioVisuals": true,
-  "showSensitiveInfo": true
+  "showSensitiveInfo": true,
+  "confirmPowerActions": true
 }

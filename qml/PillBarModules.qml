@@ -10,6 +10,7 @@ Row {
            && !mediaAutoOpened
            && !box.controlCenter
            && !box.miniDashboard
+           && !box.powerMenu
            && box.activeOsd === ""
            && !box.wallpaperSwitcherOpen
            && !box.appLauncher ? 1 : 0
