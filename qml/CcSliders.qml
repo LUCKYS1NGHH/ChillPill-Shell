@@ -14,6 +14,7 @@ Column {
   property string volIcon: ""
   property bool volMuted: false
   property real volPercent: 0   // 0-100
+  property real volMax: 100
 
   property string brightnessIcon: ""
   property real brightnessPercent: 0  // 0-1
@@ -52,7 +53,7 @@ Column {
       color: Theme.bg5
 
       Rectangle {
-        width: parent.width * (volPercent / 100)
+        width: parent.width * Math.min(volPercent / volMax, 1.0)
         height: parent.height
         radius: sliderColumnRoot.sliderRadius
         color: sliderColumnRoot.sliderColor

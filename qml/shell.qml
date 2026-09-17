@@ -454,10 +454,10 @@ ShellRoot {
           active: box.activeOsd === "volume"
           icon: box.volumeModule ? box.volumeModule.icon : ""
           iconColor: box.volumeModule && box.volumeModule.muted ? box.volumeModule.mutedFg : Theme.fg
-          percent: box.volumeModule ? box.volumeModule.vol / 100 : 0
+          percent: box.volumeModule ? Math.min(box.volumeModule.intendedVol / Config.maxVolume, 1.0) : 0
           muted: box.volumeModule ? box.volumeModule.muted : false
           barWidth: box.volumeModule && box.volumeModule.mutedFg ? 80 : 90
-          valueText: box.volumeModule ? (box.volumeModule.muted ? "muted" : box.volumeModule.vol + "%") : ""
+          valueText: box.volumeModule ? (box.volumeModule.muted ? "muted" : box.volumeModule.intendedVol + "%") : ""
       }
 
       // brightness
@@ -728,12 +728,16 @@ ShellRoot {
           sliderHitSlop: box.sliderHitSlop
           volIcon: box.volumeModule.icon
           volMuted: box.volumeModule.muted
-          volPercent: box.volumeModule.vol
+          volPercent: box.volumeModule.intendedVol
+          volMax: Config.maxVolume
           brightnessIcon: brightnessModule.icon
           brightnessPercent: brightnessModule.percent
 
           onVolumeChangeRequested: (fraction) => {
-            if (box.volumeModule) box.volumeModule.sink.audio.volume = Math.max(0, Math.min(1, fraction))
+            if (box.volumeModule) {
+              box.volumeModule.intendedVol = Math.round(Math.max(0, Math.min(1, fraction)) * Config.maxVolume)
+              box.volumeModule.sink.audio.volume = box.volumeModule.intendedVol / 100
+            }
           }
           onBrightnessChangeRequested: (fraction) => {
             let pct = Math.round(Math.max(0, Math.min(1, fraction)) * 100)

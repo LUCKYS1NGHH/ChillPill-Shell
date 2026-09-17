@@ -45,6 +45,7 @@ Singleton {
       property string customWallpaperScript: ""
       property bool pillOnHover: false
       property bool confirmPowerActions: true
+      property int maxVolume: 100
     }
   }
 
@@ -80,4 +81,5 @@ Singleton {
   readonly property alias customWallpaperScript: adapter.customWallpaperScript
   readonly property alias pillOnHover: adapter.pillOnHover
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
+  readonly property alias maxVolume: adapter.maxVolume
 }

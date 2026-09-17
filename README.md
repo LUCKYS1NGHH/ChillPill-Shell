@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.9.1](https://img.shields.io/badge/CP--Shell-0.9.1-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.9.2](https://img.shields.io/badge/CP--Shell-0.9.2-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -212,6 +212,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `showSensitiveInfo` | Show sensitive VPN info in tooltip (IP, server, region, uptime) | `true` |
 | `customWallpaperScript` | Use your own wallpaper script with {path} placeholder | `""` |
 | `confirmPowerActions` | Prompt for confirmation before critical power actions (Shutdown, Restart, Logout) | `true` |
+| `maxVolume` | Max volume the slider can reach | `100` |
 
 <details>
 <summary>Raw config example</summary>
@@ -249,7 +250,8 @@ into your session at all times. It's not bound to any dotfiles.
   "country": "IN",
   "showAudioVisuals": true,
   "showSensitiveInfo": true,
-  "confirmPowerActions": true
+  "confirmPowerActions": true,
+  "maxVolume": 100
 }
 ```
 

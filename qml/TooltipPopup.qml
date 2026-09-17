@@ -64,7 +64,7 @@ PanelWindow {
         const m = box.volumeModule
         if (!m || !m.ready) return "No audio sink"
         if (m.muted) return "Muted" + (m.isHeadphone ? " • Headphones" : "")
-        return m.vol + "%" + (m.isHeadphone ? " • Headphones" : " • Speakers")
+        return m.intendedVol + "%" + (m.isHeadphone ? " • Headphones" : " • Speakers")
       }
       case "network": {
         const m = box.networkModule

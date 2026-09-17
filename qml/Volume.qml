@@ -7,14 +7,23 @@ import QtQuick.Layouts
 RowLayout {
   id: root
   signal volumeChanged
-  onVolChanged: root.volumeChanged()
+  onVolChanged: {
+    // sync the displayed value with the real volume for external changes
+    // (media keys, pavucontrol). `intendedVol` only stays above 100% for
+    // over-amplification set through the slider, so skip those cases.
+    if (ready && intendedVol <= 100)
+      intendedVol = vol
+    root.volumeChanged()
+  }
   onMutedChanged: root.volumeChanged()
+  onIntendedVolChanged: root.volumeChanged()
   property string fg: Theme.fg
   property string mutedFg: "#fb2a2a"
   property var sink: Pipewire.defaultAudioSink
   readonly property bool ready: sink && sink.ready
   readonly property bool muted: ready && sink.audio.muted
   readonly property int vol: ready ? Math.round(sink.audio.volume * 100) : 0
+  property int intendedVol: vol
 
   readonly property var sinkProps: ready ? sink.properties : ({})
 
@@ -47,7 +56,7 @@ RowLayout {
   onSinkChanged: checkPort()
 
   property string icon: {
-      const r = ready, m = muted, h = isHeadphone, v = vol   // force-read all deps
+      const r = ready, m = muted, h = isHeadphone, v = intendedVol   // force-read all deps
       if (!r || m) return h ? "\uf025" : String.fromCodePoint(0xf0581)
       if (h) return "\uee58"
       if (v === 0) return String.fromCodePoint(0xf0581)
@@ -87,7 +96,7 @@ RowLayout {
     text: {
       if (!root.ready) return "-"
       if (root.muted) return "0%"
-      return root.vol + "%"
+      return root.intendedVol + "%"
     }
     color: fg
 
