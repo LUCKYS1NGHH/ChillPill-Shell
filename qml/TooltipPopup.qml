@@ -66,6 +66,11 @@ PanelWindow {
         if (m.muted) return "Muted" + (m.isHeadphone ? " • Headphones" : "")
         return m.intendedVol + "%" + (m.isHeadphone ? " • Headphones" : " • Speakers")
       }
+      case "brightness": {
+        const m = brightnessModule
+        if (!m || !m.percent) return "Something wrong."
+        return Math.round(brightnessModule.percent * 100) + "% • Brightness "
+      }
       case "network": {
         const m = box.networkModule
         if (!m) return "No network info"
