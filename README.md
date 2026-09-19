@@ -213,6 +213,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `customWallpaperScript` | Use your own wallpaper script with {path} placeholder | `""` |
 | `confirmPowerActions` | Prompt for confirmation before critical power actions (Shutdown, Restart, Logout) | `true` |
 | `maxVolume` | Max volume the slider can reach | `100` |
+| `separatePreviewTabTypes` | Skip a different item type (image,text) when switching in clipboard manager preview tab | `true` |
 
 <details>
 <summary>Raw config example</summary>
@@ -251,7 +252,8 @@ into your session at all times. It's not bound to any dotfiles.
   "showAudioVisuals": true,
   "showSensitiveInfo": true,
   "confirmPowerActions": true,
-  "maxVolume": 100
+  "maxVolume": 100,
+  "separatePreviewTabTypes": true
 }
 ```
 

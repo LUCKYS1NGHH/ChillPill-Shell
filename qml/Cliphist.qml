@@ -176,8 +176,8 @@ Item {
             else if (currentIdx >= newLength) root.selectedIndex = newLength - 1
             else root.selectedIndex = currentIdx
 
-            // if in full preview, make sure landed index actually matches the preview type
-            if (wasPreviewing && root.selectedIndex !== -1) {
+            // if in full preview with separated types, make sure landed index matches the preview type
+            if (wasPreviewing && Config.separatePreviewTabTypes && root.selectedIndex !== -1) {
                 let entry = listModel.get(root.selectedIndex)
                 if (!entry || (wasImage ? !entry.imagePath : !!entry.imagePath)) {
                     let sameTypeIdx = root.findAdjacentTypeIndex(root.previewSlideDir, wasImage)
@@ -345,10 +345,15 @@ Item {
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Down) {
                         if (fullPreview) {
-                            let next = root.findAdjacentTypeIndex(1, root.currentIsImage())
-                            if (next !== -1) {
+                            if (Config.separatePreviewTabTypes) {
+                                let next = root.findAdjacentTypeIndex(1, root.currentIsImage())
+                                if (next !== -1) {
+                                    root.previewSlideDir = 1
+                                    root.selectedIndex = next
+                                }
+                            } else if (listModel.count > 0) {
                                 root.previewSlideDir = 1
-                                root.selectedIndex = next
+                                root.selectedIndex = (root.selectedIndex + 1) % listModel.count
                             }
                         } else if (listModel.count > 0) {
                             root.selectedIndex = (root.selectedIndex + 1) % listModel.count
@@ -357,10 +362,15 @@ Item {
                         event.accepted = true
                     } else if (event.key === Qt.Key_Up) {
                         if (fullPreview) {
-                            let prev = root.findAdjacentTypeIndex(-1, root.currentIsImage())
-                            if (prev !== -1) {
+                            if (Config.separatePreviewTabTypes) {
+                                let prev = root.findAdjacentTypeIndex(-1, root.currentIsImage())
+                                if (prev !== -1) {
+                                    root.previewSlideDir = -1
+                                    root.selectedIndex = prev
+                                }
+                            } else if (listModel.count > 0) {
                                 root.previewSlideDir = -1
-                                root.selectedIndex = prev
+                                root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1
                             }
                         } else if (listModel.count > 0) {
                             root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1

@@ -46,6 +46,7 @@ Singleton {
       property bool pillOnHover: false
       property bool confirmPowerActions: true
       property int maxVolume: 100
+      property bool separatePreviewTabTypes: true
     }
   }
 
@@ -82,4 +83,5 @@ Singleton {
   readonly property alias pillOnHover: adapter.pillOnHover
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
   readonly property alias maxVolume: adapter.maxVolume
+  readonly property alias separatePreviewTabTypes: adapter.separatePreviewTabTypes
 }

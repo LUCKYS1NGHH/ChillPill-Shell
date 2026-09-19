@@ -31,5 +31,6 @@
   "showAudioVisuals": true,
   "showSensitiveInfo": true,
   "confirmPowerActions": true,
-  "maxVolume": 100
+  "maxVolume": 100,
+  "separatePreviewTabTypes": true
 }
