@@ -108,7 +108,7 @@ into your session at all times. It's not bound to any dotfiles.
       <img src="screenshots/image_11.webp" width="100%" alt="Wallpaper switcher with opened with previews">
     </td>
     <td width="50%">
-      <p align="center"><b>Cliphist — Image full preview tab</b></p>
+      <p align="center"><b>Cliphist — Full preview tab (Image; Text also supports)</b></p>
       <img src="screenshots/image_12.webp" width="100%" alt="Cliphist image full preview tab">
     </td>
   </tr>
@@ -118,7 +118,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see 'Know more' below.
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
-- **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image
+- **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image/text
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
@@ -164,7 +164,7 @@ into your session at all times. It's not bound to any dotfiles.
   you want these images cache to auto delete when you delete the cliphist (clipboard manager) image item, then there's `deleteCliphistImgCache` config
   option (enabled by default).
 
-- In Cliphist image full preview (which opens through `Tab` key), you can switch to other image by `Up`/`Down` keys, and can also delete the image in full preview.
+- In Cliphist full preview tab (which opens through `Tab` key), you can switch to other item by `Up`/`Down` keys, and can also delete the item from there.
 
 - Notifications are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.

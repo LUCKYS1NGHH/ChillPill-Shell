@@ -13,8 +13,11 @@ Item {
     property string searchQuery: ""
     property string deletingId: ""
     property string collapsingId: ""
-    property bool imgFullPreview: false
+    property bool fullPreview: false
     property int previewSlideDir: 1  // 1 = down/next, -1 = up/prev
+    property string previewText: ""  // full decoded content for text preview
+    property string previewTargetId: ""  // entry id the in-flight decode is for
+    property bool previewReady: false  // true when previewText matches previewTargetId
 
     signal closeRequested()
     signal previewToggled(bool active)
@@ -43,8 +46,35 @@ Item {
         selectedIndex = 0
     }
 
-    onImgFullPreviewChanged: {
-        if (!imgFullPreview) previewImage.source = ""
+    onFullPreviewChanged: syncPreviewContent()
+
+    onSelectedIndexChanged: {
+        if (fullPreview) syncPreviewContent()
+    }
+
+    function syncPreviewContent() {
+        if (!root.fullPreview || listModel.count === 0 || root.selectedIndex < 0) {
+            decodeProc.running = false
+            root.previewText = ""
+            root.previewReady = false
+            return
+        }
+        let entry = listModel.get(root.selectedIndex)
+        if (entry && !entry.imagePath) {
+            root.loadPreviewText(entry.id)
+        } else {
+            decodeProc.running = false
+            root.previewText = ""
+            root.previewReady = false
+        }
+    }
+
+    function loadPreviewText(id) {
+        root.previewTargetId = id
+        root.previewReady = false
+        decodeProc.command = ["cliphist", "decode", id]
+        decodeProc.running = false
+        decodeProc.running = true
     }
 
     function rebuildFilteredModel() {
@@ -82,21 +112,27 @@ Item {
         holdRedTimer.restart()
     }
 
-    function imgFullPreviewSelected() {
-        let entry = listModel.count > 0 ? listModel.get(root.selectedIndex) : null
-        if (!entry || !entry.imagePath) return
-
-        imgFullPreview = !imgFullPreview
-        root.previewToggled(imgFullPreview)
+    function currentIsImage() {
+        let idx = root.selectedIndex
+        if (idx < 0 || idx >= listModel.count) return false
+        return !!listModel.get(idx).imagePath
     }
 
-    function findAdjacentImageIndex(direction) {
+    function fullPreviewSelected() {
+        let entry = listModel.count > 0 ? listModel.get(root.selectedIndex) : null
+        if (!entry) return
+
+        fullPreview = !fullPreview
+        root.previewToggled(fullPreview)
+    }
+
+    function findAdjacentTypeIndex(direction, wantImage) {
         if (listModel.count === 0) return -1
         let idx = root.selectedIndex
         for (let i = 0; i < listModel.count; i++) {
             idx = (idx + direction + listModel.count) % listModel.count
             let e = listModel.get(idx)
-            if (e.imagePath) return idx
+            if (wantImage ? !!e.imagePath : !e.imagePath) return idx
         }
         return -1
     }
@@ -122,6 +158,9 @@ Item {
             let currentIdx = root.selectedIndex
             let savedContentY = listView.contentY
 
+            let wasPreviewing = root.fullPreview
+            let wasImage = root.currentIsImage()
+
             let idx = -1
             for (let i = 0; i < listModel.count; i++) {
                 if (listModel.get(i).id === entryId) { idx = i; break }
@@ -137,18 +176,28 @@ Item {
             else if (currentIdx >= newLength) root.selectedIndex = newLength - 1
             else root.selectedIndex = currentIdx
 
-            // if in full preview, make sure landed index actually has an image
-            if (root.imgFullPreview && root.selectedIndex !== -1) {
+            // if in full preview, make sure landed index actually matches the preview type
+            if (wasPreviewing && root.selectedIndex !== -1) {
                 let entry = listModel.get(root.selectedIndex)
-                if (!entry || !entry.imagePath) {
-                    let imgIdx = root.findAdjacentImageIndex(root.previewSlideDir)
-                    if (imgIdx !== -1) {
-                        root.selectedIndex = imgIdx
+                if (!entry || (wasImage ? !entry.imagePath : !!entry.imagePath)) {
+                    let sameTypeIdx = root.findAdjacentTypeIndex(root.previewSlideDir, wasImage)
+                    if (sameTypeIdx !== -1) {
+                        root.selectedIndex = sameTypeIdx
                     } else {
-                        root.imgFullPreview = false
+                        root.fullPreview = false
                         root.previewToggled(false)
                     }
                 }
+            }
+
+            // refresh decoded text even if selectedIndex value didn't change,
+            // otherwise the preview keeps showing the deleted entry's text
+            if (root.fullPreview) {
+                if (!wasImage) {
+                    root.previewText = ""
+                    root.previewReady = false
+                }
+                root.syncPreviewContent()
             }
 
             Qt.callLater(() => {
@@ -209,9 +258,23 @@ Item {
         running: false
     }
 
+    Process {
+        id: decodeProc
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                // ignore stale output if the process was restarted for another entry
+                if (root.previewTargetId === decodeProc.command[2]) {
+                    root.previewText = this.text
+                    root.previewReady = true
+                }
+            }
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
-        radius: imgFullPreview ? 24 : 18
+        radius: fullPreview ? 24 : 18
         color: Theme.bgD1
         border.color: Theme.borderBg2
         border.width: 1
@@ -226,7 +289,7 @@ Item {
 
         RowLayout {
           width: parent.width
-          visible: !imgFullPreview
+          visible: !fullPreview
 
           Text {
               text: "Clipboard Manager"
@@ -256,7 +319,7 @@ Item {
             color: Theme.bg4
             border.color: searchInput.activeFocus ? Theme.borderBgFocus : Theme.borderBg
             border.width: 1
-            visible: !imgFullPreview
+            visible: !fullPreview
 
             TextInput {
                 id: searchInput
@@ -267,7 +330,7 @@ Item {
                 color: Theme.fg
                 font { family: Theme.fontFamily; pixelSize: 10 }
                 clip: true
-                readOnly: imgFullPreview
+                readOnly: fullPreview
 
                 onTextChanged: root.searchQuery = text
 
@@ -281,8 +344,8 @@ Item {
 
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Down) {
-                        if (imgFullPreview) {
-                            let next = root.findAdjacentImageIndex(1)
+                        if (fullPreview) {
+                            let next = root.findAdjacentTypeIndex(1, root.currentIsImage())
                             if (next !== -1) {
                                 root.previewSlideDir = 1
                                 root.selectedIndex = next
@@ -293,8 +356,8 @@ Item {
                         listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Up) {
-                        if (imgFullPreview) {
-                            let prev = root.findAdjacentImageIndex(-1)
+                        if (fullPreview) {
+                            let prev = root.findAdjacentTypeIndex(-1, root.currentIsImage())
                             if (prev !== -1) {
                                 root.previewSlideDir = -1
                                 root.selectedIndex = prev
@@ -304,15 +367,13 @@ Item {
                         }
                         listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
-                        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
-                        event.accepted = true
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root.copySelected()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Escape) {
                         event.accepted = true
-                        if (imgFullPreview) {
-                            imgFullPreview = false
+                        if (fullPreview) {
+                            fullPreview = false
                             previewToggled(false)
                         } else {
                             root.closeRequested()
@@ -321,23 +382,23 @@ Item {
                         root.deleteSelected()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Tab) {
-                        console.log("Tab key clicked for clipboard image full preview")
-                        root.imgFullPreviewSelected()
+                        console.log("Tab key clicked for clipboard full preview")
+                        root.fullPreviewSelected()
                         event.accepted = true
                     }
                 }
             }
         }
 
-        // image wrapped in item to align in center
+        // full preview (image or text), wrapped in item to align in center
         Item {
             width: parent.width
             height: parent.height
-            visible: imgFullPreview
+            visible: fullPreview
 
             Loader {
                 anchors.fill: parent
-                active: imgFullPreview
+                active: fullPreview
                 asynchronous: true
 
                 sourceComponent: Component {
@@ -349,53 +410,136 @@ Item {
                             if (idx < 0 || idx >= listModel.count) return ""
                             return listModel.get(idx).id
                         }
-
-                        Image {
-                            id: previewImage
-                            width: parent.width - 15
-                            height: parent.height - 25
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 25
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            fillMode: Image.PreserveAspectFit
-                            asynchronous: true
-                            sourceSize: Qt.size(500, 500)
-                            cache: false
-
-                            opacity: currentEntryId === root.collapsingId ? 0 : (status === Image.Ready ? 1 : 0)
-                            scale: currentEntryId === root.collapsingId ? 0.8 : 1
-                            Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-                            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-
-                            source: {
-                                let idx = root.selectedIndex
-                                if (idx < 0 || idx >= listModel.count) return ""
-                                let entry = listModel.get(idx)
-                                return entry.imagePath ? ("file://" + entry.imagePath) : ""
+                        readonly property bool currentIsImage: {
+                            let idx = root.selectedIndex
+                            if (idx < 0 || idx >= listModel.count) return false
+                            return !!listModel.get(idx).imagePath
+                        }
+                        readonly property string lineNumbers: {
+                            let content = root.previewText
+                            if (content !== "" && content.endsWith("\n")) content = content.slice(0, -1)
+                            let n = content.length === 0 ? 1 : content.split("\n").length
+                            let out = ""
+                            for (let i = 1; i <= n; i++) {
+                                if (i > 1) out += "\n"
+                                out += i
                             }
+                            return out
+                        }
+                        readonly property int lineNumWidth: {
+                            let content = root.previewText
+                            if (content !== "" && content.endsWith("\n")) content = content.slice(0, -1)
+                            let n = content.split("\n").length
+                            let digits = Math.max(1, String(n).length)
+                            return digits * 7 + 12
+                        }
+                        readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
+
+                        Component.onCompleted: {
+                            previewContent.slideY = root.previewSlideDir * 26
+                            contentSlideAnim.restart()
+                        }
+
+                        // sliding container for both preview types
+                        Item {
+                            id: previewContent
+                            anchors.fill: parent
 
                             property real slideY: 0
-                            transform: Translate { y: previewImage.slideY }
+                            transform: Translate { y: previewContent.slideY }
 
-                            onSourceChanged: {
-                                slideY = root.previewSlideDir * 26
-                                slideAnim.restart()
+                            // image preview
+                            Image {
+                                id: previewImage
+                                width: parent.width - 15
+                                height: parent.height - 25
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 25
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                fillMode: Image.PreserveAspectFit
+                                asynchronous: true
+                                sourceSize: Qt.size(500, 500)
+                                cache: false
+                                visible: currentIsImage
+
+                                opacity: currentEntryId === root.collapsingId ? 0 : (status === Image.Ready ? 1 : 0)
+                                scale: currentEntryId === root.collapsingId ? 0.8 : 1
+                                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+                                source: currentIsImage ? ("file://" + listModel.get(root.selectedIndex).imagePath) : ""
                             }
 
-                            NumberAnimation {
-                                id: slideAnim
-                                target: previewImage
-                                property: "slideY"
-                                to: 0
-                                duration: 200
-                                easing.type: Easing.OutCubic
+                            // text preview
+                            Flickable {
+                                id: textFlick
+                                visible: !currentIsImage
+                                anchors.fill: parent
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 12
+                                anchors.topMargin: 12
+                                anchors.bottomMargin: 25
+                                clip: true
+                                boundsBehavior: Flickable.StopAtBounds
+                                flickableDirection: Flickable.HorizontalAndVerticalFlick
+                                contentWidth: codeArea.implicitWidth
+                                contentHeight: codeArea.implicitHeight
+
+                                Row {
+                                    id: codeArea
+                                    spacing: 8
+
+                                    Text {
+                                        id: lineNumText
+                                        width: lineNumWidth
+                                        text: lineNumbers
+                                        color: Theme.fg6
+                                        font { family: Theme.fontFamily; pixelSize: 12 }
+                                        horizontalAlignment: Text.AlignRight
+
+                                        opacity: (currentEntryId === root.collapsingId) ? 0 : (textReady ? 0.8 : 0)
+                                        scale: currentEntryId === root.collapsingId ? 0.8 : 1
+                                        Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                                        Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                                    }
+
+                                    Text {
+                                        id: textPreview
+                                        text: root.previewText
+                                        color: Theme.fg
+                                        font { family: Theme.fontFamily; pixelSize: 12 }
+                                        wrapMode: Text.NoWrap
+                                        textFormat: Text.PlainText
+
+                                        opacity: (currentEntryId === root.collapsingId) ? 0 : (textReady ? 1 : 0)
+                                        scale: currentEntryId === root.collapsingId ? 0.8 : 1
+                                        Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                                        Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                                    }
+                                }
                             }
+                        }
+
+                        onCurrentEntryIdChanged: {
+                            textFlick.contentX = 0
+                            textFlick.contentY = 0
+                            previewContent.slideY = root.previewSlideDir * 26
+                            contentSlideAnim.restart()
+                        }
+
+                        NumberAnimation {
+                            id: contentSlideAnim
+                            target: previewContent
+                            property: "slideY"
+                            to: 0
+                            duration: 200
+                            easing.type: Easing.OutCubic
                         }
 
                         // red tint flash on delete confirm
                         Rectangle {
-                            anchors.topMargin: 5
-                            anchors.fill: previewImage
+                            anchors.fill: parent
+                            anchors.bottomMargin: 26
                             radius: 15
                             color: Theme.deleting
                             opacity: currentEntryId === root.deletingId ? 0.70 : 0
@@ -404,7 +548,7 @@ Item {
 
                         // "Deleted" pop text
                         Text {
-                            anchors.centerIn: previewImage
+                            anchors.centerIn: parent
                             text: "Deleted"
                             color: "white"
                             font { family: Theme.fontFamily; pixelSize: 14; weight: 600 }
@@ -436,7 +580,7 @@ Item {
             currentIndex: root.selectedIndex
             highlightFollowsCurrentItem: false
             highlightMoveDuration: 80
-            visible: !imgFullPreview
+            visible: !fullPreview
             cacheBuffer: 0
 
             removeDisplaced: Transition { NumberAnimation { properties: "y"; duration: 150; easing.type: Easing.OutCubic } }
@@ -474,7 +618,7 @@ Item {
                     anchors.leftMargin: 12
                     anchors.rightMargin: 8
                     text: model.label
-                    visible: !model.imagePath && !imgFullPreview
+                    visible: !model.imagePath && !fullPreview
                     color: Theme.fg
                     font { family: Theme.fontFamily; pixelSize: 10 }
                     elide: Text.ElideRight
@@ -491,5 +635,3 @@ Item {
         }
     }
 }
-
-

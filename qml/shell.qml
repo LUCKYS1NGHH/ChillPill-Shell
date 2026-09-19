@@ -303,7 +303,7 @@ ShellRoot {
                       ? (118 + notifBump)
                   : mediaAutoOpened ? 90
                   : (cliphistOpen && cliphistPreviewing) ? 380
-                  : cliphistOpen ? 270
+                  : cliphistOpen ? 282
                   : miniDashboard ? 155
                   : appLauncher ? 410
                   : wallpaperSwitcherOpen ? 308
@@ -312,7 +312,7 @@ ShellRoot {
       readonly property real baseRadius: notificationModule.active ? 99
         : mediaAutoOpened ? 22
         : powerMenu ? 24
-        : cliphistOpen && cliphistPreviewing ? 35
+        : cliphistOpen && cliphistPreviewing ? 33
         : cliphistOpen ? 28
         : controlCenter ? (notificationModule.notifications.length > 0
           ? (mprisModule.hasPlayer ? 27 : 25)
@@ -500,8 +500,8 @@ ShellRoot {
       // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
-        width: box.implicitWidth - 26
-        height: (box.cliphistOpen ? box.implicitHeight - 26 : 0) + cliphistExtraHeight
+        width: box.implicitWidth - 22
+        height: (box.cliphistOpen ? box.implicitHeight - 22 : 0) + cliphistExtraHeight
         opacity: box.cliphistOpen
                  && !notificationModule.active
                  && box.activeOsd === ""
@@ -580,8 +580,8 @@ ShellRoot {
       // app launcher opens through IPC
       Item {
           anchors.centerIn: parent
-          width: box.implicitWidth - 24
-          height: box.appLauncher ? 386 : 0
+          width: box.implicitWidth - 22
+          height: box.appLauncher ? 387 : 0
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""
