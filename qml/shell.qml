@@ -284,7 +284,7 @@ ShellRoot {
                      : powerMenu ? 348
                      : controlCenter ? 390
                      : mediaAutoOpened ? 340
-                     : appLauncher ? 390
+                     : appLauncher ? 378
                      : miniDashboard ? 420
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : cliphistOpen ? 460
@@ -317,7 +317,7 @@ ShellRoot {
         : controlCenter ? (notificationModule.notifications.length > 0
           ? (mprisModule.hasPlayer ? 27 : 25)
           : (mprisModule.hasPlayer ? 26 : 22))
-        : appLauncher ? 30
+        : appLauncher ? 29
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
         : 20 * Config.pillScale
@@ -580,8 +580,8 @@ ShellRoot {
       // app launcher opens through IPC
       Item {
           anchors.centerIn: parent
-          width: box.implicitWidth - 26
-          height: box.appLauncher ? 384 : 0
+          width: box.implicitWidth - 24
+          height: box.appLauncher ? 386 : 0
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""

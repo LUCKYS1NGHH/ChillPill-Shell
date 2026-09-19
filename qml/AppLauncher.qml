@@ -14,8 +14,8 @@ Item {
 
     signal closeRequested()
 
-    width: 320
-    height: 120
+    width: 315
+    height: 130
     visible: opacity > 0
     opacity: shown ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
@@ -178,27 +178,22 @@ Item {
             highlightMoveDuration: 80
             spacing: 2
 
+            highlight: Rectangle {
+                x: 2
+                y: appList.currentItem ? appList.currentItem.y : -999
+                width: appList.width - 4
+                height: appList.currentItem ? appList.currentItem.height : 44
+                radius: 9
+                color: Theme.bgD
+                Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            }
+
             delegate: Rectangle {
                 id: rowDelegate
                 width: appList.width
                 height: 44
                 radius: 9
-                color: index === root.selectedIndex
-                       ? Qt.rgba(0, 0, 0, 0.20)
-                       : (rowHover.hovered ? Qt.rgba(0, 0, 0, 0.20) : "transparent")
-                Behavior on color { ColorAnimation { duration: 150 } }
-
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.margins: 7
-                    width: 2
-                    radius: 5
-                    color: Theme.accent
-                    opacity: index === root.selectedIndex ? 1 : 0
-                    Behavior on opacity { NumberAnimation { duration: 120 } }
-                }
+                color: "transparent"
 
                 RowLayout {
                     anchors.fill: parent
@@ -214,8 +209,8 @@ Item {
                         Layout.alignment: Qt.AlignVCenter
                         source: Quickshell.iconPath(modelData.icon, true)
                         asynchronous: false
-                        scale: index === root.selectedIndex ? 1.10 : (rowHover.hovered ? 1.10 : 1)
-                        Behavior on scale { NumberAnimation { duration: 500; easing.type: Easing.OutExpo } }
+                        scale: index === root.selectedIndex ? 1.10 : 1
+                        Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutQuad } }
                     }
 
                     Text {
@@ -235,7 +230,6 @@ Item {
                         Text {
                             text: modelData.name
                             color: Theme.fg
-                            opacity: index === root.selectedIndex ? 1 : 0.9
                             font { family: Theme.fontFamily; pixelSize: 11; weight: index === root.selectedIndex ? 600 : 500 }
                             elide: Text.ElideRight
                             Layout.fillWidth: true
@@ -257,7 +251,10 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onEntered: hovered = true
+                    onEntered: {
+                        hovered = true
+                        root.selectedIndex = index
+                    }
                     onExited: hovered = false
                     onClicked: {
                         root.selectedIndex = index
