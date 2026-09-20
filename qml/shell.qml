@@ -264,10 +264,15 @@ ShellRoot {
       }
 
       onImplicitHeightChanged: {
+          // follow launcher live while typing (stacked height animations wobble); animate open/close jumps
           heightAnim.stop()
-          heightAnim.to = implicitHeight
-          heightAnim.duration = mediaAutoOpened ? 650 : 550
-          heightAnim.start()
+          if (box.appLauncher && Math.abs(implicitHeight - height) < 120) {
+              height = implicitHeight
+          } else {
+              heightAnim.to = implicitHeight
+              heightAnim.duration = mediaAutoOpened ? 650 : 550
+              heightAnim.start()
+          }
       }
 
       readonly property int notifBump: notificationModule.notifications.length > 0
@@ -305,7 +310,8 @@ ShellRoot {
                   : (cliphistOpen && cliphistPreviewing) ? 380
                   : cliphistOpen ? 282
                   : miniDashboard ? 155
-                  : appLauncher ? 410
+                  : appLauncher
+                      ? (appLauncherLoader.item ? appLauncherLoader.item.height + 23 : 410)
                   : wallpaperSwitcherOpen ? 308
                   : (row.implicitHeight * Config.pillScale) + 10
 
@@ -581,7 +587,10 @@ ShellRoot {
       Item {
           anchors.centerIn: parent
           width: box.implicitWidth - 22
-          height: box.appLauncher ? 387 : 0
+          // height follows launcher (shrinks with results)
+          height: box.appLauncher
+              ? (appLauncherLoader.item ? appLauncherLoader.item.height : 387)
+              : 0
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""
@@ -600,6 +609,7 @@ ShellRoot {
           }
 
           Loader {
+              id: appLauncherLoader
               anchors.fill: parent
               active: box.appLauncher
               asynchronous: true

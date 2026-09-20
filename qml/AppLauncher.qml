@@ -15,7 +15,19 @@ Item {
     signal closeRequested()
 
     width: 315
-    height: 130
+
+    // shrinks with results, capped at original max height (~387px / 302px list)
+    property int rowHeight: 44
+    property int rowSpacing: 2
+    property int headerHeight: 15
+    property int maxListHeight: 302
+    readonly property int listHeight: root.filteredApps.length === 0
+        ? root.rowHeight
+        : Math.min(root.filteredApps.length * root.rowHeight + (root.filteredApps.length - 1) * root.rowSpacing, root.maxListHeight)
+    readonly property int baseHeight: 12 + root.headerHeight + 8 + 30 + 8 + 12
+    height: root.baseHeight + root.listHeight
+    Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+
     visible: opacity > 0
     opacity: shown ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
@@ -170,7 +182,7 @@ Item {
         ListView {
             id: appList
             width: parent.width
-            height: parent.height - 67
+            height: root.listHeight
             clip: true
             model: root.filteredApps
             currentIndex: root.selectedIndex
