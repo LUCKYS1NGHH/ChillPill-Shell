@@ -46,7 +46,12 @@ Item {
         selectedIndex = 0
     }
 
-    onFullPreviewChanged: syncPreviewContent()
+    onFullPreviewChanged: {
+        syncPreviewContent()
+        // when leaving the preview, hand keyboard control back to the search box
+        // (matters once the preview text can hold focus for selection)
+        if (!fullPreview) searchInput.forceActiveFocus()
+    }
 
     onSelectedIndexChanged: {
         if (fullPreview) syncPreviewContent()
@@ -135,6 +140,67 @@ Item {
             if (wantImage ? !!e.imagePath : !e.imagePath) return idx
         }
         return -1
+    }
+
+    function moveSelection(dir) {
+        if (root.fullPreview) {
+            if (Config.separatePreviewTabTypes) {
+                let target = root.findAdjacentTypeIndex(dir, root.currentIsImage())
+                if (target !== -1) {
+                    root.previewSlideDir = dir
+                    root.selectedIndex = target
+                }
+            } else if (listModel.count > 0) {
+                root.previewSlideDir = dir
+                if (dir === 1) {
+                    root.selectedIndex = (root.selectedIndex + 1) % listModel.count
+                } else {
+                    root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1
+                }
+            }
+        } else if (listModel.count > 0) {
+            if (dir === 1) {
+                root.selectedIndex = (root.selectedIndex + 1) % listModel.count
+            } else {
+                root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1
+            }
+        }
+        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+    }
+
+    // Esc: exit the full preview first, otherwise request closing the bar.
+    function handleCloseKey() {
+        if (root.fullPreview) {
+            root.fullPreview = false
+            root.previewToggled(false)
+        } else {
+            root.closeRequested()
+        }
+    }
+
+    // Shared keyboard shortcuts so they keep working whether the search box
+    // or the (focused) preview text holds the active focus.
+    function onShortcutPressed(event) {
+        if (event.key === Qt.Key_Down) {
+            root.moveSelection(1)
+            event.accepted = true
+        } else if (event.key === Qt.Key_Up) {
+            root.moveSelection(-1)
+            event.accepted = true
+        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            root.copySelected()
+            event.accepted = true
+        } else if (event.key === Qt.Key_Escape) {
+            root.handleCloseKey()
+            event.accepted = true
+        } else if (event.key === Qt.Key_Delete) {
+            root.deleteSelected()
+            event.accepted = true
+        } else if (event.key === Qt.Key_Tab) {
+            console.log("Tab key clicked for clipboard full preview")
+            root.fullPreviewSelected()
+            event.accepted = true
+        }
     }
 
     Timer {
@@ -342,61 +408,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Keys.onPressed: (event) => {
-                    if (event.key === Qt.Key_Down) {
-                        if (fullPreview) {
-                            if (Config.separatePreviewTabTypes) {
-                                let next = root.findAdjacentTypeIndex(1, root.currentIsImage())
-                                if (next !== -1) {
-                                    root.previewSlideDir = 1
-                                    root.selectedIndex = next
-                                }
-                            } else if (listModel.count > 0) {
-                                root.previewSlideDir = 1
-                                root.selectedIndex = (root.selectedIndex + 1) % listModel.count
-                            }
-                        } else if (listModel.count > 0) {
-                            root.selectedIndex = (root.selectedIndex + 1) % listModel.count
-                        }
-                        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Up) {
-                        if (fullPreview) {
-                            if (Config.separatePreviewTabTypes) {
-                                let prev = root.findAdjacentTypeIndex(-1, root.currentIsImage())
-                                if (prev !== -1) {
-                                    root.previewSlideDir = -1
-                                    root.selectedIndex = prev
-                                }
-                            } else if (listModel.count > 0) {
-                                root.previewSlideDir = -1
-                                root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1
-                            }
-                        } else if (listModel.count > 0) {
-                            root.selectedIndex = root.selectedIndex <= 0 ? listModel.count - 1 : root.selectedIndex - 1
-                        }
-                        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.copySelected()
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Escape) {
-                        event.accepted = true
-                        if (fullPreview) {
-                            fullPreview = false
-                            previewToggled(false)
-                        } else {
-                            root.closeRequested()
-                        }
-                    } else if (event.key === Qt.Key_Delete) {
-                        root.deleteSelected()
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Tab) {
-                        console.log("Tab key clicked for clipboard full preview")
-                        root.fullPreviewSelected()
-                        event.accepted = true
-                    }
-                }
+                Keys.onPressed: (event) => root.onShortcutPressed(event)
             }
         }
 
@@ -444,10 +456,37 @@ Item {
                             return digits * 7 + 12
                         }
                         readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
+                        // brief "Copied" toast shown when text is copied from the preview
+                        property bool copiedFlash: false
+
+                        function flashCopied() {
+                            copiedFlash = true
+                            copiedFlashTimer.restart()
+                        }
 
                         Component.onCompleted: {
                             previewContent.slideY = root.previewSlideDir * 26
                             contentSlideAnim.restart()
+                        }
+
+                        Timer {
+                            id: copiedFlashTimer
+                            interval: 900
+                            repeat: false
+                            onTriggered: copiedFlash = false
+                        }
+
+                        // quick copy: copy once a mouse selection has settled (release)
+                        Timer {
+                            id: quickCopyTimer
+                            interval: 300
+                            repeat: false
+                            onTriggered: {
+                                if (textPreview.selectedText.length > 0) {
+                                    textPreview.copy()
+                                    flashCopied()
+                                }
+                            }
                         }
 
                         // sliding container for both preview types
@@ -513,13 +552,46 @@ Item {
                                         Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
                                     }
 
-                                    Text {
+                                    // TextEdit is used instead of Text so the preview text
+                                    // can be mouse-selected (and copied) in the full preview.
+                                    TextEdit {
                                         id: textPreview
                                         text: root.previewText
                                         color: Theme.fg
                                         font { family: Theme.fontFamily; pixelSize: 12 }
-                                        wrapMode: Text.NoWrap
-                                        textFormat: Text.PlainText
+                                        wrapMode: TextEdit.NoWrap
+                                        textFormat: TextEdit.PlainText
+                                        readOnly: true
+                                        selectByMouse: true
+                                        activeFocusOnTab: false
+                                        // keep Esc/Tab/arrows/etc. working while the preview text holds focus,
+                                        // and intercept copy (Ctrl+C / Ctrl+Insert) to show the "Copied" toast
+                                        Keys.onShortcutOverride: (event) => {
+                                            if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_C || event.key === Qt.Key_Insert)) {
+                                                event.accepted = true
+                                            }
+                                        }
+                                        Keys.onPressed: (event) => {
+                                            if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_C || event.key === Qt.Key_Insert)) {
+                                                if (textPreview.selectedText.length > 0) {
+                                                    textPreview.copy()
+                                                    flashCopied()
+                                                }
+                                                event.accepted = true
+                                            } else {
+                                                root.onShortcutPressed(event)
+                                            }
+                                        }
+                                        // quick copy: schedule an auto-copy once the selection stops changing
+                                        onSelectedTextChanged: {
+                                            if (textPreview.selectedText.length > 0) {
+                                                quickCopyTimer.restart()
+                                            }
+                                        }
+                                        // TextEdit doesn't auto-size like Text does,
+                                        // so track its content size explicitly.
+                                        width: implicitWidth
+                                        height: implicitHeight
 
                                         opacity: (currentEntryId === root.collapsingId) ? 0 : (textReady ? 1 : 0)
                                         scale: currentEntryId === root.collapsingId ? 0.8 : 1
@@ -535,6 +607,10 @@ Item {
                             textFlick.contentY = 0
                             previewContent.slideY = root.previewSlideDir * 26
                             contentSlideAnim.restart()
+                            // dismiss a lingering "Copied" toast when navigating away
+                            copiedFlash = false
+                            copiedFlashTimer.stop()
+                            quickCopyTimer.stop()
                         }
 
                         NumberAnimation {
@@ -566,6 +642,34 @@ Item {
                             scale: currentEntryId === root.deletingId ? 1 : 0.80
                             Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                             Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutBack } }
+                        }
+
+                        // "Copied" badge, shown briefly when text is copied from the preview.
+                        // Padded pill background keeps it readable over multi-line text.
+                        Item {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 30
+                            width: copiedLabel.implicitWidth + 18
+                            height: copiedLabel.implicitHeight + 10
+                            opacity: copiedFlash ? 1 : 0
+                            scale: copiedFlash ? 1 : 0.85
+                            Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                            Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutBack } }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: height / 2
+                                color: Theme.bg1
+                            }
+
+                            Text {
+                                id: copiedLabel
+                                anchors.centerIn: parent
+                                text: "Copied"
+                                color: "white"
+                                font { family: Theme.fontFamily; pixelSize: 12; weight: 600 }
+                            }
                         }
 
                         Text {
