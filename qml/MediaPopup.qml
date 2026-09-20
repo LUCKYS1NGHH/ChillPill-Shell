@@ -53,22 +53,12 @@ Item {
             color: Theme.bg1
             clip: true
 
-            layer.enabled: true
-            layer.effect: MultiEffect {
-                shadowEnabled: mprisModule.artUrl !== ""
-                shadowColor: Theme.coverArtGlowShadow
-                shadowBlur: 2.6
-                shadowOpacity: 0.8
-                shadowHorizontalOffset: 0
-                shadowVerticalOffset: 0
-            }
-
             Image {
-                anchors.fill: parent
-                source: mprisModule.artUrl
-                fillMode: Image.PreserveAspectCrop
-                sourceSize: Qt.size(84 * box.dpi, 84 * box.dpi)
-              }
+              anchors.fill: parent
+              source: mprisModule.artUrl
+              fillMode: Image.PreserveAspectCrop
+              sourceSize: Qt.size(84 * box.dpi, 84 * box.dpi)
+            }
 
             Text {
                 anchors.centerIn: parent
