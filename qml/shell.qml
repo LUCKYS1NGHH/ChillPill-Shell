@@ -288,12 +288,12 @@ ShellRoot {
                      : (notificationModule.active && !notifFullscreenMode) ? 320
                      : powerMenu ? 348
                      : controlCenter ? 390
-                     : mediaAutoOpened ? 340
                      : appLauncher ? 378
                      : miniDashboard ? 420
                      : (cliphistOpen && cliphistPreviewing) ? 400
-                     : cliphistOpen ? 460
                      : wallpaperSwitcherOpen ? 600
+                     : cliphistOpen ? 460
+                     : mediaAutoOpened ? 340
                      : row.implicitWidth + (12 * Config.pillScale) + (Config.pillOnHover || !hovered ? 56 : 68) * Config.pillScale
 
       readonly property real baseHeight: activeOsd === "battery" ? osdHeight
@@ -306,13 +306,13 @@ ShellRoot {
                       ? (240 + notifBump)
                   : controlCenter
                       ? (118 + notifBump)
-                  : mediaAutoOpened ? 90
                   : (cliphistOpen && cliphistPreviewing) ? 380
-                  : cliphistOpen ? 282
                   : miniDashboard ? 155
                   : appLauncher
                       ? (appLauncherLoader.item ? appLauncherLoader.item.height + 23 : 410)
                   : wallpaperSwitcherOpen ? 308
+                  : cliphistOpen ? 282
+                  : mediaAutoOpened ? 90
                   : (row.implicitHeight * Config.pillScale) + 10
 
       readonly property real baseRadius: notificationModule.active ? 99
@@ -511,7 +511,6 @@ ShellRoot {
         opacity: box.cliphistOpen
                  && !notificationModule.active
                  && box.activeOsd === ""
-                 && !mediaAutoOpened
                  && !box.controlCenter
                  && !box.powerMenu ? 1 : 0
         visible: opacity > 0
@@ -548,7 +547,6 @@ ShellRoot {
         opacity: box.wallpaperSwitcherOpen
                  && !notificationModule.active
                  && box.activeOsd === ""
-                 && !mediaAutoOpened
                  && !box.controlCenter
                  && !box.miniDashboard
                  && !box.cliphistOpen
@@ -594,7 +592,6 @@ ShellRoot {
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""
-                   && !mediaAutoOpened
                    && !box.controlCenter
                    && !box.miniDashboard
                    && !box.cliphistOpen
@@ -629,7 +626,6 @@ ShellRoot {
           opacity: box.powerMenu
                    && !notificationModule.active
                    && box.activeOsd === ""
-                   && !mediaAutoOpened
                    && !box.controlCenter
                    && !box.miniDashboard
                    && !box.cliphistOpen
@@ -677,7 +673,15 @@ ShellRoot {
       // media popup
       Item {
           anchors.fill: parent
-          opacity: box.activeOsd === "" && !notificationModule.active && !box.controlCenter ? 1 : 0
+          opacity: box.activeOsd === ""
+                   && !notificationModule.active
+                   && !box.controlCenter
+                   && !box.cliphistOpen
+                   && !box.miniDashboard
+                   && !box.appLauncher
+                   && !box.wallpaperSwitcherOpen
+                   && !box.powerMenu
+                   ? 1 : 0
           visible: opacity > 0
 
           Loader {
@@ -775,7 +779,6 @@ ShellRoot {
         width: box.implicitWidth - 30
         height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
         opacity: box.miniDashboard
-                 && !mediaAutoOpened
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !box.cliphistOpen
