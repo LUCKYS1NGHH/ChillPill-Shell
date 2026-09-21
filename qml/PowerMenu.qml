@@ -179,7 +179,7 @@ Item {
             radius: 12 * root.scaleFactor
             color: isSelected ? Theme.bg4 : (isHovered ? Theme.bg2 : Theme.bg2)
             border.color: isSelected ? modelData.accent : (isHovered ? Theme.borderBg1 : Theme.borderBg3)
-            border.width: isSelected ? 2 : 1
+            border.width: isSelected ? 1.5 : 0.5
             scale: itemMouse.pressed ? 0.92 : (isSelected ? 1.05 : (isHovered ? 1.03 : 1.0))
 
             Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
@@ -274,8 +274,8 @@ Item {
 
       // Cancel button
       Rectangle {
-        width: 86 * root.scaleFactor
-        height: 28 * root.scaleFactor
+        width: 78 * root.scaleFactor
+        height: 27 * root.scaleFactor
         radius: 8 * root.scaleFactor
         color: (root.confirmIndex === 0 || root.hoveredButton === 0) ? Theme.focusBgL : Theme.bg1
         border.color: (root.confirmIndex === 0 || root.hoveredButton === 0) ? Theme.borderBgFocus : Theme.borderBg3
@@ -314,10 +314,10 @@ Item {
 
       // Confirm button
       Rectangle {
-        width: 86 * root.scaleFactor
-        height: 28 * root.scaleFactor
+        width: 78 * root.scaleFactor
+        height: 27 * root.scaleFactor
         radius: 8 * root.scaleFactor
-        color: root.pendingAction === "shutdown" ? "#e22323" : (root.pendingAction === "reboot" ? "#ff6b35" : "#e08d24")
+        color: root.pendingAction === "shutdown" ? "#e22323" : (root.pendingAction === "reboot" ? "#ff6c25" : "#e07e20")
         opacity: (root.confirmIndex === 1 || root.hoveredButton === 1) ? 1.0 : 0.85
         scale: confirmMouse.pressed ? 0.94 : ((root.confirmIndex === 1 || root.hoveredButton === 1) ? 1.03 : 1.0)
         Behavior on scale { NumberAnimation { duration: 80 } }

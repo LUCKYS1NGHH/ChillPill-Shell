@@ -278,7 +278,7 @@ ShellRoot {
       readonly property int notifBump: notificationModule.notifications.length > 0
         ? Math.min(notificationStack.listContentHeight + 40, 130) : 0
 
-      // adjust box shape conditionally
+      // adjust pill shape conditionally (pill state)
       readonly property real dpi: Config.dpiScale
 
       readonly property real baseWidth: activeOsd === "battery" ? osdWidth
@@ -286,7 +286,7 @@ ShellRoot {
                      : activeOsd === "volume" ? osdWidth
                      : activeOsd === "brightness" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 320
-                     : powerMenu ? 348
+                     : powerMenu ? 342
                      : controlCenter ? 390
                      : appLauncher ? 378
                      : miniDashboard ? 420
@@ -301,7 +301,7 @@ ShellRoot {
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
                   : (notificationModule.active && !notifFullscreenMode) ? 52
-                  : powerMenu ? 98
+                  : powerMenu ? 100
                   : controlCenter && mprisModule.hasPlayer
                       ? (240 + notifBump)
                   : controlCenter
@@ -338,7 +338,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: (controlCenter || powerMenu) ? Theme.bgD1 : bg
+      color: controlCenter ? Theme.bgD1 : bg
 
       onMiniDashboardChanged: {
           if (!box.miniDashboard) {
