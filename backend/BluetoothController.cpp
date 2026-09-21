@@ -383,17 +383,19 @@ void BluetoothController::pairDevice(const QString &address) {
     const QString path = devicePathForAddress(address);
     if (path.isEmpty()) return;
 
+    const QString displayName = m_devices ? m_devices->deviceDisplayName(address) : address;
+
     setBusy(true);
     setErrorMessage(QString());
     QDBusMessage call = QDBusMessage::createMethodCall(kBluezService, path, kDeviceIface, "Pair");
     auto pending = QDBusConnection::systemBus().asyncCall(call);
     auto *watcher = new QDBusPendingCallWatcher(pending, this);
-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, address]() {
+    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, displayName, address]() {
         watcher->deleteLater();
         setBusy(false);
         QDBusPendingReply<> reply = *watcher;
         if (reply.isError()) {
-            setErrorMessage("Pairing with " + address + " failed: " + reply.error().message());
+            setErrorMessage("Pairing with " + displayName + " failed: " + reply.error().message());
         } else {
             // trust it once paired so future connects don't need re-authorization
             asyncCallNoReply(devicePathForAddress(address), "org.freedesktop.DBus.Properties", "Set",
@@ -406,17 +408,19 @@ void BluetoothController::connectDevice(const QString &address) {
     const QString path = devicePathForAddress(address);
     if (path.isEmpty()) return;
 
+    const QString displayName = m_devices ? m_devices->deviceDisplayName(address) : address;
+
     setBusy(true);
     setErrorMessage(QString());
     QDBusMessage call = QDBusMessage::createMethodCall(kBluezService, path, kDeviceIface, "Connect");
     auto pending = QDBusConnection::systemBus().asyncCall(call);
     auto *watcher = new QDBusPendingCallWatcher(pending, this);
-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, address]() {
+    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, displayName]() {
         watcher->deleteLater();
         setBusy(false);
         QDBusPendingReply<> reply = *watcher;
         if (reply.isError())
-            setErrorMessage("Connecting to " + address + " failed: " + reply.error().message());
+            setErrorMessage("Connecting to " + displayName + " failed: " + reply.error().message());
     });
 }
 
@@ -424,16 +428,18 @@ void BluetoothController::disconnectDevice(const QString &address) {
     const QString path = devicePathForAddress(address);
     if (path.isEmpty()) return;
 
+    const QString displayName = m_devices ? m_devices->deviceDisplayName(address) : address;
+
     setBusy(true);
     QDBusMessage call = QDBusMessage::createMethodCall(kBluezService, path, kDeviceIface, "Disconnect");
     auto pending = QDBusConnection::systemBus().asyncCall(call);
     auto *watcher = new QDBusPendingCallWatcher(pending, this);
-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, address]() {
+    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, displayName]() {
         watcher->deleteLater();
         setBusy(false);
         QDBusPendingReply<> reply = *watcher;
         if (reply.isError())
-            setErrorMessage("Disconnecting " + address + " failed: " + reply.error().message());
+            setErrorMessage("Disconnecting " + displayName + " failed: " + reply.error().message());
     });
 }
 
@@ -442,6 +448,8 @@ void BluetoothController::forgetDevice(const QString &address) {
     const QString path = devicePathForAddress(address);
     if (path.isEmpty()) return;
 
+    const QString displayName = m_devices ? m_devices->deviceDisplayName(address) : address;
+
     setBusy(true);
     setErrorMessage(QString());
     // RemoveDevice lives on the adapter, not the device - it unpairs and drops the object entirely
@@ -449,12 +457,12 @@ void BluetoothController::forgetDevice(const QString &address) {
     call.setArguments({ QVariant::fromValue(QDBusObjectPath(path)) });
     auto pending = QDBusConnection::systemBus().asyncCall(call);
     auto *watcher = new QDBusPendingCallWatcher(pending, this);
-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, address, path]() {
+    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher, displayName, path]() {
         watcher->deleteLater();
         setBusy(false);
         QDBusPendingReply<> reply = *watcher;
         if (reply.isError()) {
-            setErrorMessage("Forgetting " + address + " failed: " + reply.error().message());
+            setErrorMessage("Forgetting " + displayName + " failed: " + reply.error().message());
         } else {
             // InterfacesRemoved should also fire this, but do it eagerly so the UI
             // updates immediately instead of waiting on the signal round-trip

@@ -48,6 +48,15 @@ QString BluetoothDeviceModel::connectedDeviceName() const {
     return {};
 }
 
+QString BluetoothDeviceModel::deviceDisplayName(const QString &address) const {
+    for (const auto &d : m_devices) {
+        if (d.address.compare(address, Qt::CaseInsensitive) == 0) {
+            return d.name.isEmpty() ? d.address : d.name;
+        }
+    }
+    return address;
+}
+
 bool BluetoothDeviceModel::upsertDevice(const Device &device) {
     const int existing = indexOfPath(device.objectPath);
     if (existing >= 0) {
