@@ -131,7 +131,9 @@ into your session at all times. It's not bound to any dotfiles.
 <summary>Know more</summary>
 
 ---
-- Main pill bar modules has tooltip
+- Main pill bar modules has tooltips
+
+- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`
 
 - 3 pill states are open-able with mouse:
 
@@ -142,13 +144,12 @@ into your session at all times. It's not bound to any dotfiles.
   For the rest of states, you have to call the IPC through keybinds in Hyprland, which are provided in [Keybinds](#key-bindings)
   section (including the mouse open-able states)
 
-- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`
-
 - DPI and Pill scaling is available in the config if you need it.
 
 - Audio, workspaces, bluetooth and wifi in pill bar are clickable.
 
-- Control center's media player progress bar is not only for status, it's usable to control the media you playing. also timer minutes can be change by right click.
+- Control center's media player progress bar is not only for status, it's usable to control the media you playing.
+  also timer minutes can be change by right click and hold-to-burst (stop) it when running.
 
 - Control center has WiFi controller (panel) which has list of active networks and has password prompt.
 
