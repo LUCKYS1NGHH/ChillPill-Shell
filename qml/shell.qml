@@ -316,8 +316,6 @@ ShellRoot {
                   : (row.implicitHeight * Config.pillScale) + 10
 
       readonly property real baseRadius: notificationModule.active ? 99
-        : mediaAutoOpened ? 22
-        : powerMenu ? 24
         : cliphistOpen && cliphistPreviewing ? 33
         : cliphistOpen ? 28
         : controlCenter ? (notificationModule.notifications.length > 0
@@ -326,6 +324,7 @@ ShellRoot {
         : appLauncher ? 29
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
+        : mediaAutoOpened ? 22
         : 20 * Config.pillScale
 
       implicitWidth: baseWidth
@@ -607,9 +606,12 @@ ShellRoot {
 
           Loader {
               id: appLauncherLoader
-              anchors.fill: parent
-              active: box.appLauncher
-              asynchronous: true
+              width: parent.width
+              anchors.horizontalCenter: parent.horizontalCenter
+              // keep the launcher alive so its app cache/height persist between opens
+              // (avoids the open-time fallback -> empty -> full resize race)
+              active: true
+              asynchronous: false
 
               sourceComponent: AppLauncher {
                   shown: box.appLauncher

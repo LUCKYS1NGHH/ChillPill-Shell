@@ -59,9 +59,13 @@ Item {
         }
     }
 
+    // preload the app list so the launcher opens at full height instead of
+    // flashing small and growing/shrinking while the cache populates
+    Component.onCompleted: loadApps()
+
     function loadApps() {
+        let entries = DesktopEntries.applications ? DesktopEntries.applications.values : []
         let list = []
-        let entries = DesktopEntries.applications.values
         for (let i = 0; i < entries.length; i++) {
             let e = entries[i]
             list.push({
