@@ -21,6 +21,7 @@ into your session at all times. It's not bound to any dotfiles.
 [![Showcase](https://img.shields.io/badge/Showcase-252525?style=flat-square)](#showcase)
 [![Features](https://img.shields.io/badge/Features-252525?style=flat-square)](#features)
 [![Configuration](https://img.shields.io/badge/Configuration-252525?style=flat-square)](#configurable-options)
+[![Custom Modules](https://img.shields.io/badge/Custom%20Modules-252525?style=flat-square)](#custom-pill-modules)
 [![Dependencies](https://img.shields.io/badge/Dependencies-252525?style=flat-square)](#dependencies)
 [![Installation](https://img.shields.io/badge/Installation-252525?style=flat-square)](#install)
 [![Auto Startup](https://img.shields.io/badge/Auto%20Startup-252525?style=flat-square)](#auto-startup)
@@ -135,6 +136,8 @@ into your session at all times. It's not bound to any dotfiles.
 
 - Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`
 
+- Pill bar supports custom modules (waybar-style) — run any command/script in the bar with `format`/`tooltip` templates, refresh intervals, streaming output and click actions (see [Custom pill modules](#custom-pill-modules)).
+
 - 3 pill states are open-able with mouse:
 
   - Control center: `Left click`
@@ -186,7 +189,7 @@ into your session at all times. It's not bound to any dotfiles.
 | `pillTopMargin` | Top spacing of pill bar | `9` |
 | `pillBottomMargin` | Bottom spacing of pill bar | `26` |
 | `pillScale` | Scale factor for pill bar size | `1.0` |
-| `pillModules` | Pill bar modules order/add/remove | `["battery", "volume", "workspaces", "network", "clock"]` |
+| `pillModules` | Pill bar modules order/add/remove. Accepts built-in module names or custom module (see [Custom pill modules](#custom-pill-modules)) | `["battery", "volume", "workspaces", "network", "clock"]` |
 | `pillOnHover` | Auto hide the pill bar and only show on hover | `false` |
 | `dpiScale` | DPI Scaling | `1.0` |
 | `textFontFamily` | Font family for general text | `Monocraft` |
@@ -259,6 +262,55 @@ into your session at all times. It's not bound to any dotfiles.
 ```
 
 </details>
+
+### Custom Pill Modules
+
+Besides the built-in Quickshell modules (`battery`, `volume`, `workspaces`, `network`, `clock`,
+`weather`, `bluetooth`, `vpn`, `notifications`, `brightness`), `pillModules` also accepts
+**object entries** that run any command/script and show its output in the bar — kind of similar to
+[waybar's custom module](https://github.com/Alexays/Waybar/wiki/Module:-Custom).
+
+| Key | Description |
+|---|---|
+| `run` | Command to execute **(required)**. A leading `~` is expanded to `$HOME`. |
+| `icon` | Optional icon (e.g. a nerd font glyph), referenced in `format`/`tooltip` as `{icon}` |
+| `format` | Text shown in the bar. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: `{icon} {text}` (or just `{text}` without an icon) |
+| `tooltip` | Tooltip shown on hover. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: the output's tooltip |
+| `every` | Refresh every N seconds. Omit (or `0`) to run once at startup |
+| `stream` | Keep the process running and update the module on every stdout line (`true`) |
+| `click` | Command run on left click |
+
+The command may print **plain text** (used as `{text}`) or a **JSON object** per run / per line:
+
+```json
+{ "icon": "", "color": "#6d9fd7", "text": "45°C", "tooltip": "45°C CPU Temperature" }
+```
+
+`text` is required; `tooltip` and `icon` are optional and refill the `{tooltip}` /
+`{icon}` placeholders (a `tooltip`/`icon` from the output wins over the static
+`tooltip`/`icon` config keys).
+
+A sample script ship in the repo and get installed to
+`~/.config/chillpill-shell/modules/`: `cpu-temp.sh` (one-shot CPU temperature,
+prints a temperature-dependent `{icon, text, tooltip}` JSON line).
+waybar-style `{text, tooltip}`.
+Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar,
+and reference them with `run` like the example shown below.
+
+Example `pillModules`:
+
+```jsonc
+"pillModules": [
+  "battery", "volume", "workspaces", "notifications", "network", "clock",
+  {
+    "run": "~/.config/chillpill-shell/modules/cpu-temp.sh", # required - rest are optional
+    "format": "{icon} {text}",
+    "tooltip": "{tooltip}",
+    "every": 10
+  }
+]
+```
+
 
 ## Dependencies
 > [!NOTE]

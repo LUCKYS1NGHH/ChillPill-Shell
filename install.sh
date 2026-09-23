@@ -125,7 +125,7 @@ fi
 # make directories
 info "Creating few new directories"
 mkdir -p /usr/share/chillpill-shell/IslandBackend
-mkdir -p "$REAL_HOME/.config/chillpill-shell"
+mkdir -p "$REAL_HOME/.config/chillpill-shell/modules"
 mkdir -p "$REAL_HOME/.cache/chillpill-shell"
 #mkdir -p /etc/systemd/user
 
@@ -201,6 +201,11 @@ chmod 755 /usr/share/chillpill-shell/scripts
 chmod 755 /usr/share/chillpill-shell/scripts/*
 chmod 755 /usr/share/chillpill-shell/IslandBackend
 chmod 644 /usr/share/chillpill-shell/IslandBackend/*
+chmod 755 "$REAL_HOME/.config/chillpill-shell/modules"
+
+# chown back the files permission to real user
+chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.config/chillpill-shell"
+chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.cache/chillpill-shell"
 
 # setup config file
 info "Setting up config file"
@@ -221,15 +226,23 @@ fi
 #info "Copying systemd file to /etc/systemd/user"
 #install -m 644 chillpill-shell.service /etc/systemd/user/chillpill-shell.service
 
-# chown back the files permission to real user
-chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.config/chillpill-shell"
-chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.cache/chillpill-shell"
+# minor adjustments
+info "Few adjustments"
+if [[ -f /usr/share/chillpill-shell/scripts/cpu-temp.sh ]]; then
+   mv /usr/share/chillpill-shell/scripts/cpu-temp.sh "$REAL_HOME/.config/chillpill-shell/modules/cpu-temp.sh"
+   chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.config/chillpill-shell/modules/cpu-temp.sh"
+fi
 
 # cleaning build files
 info "Cleaning up build files"
 rm -rf build
 
+
 echo -e "\nRun the command '${GREEN}chillpill-shell${NC}' to start now."
-echo -e "or open '${GREEN}CP-Shell${NC}' through your app launcher.\n"
-echo -e "To auto-run at every startup, paste this code in your ${BLUE_BG} ${BLACK}~/.config/hypr/hyprland.lua ${NC} config:"
-echo -e "${BLUE}hl.on(\"hyprland.start\", function()\n   hl.exec_cmd(\"chillpill-shell\")\nend)${NC}\n"
+echo -e "or open '${GREEN}CP-Shell${NC}' through your app launcher."
+
+# if needed backend build, that probably (partially) means a new user, so only show auto-run command paste code to them
+if $needs_build; then
+   echo -e "\nTo auto-run at every startup, paste this code in your ${BLUE_BG} ${BLACK}~/.config/hypr/hyprland.lua ${NC} config:"
+   echo -e "${BLUE}hl.on(\"hyprland.start\", function()\n   hl.exec_cmd(\"chillpill-shell\")\nend)${NC}\n"
+fi
