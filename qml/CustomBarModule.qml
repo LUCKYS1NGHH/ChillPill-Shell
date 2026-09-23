@@ -21,9 +21,10 @@ import QtQuick
 //    click     shell command run on left click
 //
 //  The command may print plain text (used as {text}) or one JSON object per
-//  run / per line: { "text": "...", "tooltip": "...", "icon": "..." }
+//  run / per line: { "text": "...", "tooltip": "...", "icon": "...", "color": "..." }
 //  (only "text" is required). A "tooltip" / "icon" from the output overrides
-//  the static config keys of the same name.
+//  the static config keys of the same name; "color" (output-only) tints the
+//  bar's {icon} glyph, falling back to Theme.fg when absent.
 //
 //  A leading '~' in a command is expanded to $HOME.
 
@@ -58,6 +59,39 @@ Item {
   // present, otherwise the static `icon` key from the config entry
   property string icon: ""
 
+  // JSON "color" field (e.g. "#e5c07b"): tints ONLY the bar's {icon}; the rest
+  // of the label stays Theme.fg. Empty = fall back to Theme.fg.
+  property string color: ""
+
+  readonly property bool showHtml: color !== ""
+  readonly property string labelHtml: buildLabelHtml()
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+  }
+
+  function templateString() {
+    if (spec.format !== undefined && spec.format !== null && String(spec.format) !== "")
+      return String(spec.format)
+    return root.icon !== "" ? "{icon} {text}" : "{text}"
+  }
+
+  // like computeLabel(), but wraps the {icon} glyph in a colored span so the
+  // icon picks up the JSON color while the rest keeps Theme.fg. Only engaged
+  // when a color was provided (html on), otherwise the plain path is used.
+  function buildLabelHtml() {
+    if (!showHtml) return renderedLabel
+    const escapedText = esc(text)
+    const escapedTooltip = esc(tooltip)
+    const span = '<span style="color:' + esc(color) + '">'
+      + esc(icon)
+      + '</span>'
+    return templateString()
+      .split("{text}").join(escapedText)
+      .split("{tooltip}").join(escapedTooltip)
+      .split("{icon}").join(span)
+  }
+
   function iconFromSpec() {
     return spec.icon !== undefined && spec.icon !== null ? String(spec.icon) : ""
   }
@@ -76,6 +110,7 @@ Item {
     let text = String(raw).trim()
     let tooltip = ""
     let icon = ""
+    let color = ""
     if (text !== "") {
       try {
         const json = JSON.parse(text)
@@ -83,10 +118,11 @@ Item {
           if (typeof json.text === "string") text = json.text
           if (typeof json.tooltip === "string") tooltip = json.tooltip
           if (typeof json.icon === "string") icon = json.icon
+          if (typeof json.color === "string") color = json.color
         }
       } catch (e) { /* plain text output, used as-is */ }
     }
-    return { text: text, tooltip: tooltip, icon: icon }
+    return { text: text, tooltip: tooltip, icon: icon, color: color }
   }
 
   function applyOutput(raw) {
@@ -95,14 +131,13 @@ Item {
     root.tooltip = entry.tooltip
     // dynamic icon from the script wins; otherwise fall back to the static one
     root.icon = entry.icon !== "" ? entry.icon : iconFromSpec()
+    // color comes from the output only; empty means Theme.fg for the icon
+    root.color = entry.color
     root.loading = false
   }
 
   function computeLabel() {
-    if (spec.format !== undefined && spec.format !== null && String(spec.format) !== "")
-      return fillTemplate(String(spec.format), text, tooltip)
-    // no format: show "icon text", or just the text when no icon is set
-    return root.icon !== "" ? fillTemplate("{icon} {text}", text, tooltip) : text
+    return fillTemplate(templateString(), text, tooltip)
   }
 
   function computeTooltip() {
@@ -182,6 +217,7 @@ Item {
   onSpecChanged: {
     const spec = root.spec || {}
     root.icon = iconFromSpec() // static icon baseline; output may override
+    root.color = ""            // no static color key; output decides
     if (!spec.run) {
       refreshTimer.running = false
       runner.running = false
@@ -210,7 +246,8 @@ Item {
 
   Text {
     id: label
-    text: root.renderedLabel
+    text: root.showHtml ? root.labelHtml : root.renderedLabel
+    textFormat: root.showHtml ? Text.RichText : Text.PlainText
     color: Theme.fg
     font {
       family: Theme.fontFamily
