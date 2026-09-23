@@ -265,15 +265,14 @@ into your session at all times. It's not bound to any dotfiles.
 
 ### Custom Pill Modules
 
-Besides the built-in Quickshell modules (`battery`, `volume`, `workspaces`, `network`, `clock`,
-`weather`, `bluetooth`, `vpn`, `notifications`, `brightness`), `pillModules` also accepts
+Besides the built-in Quickshell modules (`battery`, `workspaces`, `network`, `clock`, `vpn`, `notifications` etc.), `pillModules` also accepts
 **object entries** that run any command/script and show its output in the bar — kind of similar to
 [waybar's custom module](https://github.com/Alexays/Waybar/wiki/Module:-Custom).
 
 | Key | Description |
 |---|---|
 | `run` | Command to execute **(required)**. A leading `~` is expanded to `$HOME`. |
-| `icon` | Optional icon (e.g. a nerd font glyph), referenced in `format`/`tooltip` as `{icon}` |
+| `icon` | Optional nerdfont icon, referenced in `format`/`tooltip` as `{icon}` |
 | `format` | Text shown in the bar. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: `{icon} {text}` (or just `{text}` without an icon) |
 | `tooltip` | Tooltip shown on hover. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: the output's tooltip |
 | `every` | Refresh every N seconds. Omit (or `0`) to run once at startup |
@@ -286,16 +285,12 @@ The command may print **plain text** (used as `{text}`) or a **JSON object** per
 { "icon": "", "color": "#6d9fd7", "text": "45°C", "tooltip": "45°C CPU Temperature" }
 ```
 
-`text` is required; `tooltip` and `icon` are optional and refill the `{tooltip}` /
-`{icon}` placeholders (a `tooltip`/`icon` from the output wins over the static
-`tooltip`/`icon` config keys).
+`text` is required; `tooltip`, `color` and `icon` are optional. single `{text}` in JSON output fills the `{tooltip}` same.
 
 A sample script ship in the repo and get installed to
 `~/.config/chillpill-shell/modules/`: `cpu-temp.sh` (one-shot CPU temperature,
-prints a temperature-dependent `{icon, text, tooltip}` JSON line).
-waybar-style `{text, tooltip}`.
-Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar,
-and reference them with `run` like the example shown below.
+prints a temperature-dependent `{icon, color, text, tooltip}` JSON line).
+Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar.
 
 Example `pillModules`:
 
@@ -303,14 +298,13 @@ Example `pillModules`:
 "pillModules": [
   "battery", "volume", "workspaces", "notifications", "network", "clock",
   {
-    "run": "~/.config/chillpill-shell/modules/cpu-temp.sh", # required - rest are optional
+    "run": "~/.config/chillpill-shell/modules/cpu-temp.sh", // required - rest are optional
     "format": "{icon} {text}",
     "tooltip": "{tooltip}",
     "every": 10
   }
 ]
 ```
-
 
 ## Dependencies
 > [!NOTE]
