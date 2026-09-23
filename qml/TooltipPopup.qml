@@ -47,6 +47,9 @@ PanelWindow {
 
   property string content: {
     if (tooltipExcluded.includes(box.tooltipModule)) return ""
+    // waybar-style custom modules render their own tooltip (tooltip/{tooltip})
+    // and hand it to the popup through box.customTooltipText
+    if (box.tooltipModule.startsWith("custom")) return box.customTooltipText
     if (refreshTick < 0) return "" // force dependency on refreshTick so content re-evaluates
     switch (box.tooltipModule) {
       case "battery": {

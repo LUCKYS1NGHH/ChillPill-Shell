@@ -35,11 +35,23 @@ Row {
       implicitWidth: moduleLoader.implicitWidth
       implicitHeight: moduleLoader.implicitHeight
 
+      // pillModules entries can be a module name ('clock') or a waybar-style
+      // custom module object ({ "run": "...", ... }) handled by CustomBarModule.qml
+      readonly property bool isCustom: typeof modelData === "object" && modelData !== null
+      readonly property string moduleID: isCustom ? "custom" + index : String(modelData)
+
+      visible: !isCustom || !!modelData.run
+
       Loader {
         id: moduleLoader
         anchors.fill: parent
-        source: capitalize(modelData) + ".qml"
+        source: isCustom ? "CustomBarModule.qml" : capitalize(modelData) + ".qml"
         onLoaded: {
+          if (isCustom) {
+            item.spec = modelData
+            item.moduleID = moduleID
+            return
+          }
           switch (modelData) {
             case "volume":
               box.volumeModule = item
@@ -58,8 +70,9 @@ Row {
       }
       TapHandler {
         acceptedButtons: Qt.LeftButton
-        enabled: modelData === "volume" || modelData === "network" || modelData === "bluetooth"
+        enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth")
         onTapped: {
+          if (isCustom) return
           switch (modelData) {
             case "volume":
               if (moduleLoader.item && moduleLoader.item.toggleMute)
@@ -78,12 +91,22 @@ Row {
       }
       HoverHandler {
         id: hoverHandler
-        cursorShape: (modelData === "workspaces" || modelData === "volume"
-                      || modelData === "network" || modelData === "bluetooth")
-                     ? Qt.PointingHandCursor : Qt.ArrowCursor
+        cursorShape: isCustom
+          ? (modelData.click
+             ? Qt.PointingHandCursor : Qt.ArrowCursor)
+          : (modelData === "workspaces" || modelData === "volume"
+             || modelData === "network" || modelData === "bluetooth")
+            ? Qt.PointingHandCursor : Qt.ArrowCursor
         onHoveredChanged: {
           if (hovered) {
-            box.tooltipModule = modelData
+            box.tooltipModule = moduleID
+            if (isCustom) {
+              // custom modules render their own tooltip (tooltip/{tooltip}); the
+              // shared tooltip popup reads it through customTooltipText
+              const moduleItem = moduleLoader.item
+              box.customTooltipText = moduleItem && typeof moduleItem.tooltipText === "string"
+                ? moduleItem.tooltipText : ""
+            }
             if (tooltipPopup.content === "") {
               box.tooltipVisible = false
               return
@@ -95,6 +118,7 @@ Row {
             box.tooltipVisible = true
           } else {
             box.tooltipVisible = false
+            if (isCustom) box.customTooltipText = ""
           }
         }
       }

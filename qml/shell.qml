@@ -204,6 +204,7 @@ ShellRoot {
 
       property bool tooltipVisible: false
       property string tooltipModule: ""
+      property string customTooltipText: ""
       property real tooltipX: 0
       property real tooltipY: 0
 

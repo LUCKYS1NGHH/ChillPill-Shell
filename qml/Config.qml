@@ -41,7 +41,7 @@ Singleton {
       property string country: "Japan"
       property bool showAudioVisuals: true
       property bool showSensitiveInfo: true
-      property list<string> pillModules: ["battery", "volume", "workspaces", "network", "clock"]
+      property var pillModules: ["battery", "volume", "workspaces", "network", "clock"]
       property string customWallpaperScript: ""
       property bool pillOnHover: false
       property bool confirmPowerActions: true
