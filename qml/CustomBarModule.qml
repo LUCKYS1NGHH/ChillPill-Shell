@@ -26,6 +26,13 @@ import QtQuick
 //  the static config keys of the same name; "color" (output-only) tints the
 //  bar's {icon} glyph, falling back to Theme.fg when absent.
 //
+//  If the JSON output is missing the required "text" field, the bar shows the
+//  error message "ERR: missing text" in place of {text} (instead of the raw
+//  JSON output). In that error state any surrounding config template text is
+//  ignored too — e.g. format "{text} MB" renders only "ERR: missing text" —
+//  and the tooltip explains the problem: "I need atleast 'text' in JSON
+//  output".
+//
 //  A leading '~' in a command is expanded to $HOME.
 
 Item {
@@ -36,6 +43,10 @@ Item {
   property string text: ""
   property string tooltip: ""
   property bool loading: false
+  // set when the last JSON output had no "text": the bar and tooltip show only
+  // the error message, ignoring the config's format / tooltip template (so
+  // "{text} MB" doesn't render as "ERR: missing text MB")
+  property bool outputError: false
 
   readonly property string renderedLabel: computeLabel()
   readonly property string renderedTooltip: computeTooltip()
@@ -81,6 +92,7 @@ Item {
   // when a color was provided (html on), otherwise the plain path is used.
   function buildLabelHtml() {
     if (!showHtml) return renderedLabel
+    if (root.outputError) return esc(text)
     const escapedText = esc(text)
     const escapedTooltip = esc(tooltip)
     const span = '<span style="color:' + esc(color) + '">'
@@ -111,18 +123,26 @@ Item {
     let tooltip = ""
     let icon = ""
     let color = ""
+    let outputError = false
     if (text !== "") {
       try {
         const json = JSON.parse(text)
         if (json !== null && typeof json === "object") {
-          if (typeof json.text === "string") text = json.text
+          if (typeof json.text === "string") {
+            text = json.text
+          } else {
+            // required "text" field missing: show an error message in the bar
+            // in place of {text} instead of dumping the raw JSON output
+            text = "ERR: missing text"
+            outputError = true
+          }
           if (typeof json.tooltip === "string") tooltip = json.tooltip
           if (typeof json.icon === "string") icon = json.icon
           if (typeof json.color === "string") color = json.color
         }
       } catch (e) { /* plain text output, used as-is */ }
     }
-    return { text: text, tooltip: tooltip, icon: icon, color: color }
+    return { text: text, tooltip: tooltip, icon: icon, color: color, outputError: outputError }
   }
 
   function applyOutput(raw) {
@@ -133,14 +153,22 @@ Item {
     root.icon = entry.icon !== "" ? entry.icon : iconFromSpec()
     // color comes from the output only; empty means Theme.fg for the icon
     root.color = entry.color
+    root.outputError = entry.outputError
     root.loading = false
   }
 
   function computeLabel() {
+    // error state: show only the error message — ignore the config's format
+    // template (e.g. "{text} MB") so no wrapper text is appended
+    if (root.outputError) return text
     return fillTemplate(templateString(), text, tooltip)
   }
 
   function computeTooltip() {
+    // error state: explain what the module needs instead of the config's
+    // tooltip template (e.g. "... {tooltip} MB of RAM") and instead of the
+    // raw output
+    if (root.outputError) return "I need atleast 'text' in JSON output"
     if (spec.tooltip !== undefined && spec.tooltip !== null && String(spec.tooltip) !== "")
       return fillTemplate(String(spec.tooltip), text, tooltip)
     return tooltip
@@ -218,6 +246,7 @@ Item {
     const spec = root.spec || {}
     root.icon = iconFromSpec() // static icon baseline; output may override
     root.color = ""            // no static color key; output decides
+    root.outputError = false   // fresh module, no stale error state
     if (!spec.run) {
       refreshTimer.running = false
       runner.running = false
