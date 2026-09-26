@@ -11,8 +11,11 @@ Item {
     property int selectedIndex: 0
     property var allEntries: [] // raw source of: { id, label, imagePath }
     property string searchQuery: ""
-    property string deletingId: ""
-    property string collapsingId: ""
+    property var markedIds: []  // ids picked for multi select, deleted together
+    property string markAnchorId: ""  // id the Shift+Up/Down range grows from
+    property var deletingIds: []  // ids flashing red before they leave the list
+    property var deletingBatch: []  // ids of the delete currently in flight
+    property var collapsingIds: []  // ids animating out right before removal
     property bool fullPreview: false
     property int previewSlideDir: 1  // 1 = down/next, -1 = up/prev
     property string previewText: ""  // full decoded content for text preview
@@ -37,6 +40,7 @@ Item {
             searchQuery = ""
             searchInput.text = ""
             selectedIndex = 0
+            clearMarks()
             searchInput.forceActiveFocus()
         }
     }
@@ -95,6 +99,66 @@ Item {
         listCountProc.running = true
     }
 
+    function isMarked(id) {
+        return root.markedIds.indexOf(id) !== -1
+    }
+
+    function isDeleting(id) {
+        return root.deletingIds.indexOf(id) !== -1
+    }
+
+    function isCollapsing(id) {
+        return root.collapsingIds.indexOf(id) !== -1
+    }
+
+    function clearMarks() {
+        root.markedIds = []
+        root.markAnchorId = ""
+    }
+
+    // Shift+Space (or Ctrl/Shift+click) marks/unmarks a single item
+    function toggleMarkAt(index) {
+        if (index < 0 || index >= listModel.count) return
+        let id = listModel.get(index).id
+        root.markAnchorId = id
+        root.markedIds = root.isMarked(id) ? root.markedIds.filter(x => x !== id)
+                                          : root.markedIds.concat([id])
+    }
+
+    // the row the marked range grows from, kept as an id so it survives
+    // list rebuilds (search, removals), resolved on demand
+    function markAnchorIndex() {
+        if (root.markAnchorId !== "") {
+            for (let i = 0; i < listModel.count; i++) {
+                if (listModel.get(i).id === root.markAnchorId) return i
+            }
+        }
+        return root.selectedIndex
+    }
+
+    // Shift+Up/Down: grow/shrink the marked range, editor style.
+    // only in the list, in the full preview Up/Down can jump over items of the
+    // other type (separatePreviewTabTypes), a range would swallow unrelated rows
+    function extendMark(dir) {
+        if (listModel.count === 0) return
+        // the first Shift+<arrow> turns the highlighted row into the range start
+        if (root.markAnchorId === "" && root.selectedIndex >= 0) {
+            root.markAnchorId = listModel.get(root.selectedIndex).id
+        }
+        let anchor = root.markAnchorIndex()
+        let to = root.selectedIndex + dir
+        if (to < 0 || to >= listModel.count) return
+
+        root.selectedIndex = to
+        let ids = []
+        let lo = Math.min(anchor, to)
+        let hi = Math.max(anchor, to)
+        for (let i = lo; i <= hi; i++) ids.push(listModel.get(i).id)
+        root.markedIds = ids
+
+        listView.positionViewAtIndex(to, ListView.Contain)
+    }
+
     function copySelected() {
         if (listModel.count === 0) return
         let entry = listModel.get(selectedIndex)
@@ -104,16 +168,57 @@ Item {
         root.closeRequested()
     }
 
-    function deleteSelected() {
-        if (listModel.count === 0) return
-        let entry = listModel.get(selectedIndex)
-        root.deletingId = entry.id
+    // cliphist ids are plain numbers, some versions use "b64:<hash>" for binary
+    // entries, anything outside this set never reaches a shell
+    function safeIds(ids) {
+        let out = []
+        for (let i = 0; i < ids.length; i++) {
+            let id = String(ids[i])
+            if (/^[A-Za-z0-9:+=._\/-]+$/.test(id)) out.push(id)
+        }
+        return out
+    }
 
-        deleteProc.command = ["sh", "-c", "/usr/share/chillpill-shell/scripts/cliphist-img.sh delete \"$1\" \"$2\"", "_", entry.id, Config.deleteCliphistImgCache]
+    // the whole batch goes through a single cliphist pipeline, ids are matched on
+    // the "<id>\t" prefix so a short id can't drag a longer one with it
+    function deleteCommand(ids) {
+        let safe = root.safeIds(ids)
+        if (safe.length === 0) return ""
+        let patterns = []
+        for (let i = 0; i < safe.length; i++) patterns.push("-e '^" + safe[i] + "\t'")
+        return "cliphist list | grep -a " + patterns.join(" ") + " | cliphist delete"
+    }
+
+    // the image cache files the list previews are made of, cleaned up once the
+    // delete actually ran, same opt-in the script had
+    function removeImgCache(ids) {
+        if (!Config.deleteCliphistImgCache) return
+        let safe = root.safeIds(ids)
+        if (safe.length === 0) return
+        let dir = Quickshell.env("HOME") + "/.cache/chillpill-shell/cliphist-imgs"
+        imgCacheProc.command = ["rm", "-f"].concat(safe.map(id => dir + "/" + id + ".png"))
+        imgCacheProc.running = false
+        imgCacheProc.running = true
+    }
+
+    // Del: the marked items go first, the highlighted one only when nothing is marked
+    function deleteSelected() {
+        if (listModel.count === 0 || root.selectedIndex < 0) return
+        let ids = root.markedIds.length > 0
+            ? root.markedIds.slice()
+            : [listModel.get(root.selectedIndex).id]
+
+        let cmd = root.deleteCommand(ids)
+        if (cmd === "") return
+
+        root.deletingIds = ids
+        root.deletingBatch = ids
+
+        deleteProc.command = ["sh", "-c", cmd]
         deleteProc.running = false
         deleteProc.running = true
 
-        holdRedTimer.entryId = entry.id
+        holdRedTimer.ids = ids
         holdRedTimer.restart()
     }
 
@@ -168,11 +273,14 @@ Item {
         listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
     }
 
-    // Esc: exit the full preview first, otherwise request closing the bar.
+    // Esc: exit the full preview first, then drop the multi select marks,
+    // only then request closing the bar.
     function handleCloseKey() {
         if (root.fullPreview) {
             root.fullPreview = false
             root.previewToggled(false)
+        } else if (root.markedIds.length > 0) {
+            root.clearMarks()
         } else {
             root.closeRequested()
         }
@@ -182,10 +290,12 @@ Item {
     // or the (focused) preview text holds the active focus.
     function onShortcutPressed(event) {
         if (event.key === Qt.Key_Down) {
-            root.moveSelection(1)
+            if (event.modifiers & Qt.ShiftModifier && !root.fullPreview) root.extendMark(1)
+            else root.moveSelection(1)
             event.accepted = true
         } else if (event.key === Qt.Key_Up) {
-            root.moveSelection(-1)
+            if (event.modifiers & Qt.ShiftModifier && !root.fullPreview) root.extendMark(-1)
+            else root.moveSelection(-1)
             event.accepted = true
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             root.copySelected()
@@ -196,6 +306,12 @@ Item {
         } else if (event.key === Qt.Key_Delete) {
             root.deleteSelected()
             event.accepted = true
+        } else if (event.key === Qt.Key_Space) {
+            // plain Space still types into the search box, Shift+Space marks
+            if (event.modifiers & Qt.ShiftModifier) {
+                root.toggleMarkAt(root.selectedIndex)
+                event.accepted = true
+            }
         } else if (event.key === Qt.Key_Tab) {
             console.log("Tab key clicked for clipboard full preview")
             root.fullPreviewSelected()
@@ -205,42 +321,51 @@ Item {
 
     Timer {
         id: holdRedTimer
-        property string entryId: ""
+        property var ids: []
         interval: 160
         repeat: false
         onTriggered: {
-            root.collapsingId = entryId
-            removeTimer.entryId = entryId
+            root.collapsingIds = ids
+            removeTimer.ids = ids
             removeTimer.restart()
         }
     }
 
     Timer {
         id: removeTimer
-        property string entryId: ""
+        property var ids: []
         interval: 220
         repeat: false
         onTriggered: {
+            let batch = ids
             let currentIdx = root.selectedIndex
             let savedContentY = listView.contentY
 
             let wasPreviewing = root.fullPreview
             let wasImage = root.currentIsImage()
 
-            let idx = -1
+            // collect the rows first, then drop them last index first so the
+            // earlier indices stay valid while the model shrinks
+            let indices = []
             for (let i = 0; i < listModel.count; i++) {
-                if (listModel.get(i).id === entryId) { idx = i; break }
+                if (batch.indexOf(listModel.get(i).id) !== -1) indices.push(i)
             }
-            if (idx !== -1) listModel.remove(idx)
-            root.allEntries = root.allEntries.filter(e => e.id !== entryId)
+            for (let i = indices.length - 1; i >= 0; i--) listModel.remove(indices[i])
+            root.allEntries = root.allEntries.filter(e => batch.indexOf(e.id) === -1)
 
-            root.deletingId = ""
-            root.collapsingId = ""
+            root.deletingIds = []
+            root.collapsingIds = []
+            root.markedIds = root.markedIds.filter(id => batch.indexOf(id) === -1)
+
+            // land on the row the removed block started at when the cursor itself
+            // was deleted, otherwise keep the cursor on the same item it was on
+            let landed = indices.length > 0 && indices.indexOf(currentIdx) !== -1
+                ? indices[0]
+                : currentIdx - indices.filter(i => i < currentIdx).length
 
             let newLength = listModel.count
             if (newLength === 0) root.selectedIndex = -1
-            else if (currentIdx >= newLength) root.selectedIndex = newLength - 1
-            else root.selectedIndex = currentIdx
+            else root.selectedIndex = Math.max(0, Math.min(landed, newLength - 1))
 
             // if in full preview with separated types, make sure landed index matches the preview type
             if (wasPreviewing && Config.separatePreviewTabTypes && root.selectedIndex !== -1) {
@@ -317,6 +442,15 @@ Item {
             listCountProc.running = false
             listCountProc.running = true
         }
+        onExited: (code) => {
+            if (code === 0) root.removeImgCache(root.deletingBatch)
+        }
+    }
+
+    // drops the cached preview images of the deleted binary entries
+    Process {
+        id: imgCacheProc
+        running: false
     }
 
     Process {
@@ -410,6 +544,27 @@ Item {
 
                 Keys.onPressed: (event) => root.onShortcutPressed(event)
             }
+
+            // multi select state / hint, hidden as soon as the query gets in the way
+            Text {
+                anchors.right: parent.right
+                anchors.rightMargin: 8
+                anchors.verticalCenter: parent.verticalCenter
+                visible: !fullPreview && searchInput.text.length === 0 && root.markedIds.length === 0
+                text: " / [SPACE] to multi-select"
+                color: Theme.fg4
+                font { family: Theme.fontFamily; pixelSize: 9 }
+            }
+
+            Text {
+                anchors.right: parent.right
+                anchors.rightMargin: 8
+                anchors.verticalCenter: parent.verticalCenter
+                visible: !fullPreview && root.markedIds.length > 0
+                text: root.markedIds.length + " marked • Del removes"
+                color: Theme.fg3
+                font { family: Theme.fontFamily; pixelSize: 8; weight: 600 }
+            }
         }
 
         // full preview (image or text), wrapped in item to align in center
@@ -456,6 +611,8 @@ Item {
                             return digits * 7 + 12
                         }
                         readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
+                        readonly property bool currentDeleting: root.isDeleting(currentEntryId)
+                        readonly property bool currentCollapsing: root.isCollapsing(currentEntryId)
                         // brief "Copied" toast shown when text is copied from the preview
                         property bool copiedFlash: false
 
@@ -511,8 +668,8 @@ Item {
                                 cache: false
                                 visible: currentIsImage
 
-                                opacity: currentEntryId === root.collapsingId ? 0 : (status === Image.Ready ? 1 : 0)
-                                scale: currentEntryId === root.collapsingId ? 0.8 : 1
+                                opacity: currentCollapsing ? 0 : (status === Image.Ready ? 1 : 0)
+                                scale: currentCollapsing ? 0.8 : 1
                                 Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
@@ -546,8 +703,8 @@ Item {
                                         font { family: Theme.fontFamily; pixelSize: 12 }
                                         horizontalAlignment: Text.AlignRight
 
-                                        opacity: (currentEntryId === root.collapsingId) ? 0 : (textReady ? 0.8 : 0)
-                                        scale: currentEntryId === root.collapsingId ? 0.8 : 1
+                                        opacity: currentCollapsing ? 0 : (textReady ? 0.8 : 0)
+                                        scale: currentCollapsing ? 0.8 : 1
                                         Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                                         Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
                                     }
@@ -593,8 +750,8 @@ Item {
                                         width: implicitWidth
                                         height: implicitHeight
 
-                                        opacity: (currentEntryId === root.collapsingId) ? 0 : (textReady ? 1 : 0)
-                                        scale: currentEntryId === root.collapsingId ? 0.8 : 1
+                                        opacity: currentCollapsing ? 0 : (textReady ? 1 : 0)
+                                        scale: currentCollapsing ? 0.8 : 1
                                         Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                                         Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
                                     }
@@ -628,7 +785,7 @@ Item {
                             anchors.bottomMargin: 26
                             radius: 15
                             color: Theme.deleting
-                            opacity: currentEntryId === root.deletingId ? 0.70 : 0
+                            opacity: currentDeleting ? 0.70 : 0
                             Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                         }
 
@@ -638,8 +795,8 @@ Item {
                             text: "Deleted"
                             color: "white"
                             font { family: Theme.fontFamily; pixelSize: 14; weight: 600 }
-                            opacity: currentEntryId === root.deletingId ? 1 : 0
-                            scale: currentEntryId === root.deletingId ? 1 : 0.80
+                            opacity: currentDeleting ? 1 : 0
+                            scale: currentDeleting ? 1 : 0.80
                             Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                             Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutBack } }
                         }
@@ -672,6 +829,33 @@ Item {
                             }
                         }
 
+                        // multi select chip, the list itself is hidden in the full preview
+                        // so this is the only hint of how many items are marked
+                        Item {
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.margins: 8
+                            visible: root.markedIds.length > 0
+                            width: markedLabel.implicitWidth + 18
+                            height: markedLabel.implicitHeight + 10
+                            opacity: currentCollapsing ? 0 : 1
+                            Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: height / 2
+                                color: Theme.bg1
+                            }
+
+                            Text {
+                                id: markedLabel
+                                anchors.centerIn: parent
+                                text: root.markedIds.length + " marked • Del removes"
+                                color: Theme.fg3
+                                font { family: Theme.fontFamily; pixelSize: 9 }
+                            }
+                        }
+
                         Text {
                             anchors.bottom: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -701,12 +885,12 @@ Item {
 
             delegate: Rectangle {
                 width: listView.width
-                height: model.id === root.collapsingId ? 5 : (model.imagePath ? 55 : 30)
+                height: root.isCollapsing(model.id) ? 5 : (model.imagePath ? 55 : 30)
                 radius: 7
-                color: model.id === root.deletingId ? Theme.deleting : (index === root.selectedIndex ? Theme.focusBg1 : "transparent")
+                color: root.isDeleting(model.id) ? Theme.deleting : (index === root.selectedIndex ? Theme.focusBg1 : (root.isMarked(model.id) ? Theme.bg4 : "transparent"))
                 clip: true
-                opacity: model.id === root.collapsingId ? 0 : 1
-                scale: model.id === root.collapsingId ? 0.75 : 1
+                opacity: root.isCollapsing(model.id) ? 0 : 1
+                scale: root.isCollapsing(model.id) ? 0.75 : 1
 
                 Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
                 Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
@@ -722,6 +906,18 @@ Item {
                     asynchronous: true
                     sourceSize: Qt.size(80, 50)
                     cache: false
+                }
+
+                // mark tick for multi selected items, sits in the padding ring
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 3
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.isMarked(model.id) && !root.isDeleting(model.id)
+                    width: 2
+                    height: model.imagePath ? 24 : 12
+                    radius: 1
+                    color: Theme.accent
                 }
 
                 // text label
@@ -740,9 +936,11 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
+                    onClicked: (mouse) => {
                         root.selectedIndex = index
-                        root.copySelected()
+                        // Ctrl/Shift+click marks instead of copying
+                        if (mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)) root.toggleMarkAt(index)
+                        else root.copySelected()
                     }
                 }
             }

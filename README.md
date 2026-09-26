@@ -119,7 +119,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see 'Know more' below.
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
-- **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, `Delete` key to delete any item, `Tab` to full preview the clipboard image/text
+- **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, multi select to delete many items at once (`Shift + Up/Down` range, `Shift + Space` pick, `Del` to delete), `Tab` to full preview the clipboard image/text
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
@@ -169,6 +169,14 @@ into your session at all times. It's not bound to any dotfiles.
   option (enabled by default).
 
 - In Cliphist full preview tab (which opens through `Tab` key), you can switch to other item by `Up`/`Down` keys, and can also delete the item from there.
+
+- Cliphist items can be multi selected through keys, then deleted in one go with `Del`:
+
+  - `Shift + Up` / `Shift + Down`: mark a range of items, editor style (grows and shrinks from where the range started)
+  - `Shift + Space`: mark/unmark the item under the cursor (works in the full preview too, the marked count shows as a chip there)
+  - `Ctrl + Click` / `Shift + Click`: same toggle with the mouse
+  - `Del`: deletes the marked items, or the highlighted one when nothing is marked
+  - `Esc`: drops the marks first, closes the panel on the second press
 
 - Notifications are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie in full screen.
   also it can show custom app icon to show in notification, else it shows bell icon.
