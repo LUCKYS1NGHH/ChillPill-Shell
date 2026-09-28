@@ -83,7 +83,7 @@ PanelWindow {
     id: cardBg
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: parent.top
-    color: Theme.bg
+    color: Theme.bgD
     radius: root.cardRadius
     implicitWidth: root.cardWidth
     implicitHeight: root.cardHeight

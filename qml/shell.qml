@@ -1249,6 +1249,53 @@ ShellRoot {
     }
   }
 
+  // volume OSD over fullscreen windows
+  FullscreenOsd {
+    id: fsVolume
+    active: box.activeOsd === "volume"
+      && fullscreenActive
+      && !notifFullscreenMode
+    cardWidth: 220 * box.dpi
+    cardHeight: 42 * box.dpi
+
+    readonly property var volModule: box.volumeModule
+
+    RowLayout {
+      Layout.alignment: Qt.AlignVCenter
+      spacing: 12 * box.dpi
+
+      Text {
+        text: fsVolume.volModule ? fsVolume.volModule.icon : ""
+        color: fsVolume.volModule && fsVolume.volModule.muted ? fsVolume.volModule.mutedFg : Theme.fg
+        font { family: Theme.nerdFontFamily; pixelSize: 16 * box.dpi }
+      }
+
+      // same bar geometry and fill speed as the pill OSD
+      Rectangle {
+        width: 90 * box.dpi
+        height: 4 * box.dpi
+        radius: 2 * box.dpi
+        color: Theme.bg1
+        Layout.alignment: Qt.AlignVCenter
+
+        Rectangle {
+          width: parent.width * (fsVolume.volModule ? Math.min(fsVolume.volModule.intendedVol / Config.maxVolume, 1.0) : 0)
+          height: parent.height
+          radius: parent.radius
+          color: fsVolume.volModule && fsVolume.volModule.muted ? fsVolume.volModule.mutedFg : Theme.fg
+          Behavior on width { NumberAnimation { duration: osdSpeed; easing.type: Easing.OutCubic } }
+        }
+      }
+
+      Text {
+        text: fsVolume.volModule ? (fsVolume.volModule.muted ? "muted" : fsVolume.volModule.intendedVol + "%") : ""
+        color: Theme.fg
+        font { family: Theme.fontFamily; pixelSize: 10 * box.dpi; weight: 600 }
+        Layout.alignment: Qt.AlignVCenter
+      }
+    }
+  }
+
   // brightness OSD over fullscreen windows
   FullscreenOsd {
     id: fsBrightness
