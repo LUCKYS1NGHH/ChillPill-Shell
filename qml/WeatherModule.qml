@@ -5,10 +5,11 @@ import QtQuick
 Singleton {
   id: root
 
-  property real temp: 0
-  property real feelsLike: 0
+  // raw payload, kept in both unit systems so that flipping weatherUnits in the
+  // config re-renders instantly instead of waiting for the next network fetch
+  property var current: ({})
+  property var forecastRaw: []
   property int humidity: 0
-  property real windSpeed: 0
   property string windDir: ""
   property int uvIndex: 0
   property string condition: ""
@@ -17,13 +18,33 @@ Singleton {
   property string iconColor: "#9aa0a6"
   property string sunrise: ""
   property string sunset: ""
-  property var forecast: []
   property bool loading: false
   property string errorMessage: ""
   property var lastUpdated: new Date()
   property bool hasData: false
   property bool isStale: false
   property bool isError: errorMessage.length > 0 && !isStale
+
+  readonly property bool isMetric: Config.weatherUnits !== "imperial"
+  readonly property string tempUnit: isMetric ? "°C" : "°F"
+  readonly property string speedUnit: isMetric ? "km/h" : "mph"
+
+  readonly property real temp: pick(current.temp_C, current.temp_F)
+  readonly property real feelsLike: pick(current.FeelsLikeC, current.FeelsLikeF)
+  readonly property real windSpeed: pick(current.windspeedKmph, current.windspeedMiles)
+  readonly property var forecast: forecastRaw.map(day => ({
+    date: day.date,
+    maxTemp: pick(day.maxtempC, day.maxtempF),
+    minTemp: pick(day.mintempC, day.mintempF),
+    iconGlyph: day.iconGlyph,
+    iconColor: day.iconColor
+  }))
+
+  // picks the metric or imperial variant of an API field
+  function pick(metricValue, imperialValue) {
+    const n = parseFloat(isMetric ? metricValue : imperialValue)
+    return isNaN(n) ? 0 : n
+  }
 
   function iconForCode(code) {
     const c = parseInt(code)
@@ -54,12 +75,9 @@ Singleton {
         const data = JSON.parse(xhr.responseText)
         const current = data.current_condition[0]
         const today = data.weather[0]
-        const isMetric = Config.weatherUnits === "metric"
 
-        root.temp = isMetric ? parseFloat(current.temp_C) : parseFloat(current.temp_F)
-        root.feelsLike = isMetric ? parseFloat(current.FeelsLikeC) : parseFloat(current.FeelsLikeF)
+        root.current = current
         root.humidity = parseInt(current.humidity)
-        root.windSpeed = isMetric ? parseFloat(current.windspeedKmph) : parseFloat(current.windspeedMiles)
         root.windDir = current.winddir16Point
         root.uvIndex = parseInt(current.uvIndex)
         root.condition = current.weatherDesc[0].value
@@ -72,12 +90,14 @@ Singleton {
         root.sunrise = today.astronomy[0].sunrise
         root.sunset = today.astronomy[0].sunset
 
-        root.forecast = data.weather.slice(0, 3).map(day => {
+        root.forecastRaw = data.weather.slice(0, 3).map(day => {
           const dayIcon = root.iconForCode(day.hourly[4].weatherCode)
           return {
             date: day.date,
-            maxTemp: isMetric ? parseFloat(day.maxtempC) : parseFloat(day.maxtempF),
-            minTemp: isMetric ? parseFloat(day.mintempC) : parseFloat(day.mintempF),
+            maxTempC: day.maxtempC,
+            minTempC: day.mintempC,
+            maxTempF: day.maxtempF,
+            minTempF: day.mintempF,
             iconGlyph: dayIcon.glyph,
             iconColor: dayIcon.color
           }

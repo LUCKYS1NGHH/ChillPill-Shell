@@ -90,7 +90,7 @@ Rectangle {
         Text {
           text: WeatherModule.loading ? "..."
               : WeatherModule.isError ? "!"
-              : Math.round(WeatherModule.temp) + "°" + (Config.weatherUnits === "metric" ? "C" : "F")
+              : Math.round(WeatherModule.temp) + WeatherModule.tempUnit
           color: WeatherModule.isError ? Theme.warning : "#ecebeb"
           font.family: WeatherModule.isError ? Config.nerdFontFamily : Theme.fontFamily
           font.pixelSize: 25 * box.dpi
@@ -117,9 +117,9 @@ Rectangle {
 
       Repeater {
         model: [
-          { icon: "\ue34e", color: "#f18d41", value: Math.round(WeatherModule.feelsLike) + "°", label: "Feels" },
+          { icon: "\ue34e", color: "#f18d41", value: Math.round(WeatherModule.feelsLike) + WeatherModule.tempUnit, label: "Feels" },
           { icon: "\ue373", color: "#5f99fa", value: WeatherModule.humidity + "%", label: "Humidity" },
-          { icon: "\ue34b", color: "#54e04b", value: Math.round(WeatherModule.windSpeed) + " km/h", label: "Wind" }
+          { icon: "\ue34b", color: "#54e04b", value: Math.round(WeatherModule.windSpeed) + " " + WeatherModule.speedUnit, label: "Wind" }
         ]
         delegate: Rectangle {
           Layout.fillWidth: true
@@ -249,6 +249,7 @@ Rectangle {
             font.family: Theme.fontFamily
             font.pixelSize: weatherPopup.fontSizeTiny * box.dpi
             Layout.alignment: Qt.AlignHCenter
+            elide: Text.ElideRight
           }
         }
       }

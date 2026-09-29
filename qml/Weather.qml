@@ -24,7 +24,7 @@ Item {
     Text {
       text: WeatherModule.loading ? "--"
           : WeatherModule.isError ? "!"
-          : Math.round(WeatherModule.temp) + "°" + (Config.weatherUnits === "metric" ? "C" : "F")
+          : Math.round(WeatherModule.temp) + WeatherModule.tempUnit
       color: WeatherModule.isError ? Theme.warning : fg
       font { family: WeatherModule.isError ? Config.nerdFontFamily : Theme.fontFamily; pixelSize: clickable ? 10 : 10 * Config.pillScale; weight: 400 }
       anchors.verticalCenter: parent.verticalCenter

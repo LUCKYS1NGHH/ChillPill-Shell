@@ -1217,7 +1217,7 @@ ShellRoot {
                 Page {
                     Heading { text: "MODULES (LEFT → RIGHT)" }
                     ModulesEditor {
-                        known: ["battery", "volume", "workspaces", "network", "clock", "brightness", "vpn", "notifications", "bluetooth"]
+                        known: ["battery", "volume", "workspaces", "network", "clock", "brightness", "vpn", "notifications", "bluetooth", "weather"]
                         value: root.get("pillModules", [])
                         onEdited: (v) => root.set("pillModules", v)
                     }
