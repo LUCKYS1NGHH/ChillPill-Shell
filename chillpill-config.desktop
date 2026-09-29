@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=CP-Shell's Config
+GenericName=CP-Shell
+Comment=ChillPill-Shell's Config App
+Icon=
+Exec=/usr/local/bin/chillpill-config
+Terminal=false
+Categories=System;Utility;

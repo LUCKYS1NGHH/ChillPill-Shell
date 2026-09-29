@@ -175,21 +175,24 @@ else
 fi
 
 # copy directories
-info "Copying scripts and share directory to /usr/share/chillpill-shell"
+info "Copying scripts, config-app & share directories to /usr/share/chillpill-shell"
 cp -r scripts /usr/share/chillpill-shell
 cp -r share /usr/share/chillpill-shell
+cp -r config-app /usr/share/chillpill-shell
 
 # copy QML files
 info "Copying QML files"
 install -m 644 qml/* /usr/share/chillpill-shell
 
 # copy launcher (bash)
-info "Copying the launcher.sh"
+info "Creating launchers (main shell and config-app)"
 install -m 755 launcher.sh /usr/local/bin/chillpill-shell
+install -m 755 config-launcher.sh /usr/local/bin/chillpill-config
 
 # copy app launcher
-info "Copying app launcher"
+info "Copying app launchers"
 install -m 644 chillpill.desktop /usr/share/applications
+install -m 644 chillpill-config.desktop /usr/share/applications
 
 # set correct permissions at last
 info "Setting up right permissions"
@@ -199,6 +202,8 @@ chmod 755 /usr/share/chillpill-shell/share
 chmod 644 /usr/share/chillpill-shell/share/*
 chmod 755 /usr/share/chillpill-shell/scripts
 chmod 755 /usr/share/chillpill-shell/scripts/*
+chmod 755 /usr/share/chillpill-shell/config-app
+chmod 666 /usr/share/chillpill-shell/config-app/*
 chmod 755 /usr/share/chillpill-shell/IslandBackend
 chmod 644 /usr/share/chillpill-shell/IslandBackend/*
 chmod 755 "$REAL_HOME/.config/chillpill-shell/modules"
@@ -206,6 +211,7 @@ chmod 755 "$REAL_HOME/.config/chillpill-shell/modules"
 # chown back the files permission to real user
 chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.config/chillpill-shell"
 chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.cache/chillpill-shell"
+chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" /usr/share/chillpill-shell
 
 # setup config file
 info "Setting up config file"
@@ -239,7 +245,8 @@ rm -rf build
 
 
 echo -e "\nRun the command '${GREEN}chillpill-shell${NC}' to start now."
-echo -e "or open '${GREEN}CP-Shell${NC}' through your app launcher."
+echo -e "or open '${GREEN}CP-Shell${NC}' through your current app launcher."
+echo -e "\nConfig app command '${GREEN}chillpill-config${NC}'."
 
 # if needed backend build, that probably (partially) means a new user, so only show auto-run command paste code to them
 if $needs_build; then
