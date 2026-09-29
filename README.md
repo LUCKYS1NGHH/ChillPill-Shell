@@ -187,87 +187,10 @@ into your session at all times. It's not bound to any dotfiles.
 ---
 </details>
 
-## Configurable options
-> Located at `~/.config/chillpill-shell/config.jsonc`
+## Configuration App
+> Raw config is still located at `~/.config/chillpill-shell/config.jsonc`
 
-| Option | Description | Default |
-|---|---|---|
-| `displayPicture` | Profile image path for mini dashboard | `~/.pfp.png` |
-| `clockFormat` | Clock format for the pill bar | `hh:mm` |
-| `pillTopMargin` | Top spacing of pill bar | `9` |
-| `pillBottomMargin` | Bottom spacing of pill bar | `26` |
-| `pillScale` | Scale factor for pill bar size | `1.0` |
-| `pillModules` | Pill bar modules order/add/remove. Accepts built-in module names or custom module (see [Custom pill modules](#custom-pill-modules)) | `["battery", "volume", "workspaces", "network", "clock"]` |
-| `pillOnHover` | Auto hide the pill bar and only show on hover | `false` |
-| `dpiScale` | DPI Scaling | `1.0` |
-| `textFontFamily` | Font family for general text | `Monocraft` |
-| `nerdFontFamily` | Font family for icons (Nerd Fonts) | `JetBrainsMono Nerd Font Propo` |
-| `timerPresets` | Timer minute presets | `[1, 5, 10, 15, 30]` |
-| `mediaPopupDuration` | Media-playing popup duration (ms) | `2000` |
-| `maxWorkspaces` | Max workspaces shown in pill bar | `5` |
-| `notificationDisplayTime` | Notification popup duration (ms) | `3000` |
-| `maxNotificationsInStack` | Max notifications shown in stack | `20` |
-| `avoidDuplicateNotifications` | Skip appending duplicate notifications to stack | `true` |
-| `dataUsageRefreshInterval` | Data usage refresh interval (ms) | `300000` (5 min) |
-| `screenLockAppCommand` | Screen lock command for mini dashboard's lock button | `hyprlock` |
-| `osdDuration` | OSD (on-screen display) duration (ms) | `800` |
-| `weatherLocation` | City for weather widget | `Delhi` |
-| `weatherUnits` | Temperature units: `metric` (°C) or `imperial` (°F) | `metric` |
-| `weatherRefreshInterval` | Weather refresh interval (ms) | `3600000` (1 hr) |
-| `defaultTerminal` | Terminal used to open TUI apps from launcher | `kitty` |
-| `wallpapersDir` | Wallpapers directory for wallpaper switcher | `~/Pictures/wallpapers` |
-| `wsCloseOnWallpaperSet` | Close wallpaper switcher after apply wallpaper | `true` |
-| `wsAnimation` | Wallpaper switcher open animation | `true` |
-| `deleteCliphistImgCache` | Delete cached image file on clipboard entry removal, disabled keeps it on disk | `true` |
-| `country` | Country for calendar events. accepts country name (India) or ISO 3166-1 alpha-2 (IN) but recommended is country code | `IN` |
-| `showAudioVisuals` | Show audio visuals in media player (depends on cava) | `true` |
-| `showSensitiveInfo` | Show sensitive VPN info in tooltip (IP, server, region, uptime) | `true` |
-| `customWallpaperScript` | Use your own wallpaper script with {path} placeholder | `""` |
-| `confirmPowerActions` | Prompt for confirmation before critical power actions (Shutdown, Restart, Logout) | `true` |
-| `maxVolume` | Max volume the slider can reach | `100` |
-| `separatePreviewTabTypes` | Skip a different item type (image,text) when switching in clipboard manager preview tab | `true` |
-
-<details>
-<summary>Raw config example</summary>
-
-```jsonc
-{
-  "displayPicture": "~/.pfp.png",
-  "clockFormat": "hh:mm",
-  "pillTopMargin": 9,
-  "pillBottomMargin": 26,
-  "pillModules": ["battery", "volume", "workspaces", "network", "clock"],
-  "pillOnHover": false,
-  "textFontFamily": "Monocraft",
-  "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
-  "timerPresets": [1, 5, 10, 15, 30],
-  "mediaPopupDuration": 2000,
-  "maxWorkspaces": 5,
-  "notificationDisplayTime": 3000,
-  "maxNotificationsInStack": 20,
-  "dataUsageRefreshInterval": 300000,
-  "screenLockAppCommand": "hyprlock",
-  "osdDuration": 800,
-  "weatherLocation": "Delhi",
-  "weatherUnits": "metric",
-  "weatherRefreshInterval": 3600000,
-  "avoidDuplicateNotifications": true,
-  "defaultTerminal": "kitty",
-  "pillScale": 1.0,
-  "dpiScale": 1.0,
-  "wallpapersDir": "~/Pictures/wallpapers",
-  "wsCloseOnWallpaperSet": true,
-  "wsAnimation": true,
-  "customWallpaperScript": "",
-  "deleteCliphistImgCache": true,
-  "country": "IN",
-  "showAudioVisuals": true,
-  "showSensitiveInfo": true,
-  "confirmPowerActions": true,
-  "maxVolume": 100,
-  "separatePreviewTabTypes": true
-}
-```
+<img src="screenshots/config-app.webp" width="100%" alt="GUI Config App for ChillPill-Shell">
 
 </details>
 
@@ -293,26 +216,10 @@ The command may print **plain text** (used as `{text}`) or a **JSON object** per
 { "icon": "", "color": "#6d9fd7", "text": "45°C", "tooltip": "45°C CPU Temperature" }
 ```
 
-`text` is required; `tooltip`, `color` and `icon` are optional. single `{text}` in JSON output fills the `{tooltip}` same.
-
 A sample script ship in the repo and get installed to
 `~/.config/chillpill-shell/modules/`: `cpu-temp.sh` (one-shot CPU temperature,
 prints a temperature-dependent `{icon, color, text, tooltip}` JSON line).
 Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar.
-
-Example `pillModules`:
-
-```jsonc
-"pillModules": [
-  "battery", "volume", "workspaces", "notifications", "network", "clock",
-  {
-    "run": "~/.config/chillpill-shell/modules/cpu-temp.sh", // required - rest are optional
-    "format": "{icon} {text}",
-    "tooltip": "{tooltip}",
-    "every": 10
-  }
-]
-```
 
 ## Dependencies
 > [!NOTE]
@@ -457,7 +364,7 @@ hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("chillpill-shell-ipc call powerM
 Thanks to the contributors who helped make the shell better, and special thanks to [enhaoswen](https://github.com/enhaoswen) for the Wi-Fi controller backend for Quickshell.
 
 <a href="https://github.com/LUCKYS1NGHH/chillpill-shell/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="150" />
+  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="170" />
 </a>
 
 ### Author
