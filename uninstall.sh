@@ -13,8 +13,16 @@ if [[ -e /usr/local/bin/chillpill-shell ]]; then
    rm /usr/local/bin/chillpill-shell
 fi
 
+if [[ -e /usr/local/bin/chillpill-config ]]; then
+   rm /usr/local/bin/chillpill-config
+fi
+
 if [[ -e /usr/share/applications/chillpill.desktop ]]; then
    rm /usr/share/applications/chillpill.desktop
+fi
+
+if [[ -e /usr/share/applications/chillpill-config.desktop ]]; then
+   rm /usr/share/applications/chillpill-config.desktop
 fi
 
 if [[ -e /etc/systemd/user/chillpill-shell.service ]]; then
