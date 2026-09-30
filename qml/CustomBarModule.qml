@@ -33,13 +33,16 @@ import QtQuick
 //  and the tooltip explains the problem: "I need atleast 'text' in JSON
 //  output".
 //
-//  A leading '~' in a command is expanded to $HOME.
+//  A leading '~' in a command is expanded to $HOME. A bare name (no "/") is
+//  also looked up in ~/.config/chillpill-shell/modules before the PATH.
 
 Item {
   id: root
 
   property var spec: ({})
   property string moduleID: "" // "customN", assigned by PillBarModules
+  // bare script names in `run` resolve here, before PATH
+  readonly property string modulesDir: Quickshell.env("HOME") + "/.config/chillpill-shell/modules"
   property string text: ""
   property string tooltip: ""
   property bool loading: false
@@ -180,17 +183,28 @@ Item {
     return String(cmd).replace(/^~/, Quickshell.env("HOME"))
   }
 
+  // single-quote a string for the `sh -c` line
+  function shellQuote(s) {
+    return "'" + String(s).replace(/'/g, "'\\''") + "'"
+  }
+
+  // prepend modulesDir to PATH for this one command, so bare script names
+  // ("cpu-temp.sh") resolve there first and the rest falls through to PATH
+  function resolveCmd(cmd) {
+    return "PATH=" + shellQuote(root.modulesDir) + ":$PATH " + expandHome(cmd)
+  }
+
   function refresh() {
     if (!spec.run) return
     root.loading = true
-    runner.command = ["sh", "-c", expandHome(spec.run)]
+    runner.command = ["sh", "-c", resolveCmd(spec.run)]
     runner.running = false
     runner.running = true
   }
 
   function runAction(cmd) {
     if (!cmd) return
-    actionRunner.command = ["sh", "-c", expandHome(cmd)]
+    actionRunner.command = ["sh", "-c", resolveCmd(cmd)]
     actionRunner.running = false
     actionRunner.running = true
   }
@@ -258,7 +272,7 @@ Item {
       // streaming: keep one long-running process, update per stdout line
       refreshTimer.running = false
       runner.running = false
-      streamer.command = ["sh", "-c", expandHome(spec.run)]
+      streamer.command = ["sh", "-c", resolveCmd(spec.run)]
       streamer.running = false
       streamer.running = true
     } else {

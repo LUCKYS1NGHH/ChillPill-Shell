@@ -637,8 +637,9 @@ ShellRoot {
                 TextRow {
                     id: runRow
                     label: "Run"
-                    hint: "Run command (required); ~ -> $HOME"
+                    hint: "Just the file name if the script is in ~/.config/chillpill-shell/modules, else ~ or an absolute path"
                     fieldWidth: 360
+                    placeholder: "cpu-temp.sh"
                     value: cf.draft.run
                     onEdited: (v) => cf.field("run", v)
                 }

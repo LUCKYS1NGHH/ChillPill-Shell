@@ -202,7 +202,7 @@ Besides the built-in Quickshell modules (`battery`, `workspaces`, `network`, `cl
 
 | Key | Description |
 |---|---|
-| `run` | Command to execute **(required)**. A leading `~` is expanded to `$HOME`. |
+| `run` | Command to execute **(required)**. Just pass the script name if it's in `~/.config/chillpill-shell/modules`, else with leading `~` or absolute path |
 | `icon` | Optional nerdfont icon, referenced in `format`/`tooltip` as `{icon}` |
 | `format` | Text shown in the bar. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: `{icon} {text}` (or just `{text}` without an icon) |
 | `tooltip` | Tooltip shown on hover. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: the output's tooltip |
@@ -219,6 +219,8 @@ The command may print **plain text** (used as `{text}`) or a **JSON object** per
 A sample script ship in the repo and get installed to
 `~/.config/chillpill-shell/modules/`: `cpu-temp.sh` (one-shot CPU temperature,
 prints a temperature-dependent `{icon, color, text, tooltip}` JSON line).
+Scripts in that directory can be referenced by their plain file name, so
+`"run": "cpu-temp.sh"` works, scripts living anywhere else need a `~` path or an absolute one.
 Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar.
 
 ## Dependencies
