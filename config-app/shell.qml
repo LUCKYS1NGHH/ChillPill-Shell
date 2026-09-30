@@ -405,7 +405,7 @@ ShellRoot {
         property bool dim: false
         property bool danger: false
         signal clicked()
-        // so ModuleChip's hover state includes this control
+        // so the parent thumb's hover state includes this control
         readonly property bool hovered: cma.containsMouse
 
         width: 20; height: 22; radius: 5
@@ -455,85 +455,537 @@ ShellRoot {
         }
     }
 
-    // one pill module; top row = left edge of the bar; contols quiet till hover
-    component ModuleChip: Rectangle {
-        id: mc
-        required property int position
-        required property var entry
-        required property var known
-        required property bool first
-        required property bool last
-        signal shifted(int delta)
-        signal removed()
+    component ModuleThumb: Rectangle {
+        id: mt
+
+        property string icon: ""
+        property string text: ""
+        property color iconColor: th.fg
+        property bool segments: false
+        property int segmentCount: 5
+        property int activeSegment: -1
+        property bool flag: false
+        property color flagColor: th.accent
+        property bool editable: false
+        property bool removable: false
+        property bool pinned: false
+        property bool removeState: false
+        property real iconSize: 10
+
+        signal clicked()
+        signal removeRequested()
         signal editRequested()
+        signal dragBegin(real localX, real globalX, real globalY)
+        signal dragMove(real globalX, real globalY)
+        signal dragEnd(real globalX)
 
-        // string name, or a custom module obj
-        readonly property bool isCustom: typeof entry === "object" && entry !== null
-        readonly property string name: isCustom
-            ? (entry.run ? String(entry.run).split("/").pop() : "custom")
-            : String(entry)
-        // unknown names dont render in the bar, flag them
-        readonly property bool unknown: !mc.isCustom && mc.known.indexOf(mc.name) < 0
-        // hovering the chip or any of its contols
-        readonly property bool hot: hover.hovered || upBtn.hovered || downBtn.hovered
-                                   || delBtn.hovered || editBtn.hovered
+        readonly property real ps: Math.max(0.5, root.get("pillScale", 1))
+        readonly property bool hovered: ma.containsMouse || edBtn.hovered || rmBtn.hovered
+        readonly property int padR: 0
 
-        Layout.fillWidth: true
-        implicitHeight: 34
-        radius: 8
-        color: mc.hot ? th.bg4 : th.bg1
-        border.color: mc.hot ? th.borderBg1 : th.borderBg3
-        Behavior on color { ColorAnimation { duration: 100 } }
-        Behavior on border.color { ColorAnimation { duration: 100 } }
+        implicitWidth: rowOuter.implicitWidth + 4 * mt.ps + mt.padR
+        implicitHeight: Math.round(17.5 * mt.ps)
+        radius: 13
+        color: "transparent"
+
+        Rectangle {
+            visible: mt.removeState
+            anchors.fill: parent
+            radius: parent.radius
+            color: "#e2232326"
+        }
 
         RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: 12
-            anchors.rightMargin: 6
-            spacing: 10
+            id: rowOuter
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 4 * mt.ps
+            anchors.rightMargin: mt.padR
+            spacing: 4 * mt.ps
 
-            Text {
-                text: mc.position + 1
-                color: th.fg5
-                font.family: th.fontFamily
-                font.pixelSize: 11
-                Layout.preferredWidth: 16
-                horizontalAlignment: Text.AlignRight
-            }
-            Text {
-                text: mc.name
-                color: th.fg
-                font.family: th.fontFamily
-                elide: Text.ElideRight
-                Layout.fillWidth: true
-            }
             Rectangle {
-                visible: mc.isCustom || mc.unknown
-                implicitWidth: tagLbl.implicitWidth + 10
-                implicitHeight: 16
-                radius: 4
-                color: "transparent"
-                border.width: 1
-                border.color: mc.unknown ? th.warning : th.borderBg1
-                Text {
-                    id: tagLbl
-                    anchors.centerIn: parent
-                    text: mc.isCustom ? "custom" : "unknown"
-                    color: mc.unknown ? th.warning : th.fg5
-                    font.family: th.fontFamily
-                    font.pixelSize: 9
-                }
+                visible: mt.flag
+                implicitWidth: 5; implicitHeight: 5; radius: 2.5
+                color: mt.flagColor
             }
             Row {
-                spacing: 2
-                ChipBtn { id: editBtn; label: "✎"; visible: mc.isCustom; onClicked: mc.editRequested() }
-                ChipBtn { id: upBtn; label: "↑"; dim: mc.first; onClicked: mc.shifted(-1) }
-                ChipBtn { id: downBtn; label: "↓"; dim: mc.last; onClicked: mc.shifted(1) }
-                ChipBtn { id: delBtn; label: "✕"; danger: true; onClicked: mc.removed() }
+                visible: mt.segments
+                spacing: 4 * mt.ps
+                Repeater {
+                    model: mt.segmentCount
+                    Rectangle {
+                        id: seg
+                        required property int index
+                        readonly property bool on: mt.activeSegment === seg.index
+                        width: 17.5 * mt.ps; height: 17.5 * mt.ps; radius: 8 * mt.ps
+                        color: seg.on ? "#4d5258" : "#393c41"
+                        Text {
+                            anchors.centerIn: parent
+                            text: seg.index + 1
+                            color: seg.on ? "#ffffff" : "#b3b9c2"
+                            font.family: th.fontFamily
+                            font.pixelSize: 9 * mt.ps
+                        }
+                    }
+                }
+            }
+            Text {
+                visible: !mt.segments && mt.icon !== ""
+                text: mt.icon
+                color: mt.iconColor
+                font.family: th.nerdFontFamily
+                font.pixelSize: mt.iconSize * mt.ps
+            }
+            Text {
+                visible: !mt.segments && mt.text !== ""
+                text: mt.text
+                color: th.fg
+                font.family: th.fontFamily
+                font.pixelSize: 10 * mt.ps
             }
         }
 
-        HoverHandler { id: hover }
+        MouseArea {
+            id: ma
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.OpenHandCursor
+            property point pressPt: Qt.point(0, 0)
+            property bool dragged: false
+            property real lastGX: 0
+
+            // A lost grab (fast move, pointer grabbed by the compositor, cursor
+            // leaving the item) clears `pressed` without ever emitting
+            // `onReleased`. Without this the drop is never committed and the
+            // bar stays wedged in its dragging state forever.
+            property bool released: false
+            function endDrag() {
+                if (!ma.dragged || ma.released) return
+                ma.dragged = false
+                mt.dragEnd(ma.lastGX)
+            }
+
+            onPressed: (m) => {
+                ma.pressPt = Qt.point(m.x, m.y)
+                ma.dragged = false
+                ma.released = false
+            }
+            onPressedChanged: if (!ma.pressed && ma.dragged) ma.endDrag()
+            onPositionChanged: (m) => {
+                if (!ma.pressed) return
+                var g = mt.mapToGlobal(m.x, m.y)
+                ma.lastGX = g.x
+                if (!ma.dragged && (Math.abs(m.x - ma.pressPt.x) > 5 || Math.abs(m.y - ma.pressPt.y) > 5)) {
+                    ma.dragged = true
+                    mt.dragBegin(ma.pressPt.x, g.x, g.y)
+                }
+                if (ma.dragged) mt.dragMove(g.x, g.y)
+            }
+            onReleased: (m) => {
+                ma.released = true
+                if (ma.dragged) {
+                    ma.dragged = false
+                    mt.dragEnd(mt.mapToGlobal(m.x, 0).x)
+                } else mt.clicked()
+            }
+        }
+
+        Row {
+            visible: mt.hovered && !mt.pinned && (mt.editable || mt.removable)
+            anchors.right: parent.right
+            anchors.rightMargin: 2
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 1
+            ChipBtn {
+                id: edBtn
+                visible: mt.editable
+                label: "✎"
+                width: 18; height: 18
+                onClicked: mt.editRequested()
+            }
+            ChipBtn {
+                id: rmBtn
+                visible: mt.removable
+                label: "✕"
+                width: 18; height: 18
+                danger: true
+                onClicked: mt.removeRequested()
+            }
+        }
+    }
+
+    component PillBarPreview: Item {
+        id: bar
+        property var value: []
+        property var known: []
+        property Item removeArea: null
+        signal edited(var v)
+        signal editRequested(int slot)
+        Layout.fillWidth: true
+        implicitHeight: 50
+
+        readonly property int poolSize: 12
+
+        property var disp: []
+        property var widths: []
+        function syncDisp() {
+            var a = []
+            for (var i = 0; i < bar.value.length; i++) a.push(bar.value[i])
+            var w = bar.widths.slice()
+            for (var j = 0; j < bar.poolSize; j++) if (w[j] === undefined) w[j] = 0
+            w.length = bar.poolSize
+            bar.widths = w
+            bar.disp = a
+        }
+        // A drop that never lands (grab lost, pointer grabbed by the compositor)
+        // used to leave dragActive/availActive true, which blocked every
+        // subsequent syncDisp and froze the preview. A drag that has not seen a
+        // move for this long is treated as abandoned and reset.
+        readonly property int dragStaleMs: 400
+        property real lastMoveAt: 0
+
+        Timer {
+            id: staleWatch
+            interval: 120
+            repeat: true
+            running: bar.dragActive || bar.availActive
+            onTriggered: {
+                if (!bar.dragActive && !bar.availActive) return
+                if (Date.now() - bar.lastMoveAt < bar.dragStaleMs) return
+                if (bar.availActive) bar.availEnd()
+                else bar.endDrag()
+            }
+        }
+
+        onValueChanged: if (!bar.dragActive && !bar.availActive) bar.syncDisp()
+        Component.onCompleted: bar.syncDisp()
+
+        readonly property real ps: Math.max(0.5, root.get("pillScale", 1))
+        readonly property real barH: Math.round(17.5 * bar.ps) + 10
+        readonly property real lnGap: 13 * bar.ps
+        readonly property real contentInset: 5
+
+        property bool dragActive: false
+        property int dragSlot: -1
+        property real grabX: 0
+        property real dragThumbX: 0
+        property bool removeTarget: false
+        property var grabbedEntry: null
+        property bool availActive: false
+        property string availName: ""
+        property bool availOver: false
+        property int insertAt: -1
+        property real ghostX: -999
+
+        function noteWidth(i, w) {
+            if (i < 0 || i >= bar.disp.length) return
+            var a = bar.widths.slice()
+            a[i] = w
+            bar.widths = a
+        }
+
+        function sample(name) {
+            switch (name) {
+            case "battery":       return { icon: String.fromCodePoint(0xf0081), color: "#4bd25c", text: "98%" }
+            case "volume":        return { icon: String.fromCodePoint(0xf057e), color: th.fg,     text: "64%" }
+            case "workspaces":    return { icon: "",       color: th.fg,     text: "", segments: true, n: Math.min(Math.max(root.get("maxWorkspaces", 5), 1), 6) }
+            case "network":       return { icon: String.fromCodePoint(0xf0928), color: "#6791dc", text: "Home" }
+            case "clock":         return { icon: "",       color: th.fg,     text: Qt.formatTime(new Date(), root.get("clockFormat", "hh:mm")) }
+            case "brightness":    return { icon: String.fromCodePoint(0xf00e0), color: th.fg,     text: "84%" }
+            case "vpn":           return { icon: String.fromCodePoint(0xf099d), color: "#48cc47", text: "on" }
+            case "notifications": return { icon: String.fromCodePoint(0xf0f3),  color: "#e2b052", text: "7" }
+            case "bluetooth":     return { icon: String.fromCodePoint(0xf00af), color: "#6591e0", text: "on", iconSize: 13 }
+            case "weather":       return { icon: String.fromCodePoint(0xe312),  color: "#d8ad5c", text: "24°C", iconSize: 11 }
+            default:              return { icon: String.fromCodePoint(0xf016),  color: th.fg4,    text: name }
+            }
+        }
+
+        function thumbProps(entry) {
+            if (typeof entry === "object" && entry !== null) {
+                var base = entry.run ? String(entry.run).split("/").pop() : "custom"
+                return {
+                    icon: entry.icon || "",
+                    color: th.fg,
+                    text: base,
+                    segments: false, segN: 0, activeSeg: -1,
+                    flag: false,
+                    editable: true,
+                    iconSize: 10
+                }
+            }
+            var s = bar.sample(String(entry))
+            var unk = bar.known.indexOf(String(entry)) < 0
+            return {
+                icon: s.icon, color: s.color, text: s.text,
+                segments: s.segments === true, segN: s.n || 0, activeSeg: 0,
+                flag: unk, flagColor: th.warning,
+                editable: false,
+                iconSize: s.iconSize || 10
+            }
+        }
+
+        Rectangle {
+            id: barRect
+            width: Math.max(140, bar.groupWidth() + 62 * bar.ps)
+            height: bar.barH
+            radius: 20 * bar.ps
+            color: "#0d0d0d"
+            clip: true
+            anchors.centerIn: parent
+
+            Item {
+                id: content
+                anchors.fill: parent
+                anchors.margins: bar.contentInset
+
+                Repeater {
+                    model: bar.poolSize
+                    delegate: ModuleThumb {
+                        id: thumb
+                        required property int index
+                        readonly property bool shown: index < bar.disp.length
+                        readonly property bool dragging: bar.dragActive && thumb.index === bar.dragSlot
+                        readonly property var props: {
+                            if (thumb.dragging && bar.grabbedEntry !== null && bar.grabbedEntry !== undefined)
+                                return bar.thumbProps(bar.grabbedEntry)
+                            var e = bar.disp[thumb.index]
+                            if (e === undefined)
+                                return { icon: "", text: "", color: "#00000000", segN: 0, flagColor: "#00000000" }
+                            return bar.thumbProps(e)
+                        }
+
+                        visible: thumb.shown
+                        width: implicitWidth
+                        anchors.verticalCenter: parent.verticalCenter
+                        x: thumb.dragging ? bar.dragThumbX : bar.thumbX(thumb.index)
+                        Behavior on x {
+                            enabled: !thumb.dragging
+                            NumberAnimation { duration: 130; easing.type: Easing.OutCubic }
+                        }
+                        z: thumb.dragging ? 10 : 0
+                        scale: thumb.dragging ? 1.04 : 1.0
+
+                        icon: props.icon
+                        text: props.text
+                        iconColor: props.color
+                        segments: props.segments === true
+                        segmentCount: props.segN
+                        activeSegment: props.activeSeg !== undefined ? props.activeSeg : -1
+                        flag: props.flag === true
+                        flagColor: props.flagColor
+                        editable: props.editable === true
+                        iconSize: props.iconSize || 10
+                        pinned: thumb.dragging
+                        removeState: thumb.dragging && bar.removeTarget
+
+                        Component.onCompleted: thumb.shown && bar.noteWidth(thumb.index, thumb.implicitWidth)
+                        onImplicitWidthChanged: thumb.shown && bar.noteWidth(thumb.index, thumb.implicitWidth)
+
+                        onClicked: { if (props.editable === true) bar.editRequested(thumb.index) }
+                        onEditRequested: bar.editRequested(thumb.index)
+                        onDragBegin: (lx, gx, gy) => bar.beginBarDrag(thumb.index, lx, gx, gy)
+                        onDragMove: (gx, gy) => { if (!bar.availActive) bar.moveDrag(gx, gy) }
+                        onDragEnd: (gx) => { if (!bar.availActive) bar.endDrag() }
+                    }
+                }
+
+                Rectangle {
+                    id: mark
+                    visible: (bar.dragActive || bar.availActive) && bar.insertAt >= 0
+                    width: 2; radius: 1
+                    color: th.fgL
+                    x: bar.thumbX(bar.insertAt) - 1
+                    y: 2
+                    height: parent.height - 4
+                }
+
+                ModuleThumb {
+                    id: availGhost
+                    visible: bar.availActive
+                    width: implicitWidth
+                    x: bar.ghostX
+                    anchors.verticalCenter: parent.verticalCenter
+                    z: 20
+                    removable: false
+                    editable: false
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: bar.disp.length === 0 && !bar.dragActive && !bar.availActive
+                    text: "drag modules here"
+                    color: th.fg6
+                    font.family: th.fontFamily
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: bar.disp.length > bar.poolSize
+                    text: "only the first " + bar.poolSize + " modules are shown here"
+                    color: th.warning
+                    font.family: th.fontFamily
+                    font.pixelSize: 10
+                }
+            }
+        }
+
+        function groupWidth() {
+            var w = 0, n = 0
+            for (var k = 0; k < bar.disp.length; k++) {
+                if (bar.dragActive && k === bar.dragSlot) continue
+                w += bar.widths[k] || 0
+                n++
+            }
+            return w + Math.max(0, n - 1) * bar.lnGap
+        }
+        function centerOffset() {
+            var avail = barRect.width - 2 * bar.contentInset
+            return Math.max(0, Math.floor((avail - bar.groupWidth()) / 2))
+        }
+
+        function thumbX(i) {
+            var acc = bar.centerOffset()
+            for (var k = 0; k < i; k++) {
+                if (bar.dragActive && k === bar.dragSlot) continue
+                acc += (bar.widths[k] || 0) + bar.lnGap
+            }
+            return acc
+        }
+
+        function insertionIndex(cx) {
+            var n = bar.disp.length
+            var acc = bar.centerOffset()
+            for (var d = 0; d < n; d++) {
+                if (bar.dragActive && d === bar.dragSlot) continue
+                var w = bar.widths[d] || 0
+                acc += w / 2
+                if (cx <= acc) return d
+                acc += w / 2 + bar.lnGap
+            }
+            return n
+        }
+
+        function beginBarDrag(slot, lx, gx, gy) {
+            if (bar.availActive) return
+            bar.lastMoveAt = Date.now()
+            bar.dragActive = true
+            bar.dragSlot = slot
+            bar.grabX = lx
+            bar.grabbedEntry = bar.disp[slot]
+            bar.removeTarget = false
+            bar.insertAt = slot
+            bar.moveDrag(gx, gy)
+        }
+
+        function moveDrag(gx, gy) {
+            bar.lastMoveAt = Date.now()
+            var lp = content.mapFromGlobal(gx, gy)
+            if (bar.dragActive) {
+                bar.dragThumbX = lp.x - bar.grabX
+                var cx = bar.dragThumbX + (bar.widths[bar.dragSlot] || 0) / 2
+                bar.insertAt = bar.insertionIndex(cx)
+                if (cx < -20 || cx > content.width + 20
+                        || lp.y < -16 || lp.y > content.height + 16)
+                    bar.insertAt = -1
+                var ra = bar.removeArea
+                bar.removeTarget = false
+                if (ra !== null && ra !== undefined && ra.visible) {
+                    var rm = ra.mapFromGlobal(gx, gy)
+                    bar.removeTarget = rm.x >= 0 && rm.y >= 0
+                            && rm.x <= ra.width && rm.y <= ra.height
+                }
+                if (bar.removeTarget) bar.insertAt = -1
+            } else if (bar.availActive) {
+                var over = lp.x >= -6 && lp.x <= content.width + 6
+                        && lp.y >= -6 && lp.y <= content.height + 6
+                bar.availOver = over
+                if (over) {
+                    bar.ghostX = Math.max(0, Math.min(content.width - 60, lp.x - bar.grabX))
+                    bar.insertAt = bar.insertionIndex(bar.ghostX + availGhost.width / 2)
+                } else {
+                    bar.insertAt = -1
+                }
+            }
+        }
+
+        function endDrag() {
+            if (!bar.dragActive) return
+            var removing = bar.removeTarget
+            var entry = bar.grabbedEntry
+            var slot = bar.dragSlot
+            var at = bar.insertAt
+            bar.dragActive = false
+            bar.dragSlot = -1
+            bar.removeTarget = false
+            bar.insertAt = -1
+            bar.grabbedEntry = null
+            if (entry === null || entry === undefined) return
+
+            var a
+            if (removing) {
+                var gi = bar.disp.indexOf(entry)
+                if (gi < 0) return
+                a = bar.disp.slice()
+                a.splice(gi, 1)
+            } else {
+                // `at < 0` means the pointer was outside the pill when the drag
+                // ended. Return the row to its committed order instead of
+                // bailing out, otherwise a lost pointer leaves the preview
+                // showing a module that was never saved.
+                if (at < 0) at = slot
+                if (at > bar.disp.length) at = bar.disp.length
+                a = bar.disp.slice()
+                a.splice(slot, 1)
+                if (at > slot) at -= 1
+                a.splice(at, 0, entry)
+            }
+
+            bar.disp = a
+            var changed = a.length !== bar.value.length
+            if (!changed) {
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== bar.value[i]) { changed = true; break }
+                }
+            }
+            if (changed) bar.edited(a)
+        }
+
+        function availBegin(name, lx, gx, gy) {
+            bar.lastMoveAt = Date.now()
+            bar.availActive = true
+            bar.availName = name
+            bar.grabX = lx
+            var p = bar.thumbProps(name)
+            availGhost.icon = p.icon
+            availGhost.text = p.text
+            availGhost.iconColor = p.color
+            availGhost.segments = p.segments === true
+            availGhost.segmentCount = p.segN
+            availGhost.activeSegment = p.activeSeg !== undefined ? p.activeSeg : -1
+            availGhost.flag = p.flag === true
+            availGhost.flagColor = p.flagColor
+            availGhost.iconSize = p.iconSize || 10
+            bar.ghostX = -999
+            bar.availOver = false
+            bar.moveDrag(gx, gy)
+        }
+        function availMove(gx, gy) { if (bar.availActive) bar.moveDrag(gx, gy) }
+        function availEnd() {
+            if (!bar.availActive) return
+            var ok = bar.availOver && bar.insertAt >= 0
+            var at = bar.insertAt
+            var name = bar.availName
+            bar.availActive = false
+            bar.availOver = false
+            bar.insertAt = -1
+            bar.ghostX = -999
+            if (ok) {
+                var a = bar.disp.slice()
+                a.splice(Math.min(at, a.length), 0, name)
+                bar.edited(a)
+            }
+        }
     }
 
     // Form for a custom pill module; keys match the README's "Custom pill
@@ -713,7 +1165,7 @@ ShellRoot {
         }
     }
 
-    // Pill bar modules as chips, in bar order
+    // Pill bar modules, previewed as thumbnails in bar order
     component ModulesEditor: ColumnLayout {
         id: m
         property var value: []
@@ -727,19 +1179,6 @@ ShellRoot {
         property int customIndex: -1
 
         readonly property var available: known.filter(k => value.indexOf(k) < 0)
-
-        function move(i, d) {
-            var a = value.slice(), j = i + d
-            if (j < 0 || j >= a.length) return
-            var t = a[i]; a[i] = a[j]; a[j] = t
-            edited(a)
-        }
-        function removeAt(i) { var a = value.slice(); a.splice(i, 1); edited(a) }
-        function add(name) {
-            name = name.trim()
-            if (!name || value.indexOf(name) >= 0) return
-            edited(value.concat([name]))
-        }
 
         function openNewCustom() {
             m.customIndex = -1
@@ -761,102 +1200,145 @@ ShellRoot {
             m.edited(a)
         }
 
-        // modules in the bar; top = left edge
         Text {
             visible: m.value.length > 0
-            text: "IN THE PILL BAR"
+            text: "Drag to Reorder \u00b7 Drag a module onto the list below to remove"
             color: th.fg4
             font.family: th.fontFamily
-            font.pixelSize: 10
-            font.bold: true
+            font.pixelSize: 11
         }
-        ColumnLayout {
-            Layout.fillWidth: true
-            visible: m.value.length > 0
-            spacing: 4
-            Repeater {
-                model: m.value
-                ModuleChip {
-                    id: mod
-                    required property int index
-                    required property var modelData
-                    position: mod.index
-                    entry: mod.modelData
-                    known: m.known
-                    first: mod.index === 0
-                    last: mod.index === m.value.length - 1
-                    onShifted: (delta) => m.move(mod.index, delta)
-                    onRemoved: m.removeAt(mod.index)
-                    onEditRequested: m.openEditCustom(mod.index)
-                }
-            }
+        PillBarPreview {
+            id: bar
+            known: m.known
+            value: m.value
+            removeArea: leftoverArea
+            onEdited: (v) => m.edited(v)
+            onEditRequested: (slot) => m.openEditCustom(slot)
         }
 
         Text {
             Layout.fillWidth: true
             visible: m.value.length === 0
-            text: "The pill bar is empty — add a module below"
+            text: "The pill bar is empty, drag a module below onto it"
             color: th.fg6
             font.family: th.fontFamily
         }
 
         // modules not in the bar yet + custom module action
         Text {
-            Layout.topMargin: 8
             text: "ADD MODULES"
             color: th.fg4
             font.family: th.fontFamily
             font.pixelSize: 10
-            font.bold: true
         }
-        Flow {
+        Item {
+            id: leftoverArea
             Layout.fillWidth: true
-            spacing: 6
-            Repeater {
-                model: m.available
+            implicitHeight: leftoverFlow.implicitHeight
+
+            Rectangle {
+                id: dropZone
+                anchors.fill: parent
+                radius: 12
+                z: 2
+                visible: opacity > 0.01
+                opacity: bar.dragActive ? 1 : 0
+                color: bar.removeTarget ? "#1ce32626" : "#0a9e9e9e"
+                border.color: bar.removeTarget ? "#4de32626" : "#1c9e9e9e"
+                border.width: 1
+                Behavior on opacity { NumberAnimation { duration: 130; easing.type: Easing.OutCubic } }
+                Behavior on color { ColorAnimation { duration: 130 } }
+                Behavior on border.color { ColorAnimation { duration: 130 } }
+
                 Rectangle {
-                    id: addChip
-                    required property string modelData
-                    width: addLbl.implicitWidth + 26; height: 30; radius: 15
-                    color: addMa.containsMouse ? th.accent : th.bg1
-                    border.color: addMa.containsMouse ? th.accent : th.borderBg3
-                    Behavior on color { ColorAnimation { duration: 120 } }
-                    Text {
-                        id: addLbl
+                    id: dropBadge
+                    anchors.centerIn: parent
+                    width: dropRow.implicitWidth + 26
+                    height: 28
+                    radius: 14
+                    color: bar.removeTarget ? "#2be32626" : "#1a9e9e9e"
+                    border.color: bar.removeTarget ? "#7ae32626" : "#2e9e9e9e"
+                    border.width: 1
+                    scale: bar.removeTarget ? 1 : 0.92
+                    Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutBack } }
+                    Behavior on color { ColorAnimation { duration: 130 } }
+                    Behavior on border.color { ColorAnimation { duration: 130 } }
+
+                    Row {
+                        id: dropRow
                         anchors.centerIn: parent
-                        text: "+ " + addChip.modelData
-                        color: addMa.containsMouse ? th.bgD : th.fg4
-                        font.family: th.fontFamily
-                        Behavior on color { ColorAnimation { duration: 120 } }
-                    }
-                    MouseArea {
-                        id: addMa
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: m.add(addChip.modelData)
+                        spacing: 7
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: String.fromCodePoint(0xef90)
+                            color: bar.removeTarget ? th.deleting : th.fg4
+                            font.family: th.nerdFontFamily
+                            font.pixelSize: 11
+                            Behavior on color { ColorAnimation { duration: 130 } }
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "release to remove"
+                            color: bar.removeTarget ? th.deleting : th.fg4
+                            font.family: th.fontFamily
+                            font.pixelSize: 10
+                            font.bold: true
+                            font.letterSpacing: 0.3
+                            Behavior on color { ColorAnimation { duration: 130 } }
+                        }
                     }
                 }
             }
-            Rectangle {
-                id: customAdd
-                width: customAddLbl.implicitWidth + 26; height: 30; radius: 15
-                color: customAddMa.containsMouse ? th.accent : "transparent"
-                border.color: th.accent
-                Text {
-                    id: customAddLbl
-                    anchors.centerIn: parent
-                    text: "+ Custom module"
-                    color: customAddMa.containsMouse ? th.bgD : th.accent
-                    font.family: th.fontFamily
+
+            Flow {
+                id: leftoverFlow
+                width: parent.width
+                spacing: 12
+                Repeater {
+                    model: m.available
+                    ModuleThumb {
+                        id: addThumb
+                        required property string modelData
+                        height: 30
+                        readonly property var props: bar.thumbProps(modelData)
+                        icon: props.icon
+                        text: props.text
+                        iconColor: props.color
+                        segments: props.segments === true
+                        segmentCount: props.segN || 0
+                        activeSegment: props.activeSeg !== undefined ? props.activeSeg : -1
+                        flag: props.flag === true
+                        flagColor: props.flagColor
+                        iconSize: props.iconSize || 10
+                        removable: false
+                        onDragBegin: (lx, gx, gy) => bar.availBegin(modelData, lx, gx, gy)
+                        onDragMove: (gx, gy) => bar.availMove(gx, gy)
+                        onDragEnd: bar.availEnd
+                    }
                 }
-                MouseArea {
-                    id: customAddMa
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: m.openNewCustom()
-                }
+            }
+        }
+
+        Rectangle {
+            id: customAdd
+            Layout.alignment: Qt.AlignLeft
+            implicitWidth: customAddLbl.implicitWidth + 26
+            height: 30; radius: 15
+            color: customAddMa.containsMouse ? th.accent : "transparent"
+            border.color: th.accent
+            Text {
+                id: customAddLbl
+                anchors.centerIn: parent
+                text: "+ Custom module"
+                color: customAddMa.containsMouse ? th.bgD : th.accent
+                font.family: th.fontFamily
+            }
+            MouseArea {
+                id: customAddMa
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: m.openNewCustom()
             }
         }
 
@@ -1219,7 +1701,7 @@ ShellRoot {
                     Heading { text: "MODULES (LEFT → RIGHT)" }
                     ModulesEditor {
                         known: ["battery", "volume", "workspaces", "network", "clock", "brightness", "vpn", "notifications", "bluetooth", "weather"]
-                        value: root.get("pillModules", [])
+                        value: root.cfg.pillModules === undefined ? [] : root.cfg.pillModules
                         onEdited: (v) => root.set("pillModules", v)
                     }
                     Heading { text: "BEHAVIOUR" }
