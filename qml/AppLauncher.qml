@@ -1,6 +1,7 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import Quickshell.Widgets
 
 Item {
@@ -16,31 +17,45 @@ Item {
 
     width: 315
 
-    // shrinks with results, capped at original max height (~387px / 302px list)
-    property int rowHeight: 44
+    property int rowHeight: 40
     property int rowSpacing: 2
     property int headerHeight: 15
-    property int maxListHeight: 302
+    property int maxListHeight: 250
     readonly property int listHeight: root.filteredApps.length === 0
         ? root.rowHeight
         : Math.min(root.filteredApps.length * root.rowHeight + (root.filteredApps.length - 1) * root.rowSpacing, root.maxListHeight)
     readonly property int baseHeight: 12 + root.headerHeight + 8 + 30 + 8 + 12
     height: root.baseHeight + root.listHeight
-    Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    Behavior on height { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
+    // open/close: fade + gentle scale that grows down from the top edge
     visible: opacity > 0
     opacity: shown ? 1 : 0
-    Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-    scale: shown ? 1 : 0.96
-    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+    transformOrigin: Item.Top
+    scale: shown ? 1 : 0.94
+    Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
 
-    property var filteredApps: searchQuery.length === 0
-        ? appsCache
-        : appsCache.filter(a =>
-            a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            a.comment.toLowerCase().includes(searchQuery.toLowerCase()))
+    // name-prefix matches first, then name-contains, then comment-only
+    property var filteredApps: {
+        if (searchQuery.length === 0) return appsCache
+        const q = searchQuery.toLowerCase()
+        let starts = [], contains = [], comment = []
+        for (let i = 0; i < appsCache.length; i++) {
+            const a = appsCache[i]
+            const n = a.name.toLowerCase()
+            if (n.startsWith(q)) starts.push(a)
+            else if (n.includes(q)) contains.push(a)
+            else if (a.comment.toLowerCase().includes(q)) comment.push(a)
+        }
+        return starts.concat(contains, comment)
+    }
 
     onFilteredAppsChanged: selectedIndex = 0
+
+    // keep the selection visible when moved by keyboard / on reset
+    onSelectedIndexChanged: if (keyboardNav) appList.positionViewAtIndex(selectedIndex, ListView.Contain)
+    property bool keyboardNav: false
 
     Connections {
         target: DesktopEntries
@@ -55,12 +70,11 @@ Item {
             searchQuery = ""
             searchInput.text = ""
             selectedIndex = 0
+            appList.positionViewAtBeginning()
             searchInput.forceActiveFocus()
         }
     }
 
-    // preload the app list so the launcher opens at full height instead of
-    // flashing small and growing/shrinking while the cache populates
     Component.onCompleted: loadApps()
 
     function loadApps() {
@@ -80,23 +94,32 @@ Item {
     }
 
     function launchSelected() {
-      if (filteredApps.length === 0) return
-      const app = filteredApps[selectedIndex].entry
-      if (app.runInTerminal) {
-         if (!Config.defaultTerminal || Config.defaultTerminal.length === 0) {
-             console.log("No defaultTerminal configured, cannot launch this terminal app:", app.name)
-             return
-         }
-         Quickshell.execDetached([Config.defaultTerminal, "-e", "sh", "-c", app.command.join(" ")])
-      } else {
-         app.execute()
-      }
-      root.closeRequested()
+        if (filteredApps.length === 0) return
+        const app = filteredApps[selectedIndex].entry
+        if (app.runInTerminal) {
+            if (!Config.defaultTerminal || Config.defaultTerminal.length === 0) {
+                console.log("No defaultTerminal configured, cannot launch this terminal app:", app.name)
+                return
+            }
+            Quickshell.execDetached([Config.defaultTerminal, "-e", "sh", "-c", app.command.join(" ")])
+        } else {
+            app.execute()
+        }
+        root.closeRequested()
+    }
+
+    // bold the matched part of the name (escaped for StyledText)
+    function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") }
+    function highlightName(name, q) {
+        if (!q || q.length === 0) return esc(name)
+        const i = name.toLowerCase().indexOf(q.toLowerCase())
+        if (i < 0) return esc(name)
+        return esc(name.slice(0, i)) + "<b>" + esc(name.slice(i, i + q.length)) + "</b>" + esc(name.slice(i + q.length))
     }
 
     Rectangle {
         anchors.fill: parent
-        radius: 19
+        radius: 22
         color: Theme.bgD1
         border.color: Theme.borderBg2
         border.width: 1
@@ -108,69 +131,79 @@ Item {
         spacing: 8
 
         RowLayout {
-          width: parent.width
+            width: parent.width
 
-          Text {
-              text: "Applications"
-              color: Theme.fg
-              font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
-              Layout.alignment: Qt.AlignLeft
-              Layout.leftMargin: 5
-          }
+            Text {
+                text: "Applications"
+                color: Theme.fg
+                font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
+                Layout.alignment: Qt.AlignLeft
+                Layout.leftMargin: 5
+            }
 
-          Text {
-              id: listCountText
-              property int total: 0
-              text: (filteredApps.count === 0 ? 0 : root.selectedIndex + 1)
-                     + " / " + appList.count + " (" + appList.count + ")"
-              color: Theme.fg4
-              font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
-              Layout.alignment: Qt.AlignRight
-              Layout.rightMargin: 6
+            Item { Layout.fillWidth: true }
+
+            Text {
+                text: root.filteredApps.length === 0
+                    ? "0 / 0"
+                    : (root.selectedIndex + 1) + " / " + root.filteredApps.length
+                color: Theme.fg4
+                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+                Layout.alignment: Qt.AlignRight
+                Layout.rightMargin: 6
             }
         }
 
         Rectangle {
+            id: searchBox
             width: parent.width
             height: 30
             radius: 8
-            color: Theme.bg4
+            color: Theme.bg3
             border.color: searchInput.activeFocus ? Theme.borderBgFocus : Theme.borderBg
             border.width: 1
             Behavior on border.color { ColorAnimation { duration: 120 } }
+
+            // subtle "breathing" scale on focus
+            scale: searchInput.activeFocus ? 1.0 : 0.985
+            Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
             TextInput {
                 id: searchInput
                 anchors.fill: parent
                 anchors.leftMargin: 10
-                anchors.rightMargin: 10
+                anchors.rightMargin: 28
                 verticalAlignment: TextInput.AlignVCenter
                 color: Theme.fg
                 font { family: Theme.fontFamily; pixelSize: 11 }
                 clip: true
+                selectByMouse: true
 
                 onTextChanged: root.searchQuery = text
 
                 Text {
                     text: "search apps..."
-                    color: Theme.fg4
+                    color: Theme.fg3
                     font: searchInput.font
-                    visible: searchInput.text.length === 0
                     anchors.verticalCenter: parent.verticalCenter
+                    opacity: searchInput.text.length === 0 ? 1 : 0
+                    x: searchInput.text.length === 0 ? 0 : 6
+                    Behavior on opacity { NumberAnimation { duration: 120 } }
+                    Behavior on x { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                 }
 
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Down) {
+                        root.keyboardNav = true
                         if (root.filteredApps.length > 0)
                             root.selectedIndex = (root.selectedIndex + 1) % root.filteredApps.length
-                        appList.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Up) {
+                        root.keyboardNav = true
                         if (root.filteredApps.length > 0)
                             root.selectedIndex = root.selectedIndex <= 0
                                 ? root.filteredApps.length - 1
                                 : root.selectedIndex - 1
-                        appList.positionViewAtIndex(root.selectedIndex, ListView.Contain)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root.launchSelected()
@@ -180,7 +213,7 @@ Item {
                         event.accepted = true
                     }
                 }
-            }
+            } 
         }
 
         ListView {
@@ -191,25 +224,73 @@ Item {
             model: root.filteredApps
             currentIndex: root.selectedIndex
             highlightFollowsCurrentItem: false
-            highlightMoveDuration: 80
-            spacing: 2
+            spacing: root.rowSpacing
+            boundsBehavior: Flickable.StopAtBounds
 
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+                implicitWidth: 3
+                background: Item {}
+                contentItem: Rectangle {
+                    implicitWidth: 3
+                    radius: 2
+                    color: Theme.fg4
+                    opacity: parent.active ? 0.7 : 0
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                }
+            }
+
+            // sliding selection pill with a slight overshoot
             highlight: Rectangle {
                 x: 2
                 y: appList.currentItem ? appList.currentItem.y : -999
                 width: appList.width - 4
-                height: appList.currentItem ? appList.currentItem.height : 44
+                height: appList.currentItem ? appList.currentItem.height : root.rowHeight
                 radius: 9
                 color: Theme.bgD
-                Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                Behavior on y {
+                    NumberAnimation { duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.1 }
+                }
             }
 
             delegate: Rectangle {
                 id: rowDelegate
                 width: appList.width
-                height: 44
+                height: root.rowHeight
                 radius: 9
                 color: "transparent"
+
+                readonly property bool selected: index === root.selectedIndex
+                readonly property var iconSrc: Quickshell.iconPath(modelData.icon, true)
+
+                // staggered reveal: fade + slide up, capped so long lists don't lag
+                property real reveal: 0
+                opacity: reveal
+                transform: Translate { y: (1 - rowDelegate.reveal) * 8 }
+
+                SequentialAnimation {
+                    id: revealAnim
+                    PauseAnimation { duration: Math.min(index, 9) * 22 }
+                    NumberAnimation {
+                        target: rowDelegate; property: "reveal"
+                        from: 0; to: 1; duration: 220; easing.type: Easing.OutCubic
+                    }
+                }
+                Component.onCompleted: revealAnim.start()
+
+                Connections {
+                    target: root
+                    function onShownChanged() {
+                        if (root.shown) {
+                            rowDelegate.reveal = 0
+                            revealAnim.restart()
+                        }
+                    }
+                }
+
+                // press feedback
+                scale: rowHover.pressed ? 0.98 : 1
+                Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
 
                 RowLayout {
                     anchors.fill: parent
@@ -219,24 +300,32 @@ Item {
 
                     IconImage {
                         id: appIcon
-                        visible: Quickshell.iconPath(modelData.icon, true)
+                        visible: !!rowDelegate.iconSrc
                         Layout.preferredWidth: 26
                         Layout.preferredHeight: 26
                         Layout.alignment: Qt.AlignVCenter
-                        source: Quickshell.iconPath(modelData.icon, true)
+                        source: rowDelegate.iconSrc
                         asynchronous: false
-                        scale: index === root.selectedIndex ? 1.10 : 1
-                        Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutQuad } }
+                        scale: rowDelegate.selected ? 1.10 : 1
+                        rotation: rowDelegate.selected ? -4 : 0
+                        Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
+                        Behavior on rotation { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
                     }
 
-                    Text {
-                        visible: !Quickshell.iconPath(modelData.icon, true)
-                        text: "?"
-                        color: Theme.fg
-                        font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
+                    // fallback glyph in a soft circle when the icon is missing
+                    Rectangle {
+                        visible: !rowDelegate.iconSrc
+                        Layout.preferredWidth: 26
+                        Layout.preferredHeight: 26
                         Layout.alignment: Qt.AlignVCenter
-                        Layout.leftMargin: 8
-                        Layout.rightMargin: 10
+                        radius: 13
+                        color: Theme.bg4
+                        Text {
+                            anchors.centerIn: parent
+                            text: modelData.name.length > 0 ? modelData.name[0].toUpperCase() : "?"
+                            color: Theme.fg
+                            font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
+                        }
                     }
 
                     ColumnLayout {
@@ -244,47 +333,54 @@ Item {
                         spacing: 1
 
                         Text {
-                            text: modelData.name
+                            text: root.highlightName(modelData.name, root.searchQuery)
+                            textFormat: Text.StyledText
                             color: Theme.fg
-                            font { family: Theme.fontFamily; pixelSize: 11; weight: index === root.selectedIndex ? 600 : 500 }
+                            font { family: Theme.fontFamily; pixelSize: 11; weight: rowDelegate.selected ? 600 : 500 }
                             elide: Text.ElideRight
                             Layout.fillWidth: true
+                            // nudge selected text right a touch
+                            Layout.leftMargin: rowDelegate.selected ? 2 : 0
+                            Behavior on Layout.leftMargin { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                         }
                         Text {
                             text: modelData.comment
                             visible: text.length > 0
-                            color: Theme.fg5
+                            color: Theme.fg4
                             font { family: Theme.fontFamily; pixelSize: 9; weight: 500 }
                             elide: Text.ElideRight
                             Layout.fillWidth: true
+                            Layout.leftMargin: rowDelegate.selected ? 2 : 0
+                            Behavior on Layout.leftMargin { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                         }
                     }
                 }
 
                 MouseArea {
                     id: rowHover
-                    property bool hovered: false
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onEntered: {
-                        hovered = true
+                        root.keyboardNav = false
                         root.selectedIndex = index
                     }
-                    onExited: hovered = false
                     onClicked: {
                         root.selectedIndex = index
                         root.launchSelected()
                     }
                 }
-              }
+            }
 
+            // empty state
             Text {
                 anchors.centerIn: parent
-                visible: appList.count === 0
                 text: "No apps found"
                 color: Theme.fg3
                 font { family: Theme.fontFamily; pixelSize: 10 }
+                opacity: root.filteredApps.length === 0 ? 1 : 0
+                visible: opacity > 0
+                Behavior on opacity { NumberAnimation { duration: 180 } }
             }
         }
     }

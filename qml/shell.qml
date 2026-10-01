@@ -293,7 +293,7 @@ ShellRoot {
                      : (notificationModule.active && !notifFullscreenMode) ? 320
                      : powerMenu ? 342
                      : controlCenter ? 390
-                     : appLauncher ? 378
+                     : appLauncher ? 350
                      : miniDashboard ? 420
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
@@ -314,7 +314,7 @@ ShellRoot {
                   : (cliphistOpen && cliphistPreviewing) ? 380
                   : miniDashboard ? 155
                   : appLauncher
-                      ? (appLauncherLoader.item ? appLauncherLoader.item.height + 23 : 410)
+                      ? (appLauncherLoader.item ? appLauncherLoader.item.height + 15 : 250)
                   : wallpaperSwitcherOpen ? 308
                   : cliphistOpen ? 282
                   : mediaAutoOpened ? 90
@@ -588,11 +588,9 @@ ShellRoot {
       // app launcher opens through IPC
       Item {
           anchors.centerIn: parent
-          width: box.implicitWidth - 22
+          width: box.implicitWidth - 16
           // height follows launcher (shrinks with results)
-          height: box.appLauncher
-              ? (appLauncherLoader.item ? appLauncherLoader.item.height : 387)
-              : 0
+          height: appLauncherLoader.item ? appLauncherLoader.item.height : 388
           opacity: box.appLauncher
                    && !notificationModule.active
                    && box.activeOsd === ""
