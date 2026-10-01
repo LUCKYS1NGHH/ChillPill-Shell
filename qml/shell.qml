@@ -297,7 +297,7 @@ ShellRoot {
                      : miniDashboard ? 420
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
-                     : cliphistOpen ? 460
+                     : cliphistOpen ? 440
                      : mediaAutoOpened ? 340
                      : row.implicitWidth + (12 * Config.pillScale) + (Config.pillOnHover || !hovered ? 56 : 68) * Config.pillScale
 
@@ -316,7 +316,7 @@ ShellRoot {
                   : appLauncher
                       ? (appLauncherLoader.item ? appLauncherLoader.item.height + 15 : 250)
                   : wallpaperSwitcherOpen ? 308
-                  : cliphistOpen ? 282
+                  : cliphistOpen ? 276
                   : mediaAutoOpened ? 90
                   : (row.implicitHeight * Config.pillScale) + 10
 
@@ -510,16 +510,14 @@ ShellRoot {
       // cliphist opens on middle click
       Item {
         anchors.centerIn: parent
-        width: box.implicitWidth - 22
-        height: (box.cliphistOpen ? box.implicitHeight - 22 : 0) + cliphistExtraHeight
+        width: box.cliphistOpen ? box.implicitWidth - 16 : 0
+        height: box.cliphistOpen ? box.implicitHeight - 16 : 0
         opacity: box.cliphistOpen
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !box.controlCenter
                  && !box.powerMenu ? 1 : 0
         visible: opacity > 0
-
-        property real cliphistExtraHeight: 0
 
         Behavior on opacity {
           SequentialAnimation {

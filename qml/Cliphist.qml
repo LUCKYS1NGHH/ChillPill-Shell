@@ -474,7 +474,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: fullPreview ? 24 : 18
+        radius: fullPreview ? 25 : 20
         color: Theme.bgD1
         border.color: Theme.borderBg2
         border.width: 1
@@ -535,7 +535,7 @@ Item {
                 onTextChanged: root.searchQuery = text
 
                 Text {
-                    text: "search clips..."
+                    text: "search items..."
                     color: Theme.fg3
                     font: searchInput.font
                     visible: searchInput.text.length === 0
@@ -936,3 +936,5 @@ Item {
         }
     }
 }
+
+
