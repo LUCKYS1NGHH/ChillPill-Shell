@@ -462,6 +462,9 @@ ShellRoot {
         property string text: ""
         property color iconColor: th.fg
         property bool segments: false
+        // draw a miniature of a live module (the audio spectrum) in place of
+        // its icon, so the preview shows the shape the bar will actually have
+        property bool spectrum: false
         property int segmentCount: 5
         property int activeSegment: -1
         property bool flag: false
@@ -530,8 +533,14 @@ ShellRoot {
                     }
                 }
             }
+            // Miniature of the audioVisualizer module, drawn in place of its icon.
+            AudioVisualPreview {
+                visible: mt.spectrum
+                Layout.fillWidth: false
+                ps: mt.ps
+            }
             Text {
-                visible: !mt.segments && mt.icon !== ""
+                visible: !mt.segments && !mt.spectrum && mt.icon !== ""
                 text: mt.icon
                 color: mt.iconColor
                 font.family: th.nerdFontFamily
@@ -550,7 +559,7 @@ ShellRoot {
             id: ma
             anchors.fill: parent
             hoverEnabled: true
-            cursorShape: Qt.OpenHandCursor
+            cursorShape: ma.dragged ? Qt.ClosedHandCursor : Qt.OpenHandCursor
             property point pressPt: Qt.point(0, 0)
             property bool dragged: false
             property real lastGX: 0
@@ -697,6 +706,7 @@ ShellRoot {
             case "notifications": return { icon: String.fromCodePoint(0xf0f3),  color: "#e2b052", text: "7" }
             case "bluetooth":     return { icon: String.fromCodePoint(0xf00af), color: "#6591e0", text: "on", iconSize: 13 }
             case "weather":       return { icon: String.fromCodePoint(0xe312),  color: "#d8ad5c", text: "24°C", iconSize: 11 }
+            case "audioVisualizer": return { icon: "",       spectrum: true, color: th.fg,     text: "" }
             default:              return { icon: String.fromCodePoint(0xf016),  color: th.fg4,    text: name }
             }
         }
@@ -709,6 +719,7 @@ ShellRoot {
                     color: th.fg,
                     text: base,
                     segments: false, segN: 0, activeSeg: -1,
+                    spectrum: false,
                     flag: false,
                     editable: true,
                     iconSize: 10
@@ -719,6 +730,7 @@ ShellRoot {
             return {
                 icon: s.icon, color: s.color, text: s.text,
                 segments: s.segments === true, segN: s.n || 0, activeSeg: 0,
+                spectrum: s.spectrum === true,
                 flag: unk, flagColor: th.warning,
                 editable: false,
                 iconSize: s.iconSize || 10
@@ -770,6 +782,7 @@ ShellRoot {
                         text: props.text
                         iconColor: props.color
                         segments: props.segments === true
+                        spectrum: props.spectrum === true
                         segmentCount: props.segN
                         activeSegment: props.activeSeg !== undefined ? props.activeSeg : -1
                         flag: props.flag === true
@@ -1305,6 +1318,7 @@ ShellRoot {
                         text: props.text
                         iconColor: props.color
                         segments: props.segments === true
+                        spectrum: props.spectrum === true
                         segmentCount: props.segN || 0
                         activeSegment: props.activeSeg !== undefined ? props.activeSeg : -1
                         flag: props.flag === true
@@ -1693,14 +1707,14 @@ ShellRoot {
                     SliderRow { label: "DPI scale"; from: 0.5; to: 3; step: 0.05; value: root.get("dpiScale", 1); onEdited: (v) => root.set("dpiScale", v) }
                     NumRow { label: "Pill top margin"; to: 200; suffix: "px"; value: root.get("pillTopMargin", 9); onEdited: (v) => root.set("pillTopMargin", v) }
                     NumRow { label: "Pill bottom margin"; to: 200; suffix: "px"; value: root.get("pillBottomMargin", 26); onEdited: (v) => root.set("pillBottomMargin", v) }
-                    ToggleRow { label: "Audio visualizer"; hint: "Shown in the Control Center's Media Player";  value: root.get("showAudioVisuals", true); onEdited: (v) => root.set("showAudioVisuals", v) }
+                    ToggleRow { label: "Audio visualizer"; hint: "Live spectrum in the Control Center's Media Player";  value: root.get("showAudioVisuals", true); onEdited: (v) => root.set("showAudioVisuals", v) }
                 }
 
                 // 1 — Pill
                 Page {
                     Heading { text: "MODULES (LEFT → RIGHT)" }
                     ModulesEditor {
-                        known: ["battery", "volume", "workspaces", "network", "clock", "brightness", "vpn", "notifications", "bluetooth", "weather"]
+                        known: ["battery", "volume", "workspaces", "network", "clock", "brightness", "vpn", "notifications", "bluetooth", "weather", "audioVisualizer"]
                         value: root.cfg.pillModules === undefined ? [] : root.cfg.pillModules
                         onEdited: (v) => root.set("pillModules", v)
                     }

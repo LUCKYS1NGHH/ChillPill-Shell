@@ -18,6 +18,17 @@ Row {
 
   Behavior on opacity { NumberAnimation { duration: 100 } }
 
+  // pillModules entries are normally loaded as Capitalize(name).qml, these are
+  // the few that need a different file (the audio visualizer module is named
+  // after the component it wraps, AudioVisualizer.qml)
+  readonly property var moduleFiles: ({
+    "audioVisualizer": "AudioVisualizerModule.qml"
+  })
+
+  function moduleFile(name) {
+    return moduleFiles[String(name)] || capitalize(name) + ".qml"
+  }
+
   // single hover source for the whole row, gaps included
   // for eating hover-able gaps between modules which expands the bar
   // width while hovering or sliding the cursor between bar's modules
@@ -45,7 +56,7 @@ Row {
       Loader {
         id: moduleLoader
         anchors.fill: parent
-        source: isCustom ? "CustomBarModule.qml" : capitalize(modelData) + ".qml"
+        source: isCustom ? "CustomBarModule.qml" : moduleFile(modelData)
         onLoaded: {
           if (isCustom) {
             item.spec = modelData

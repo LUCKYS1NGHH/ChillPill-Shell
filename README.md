@@ -134,7 +134,7 @@ into your session at all times. It's not bound to any dotfiles.
 ---
 - Main pill bar modules has tooltips
 
-- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`
+- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`, `audioVisualizer`
 
 - Pill bar supports custom modules (waybar-style) — run any command/script in the bar with `format`/`tooltip` templates, refresh intervals, streaming output and click actions (see [Custom pill modules](#custom-pill-modules)).
 
@@ -153,6 +153,11 @@ into your session at all times. It's not bound to any dotfiles.
 
 - Control center's media player progress bar is not only for status, it's usable to control the media you playing.
   also timer minutes can be change by right click and hold-to-burst (stop) it when running.
+
+- The live audio spectrum (needs `cava`) is drawn in two independent flavours: bottom-anchored in the control center's
+  media player (toggled by `showAudioVisuals`), and mirrored around its middle line (a wave instead of a skyline) -x
+  as the `audioVisualizer` pill bar module (toggled by adding/removing it from `pillModules`). Either one can be used
+  without the other.
 
 - Control center has WiFi controller (panel) which has list of active networks and has password prompt.
 
@@ -244,7 +249,7 @@ Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar
 - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
 - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
 - `holidays` (Python lib) event dates in calendar; `install.sh` prompts to install this one
-- `cava` for showing audio visuals in media player
+- `cava` for showing audio visuals
 - `awww` for wallpaper switcher if you don't use custom wallpaper script
 
 ## Install

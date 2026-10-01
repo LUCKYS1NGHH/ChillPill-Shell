@@ -87,6 +87,10 @@ ShellRoot {
   property bool mediaAutoOpened: false
   property var visualizerValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   property bool cavaAvailable: false
+  // the pill bar's "audioVisualizer" module draws the same spectrum, so cava has
+  // to run while the pill is revealed too (not just for the control center)
+  readonly property bool pillHasVisualizer: (Config.pillModules || []).some(
+    m => m === "audioVisualizer")
 
   Process {
     id: cavaCheckProc
@@ -1343,7 +1347,9 @@ ShellRoot {
   Process {
     id: cavaProc
     command: ["sh", "-c", "cava -p ~/.cache/chillpill-shell/cava.conf"]
-    running: Config.showAudioVisuals && box.controlCenter && shellRoot.cavaAvailable
+    running: shellRoot.cavaAvailable
+             && ((Config.showAudioVisuals && box.controlCenter)
+                 || (box.revealed && shellRoot.pillHasVisualizer))
     stdout: SplitParser {
       splitMarker: "\n"
       onRead: data => {
