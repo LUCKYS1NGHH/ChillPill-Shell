@@ -20,7 +20,7 @@ Rectangle {
     }
   }
 
-  color: Theme.bgD1
+  color: Theme.bgD
   radius: 18
   visible: opacity > 0
   opacity: shown ? 1 : 0
@@ -212,13 +212,10 @@ Rectangle {
           color: Theme.bg4
           scale: (mouseArea.containsMouse || cell.isCurrent) ? 1.03 : 1.0
           Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutExpo } }
-          border.width: cell.isCurrent ? 1 : 0
-          border.color: Theme.borderBg
 
           ClippingRectangle {
             anchors.fill: parent
-            anchors.margins: 2
-            radius: 8
+            radius: 10
             color: "transparent"
 
             Image {
