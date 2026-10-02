@@ -19,8 +19,8 @@ into your session at all times. It's not bound to any dotfiles.
 
 [![Resource Usage](https://img.shields.io/badge/Resource%20Usage-252525?style=flat-square)](#resource-usage)
 [![Showcase](https://img.shields.io/badge/Showcase-252525?style=flat-square)](#showcase)
-[![Features](https://img.shields.io/badge/Features-252525?style=flat-square)](#features)
-[![Configuration](https://img.shields.io/badge/Configuration-252525?style=flat-square)](#configurable-options)
+[![Features](https://img.shields.io/badge/Features-252525?style=flat-square)](#features-pill-states)
+[![Configuration](https://img.shields.io/badge/Configuration%20App-252525?style=flat-square)](#configuration-app)
 [![Custom Modules](https://img.shields.io/badge/Custom%20Modules-252525?style=flat-square)](#custom-pill-modules)
 [![Dependencies](https://img.shields.io/badge/Dependencies-252525?style=flat-square)](#dependencies)
 [![Installation](https://img.shields.io/badge/Installation-252525?style=flat-square)](#install)
@@ -34,9 +34,9 @@ into your session at all times. It's not bound to any dotfiles.
 
 ### Resource Usage
 
-- RAM: 200-500 MB (Average 380)
+- RAM: 200-500 MB (Average 400)
 - CPU: Idle 0%, Average 3%, Min 0.1%, Max 10%
-- GPU: Idle 0%, Average 15%, Min 6%, Max 45%
+- GPU: Idle 0%, Average 15%, Min 6%, Max 40%
 
 > CPU and GPU usage varies with system. a better CPU and GPU use less.
 
@@ -115,7 +115,7 @@ into your session at all times. It's not bound to any dotfiles.
   </tr>
 </table>
 
-## Features
+## Features (Pill States)
 
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see 'Know more' below.
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
@@ -123,10 +123,11 @@ into your session at all times. It's not bound to any dotfiles.
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
+- **App Launcher**                 - List of applications (`Tab` to read the long app description)
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher
-- **Power Menu**                   - Dedicated power pill state with 5 actions (Lock, Sleep, Logout, Restart, Shutdown) and action confirmation prompt
+- **Power Menu**                   - 5 actions (Lock, Sleep, Logout, Restart, Shutdown) and action confirmation prompt
 
 <details>
 <summary>Know more</summary>
@@ -199,7 +200,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 </details>
 
-### Custom Pill Modules
+## Custom Pill Modules
 
 Besides the built-in Quickshell modules (`battery`, `workspaces`, `network`, `clock`, `vpn`, `notifications` etc.), `pillModules` also accepts
 **object entries** that run any command/script and show its output in the bar — kind of similar to
@@ -364,7 +365,6 @@ hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("chillpill-shell-ipc call powerM
 </details>
 
 ---
-
 
 ### Contributors
 
