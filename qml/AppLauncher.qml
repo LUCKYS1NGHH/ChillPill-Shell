@@ -9,6 +9,8 @@ Item {
     clip: true
 
     property bool shown: false
+    // Tab-toggled description of the selected app, expanded inside its row
+    property bool descShown: false
     property int selectedIndex: 0
     property string searchQuery: ""
     property var appsCache: []
@@ -17,16 +19,23 @@ Item {
 
     width: 315
 
-    property int rowHeight: 40
+    property int rowHeight: 44
     property int rowSpacing: 2
     property int headerHeight: 15
     property int maxListHeight: 250
+
+    // the pill, the row and the text fade all run OutCubic over this, so they stay in step
+    readonly property int openDuration: 200
+
     readonly property int listHeight: root.filteredApps.length === 0
         ? root.rowHeight
         : Math.min(root.filteredApps.length * root.rowHeight + (root.filteredApps.length - 1) * root.rowSpacing, root.maxListHeight)
     readonly property int baseHeight: 12 + root.headerHeight + 8 + 30 + 8 + 12
-    height: root.baseHeight + root.listHeight
-    Behavior on height { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+    // the description opens inside its row, so the launcher keeps its height; the viewport
+    // only stretches when a lone result is too short to hold the opened row
+    readonly property int viewHeight: Math.max(root.listHeight, root.descShown && appList.currentItem ? appList.currentItem.height : 0)
+    height: root.baseHeight + root.viewHeight
+    Behavior on height { NumberAnimation { duration: root.openDuration; easing.type: Easing.OutCubic } }
 
     // open/close: fade + gentle scale that grows down from the top edge
     visible: opacity > 0
@@ -70,6 +79,7 @@ Item {
             searchQuery = ""
             searchInput.text = ""
             selectedIndex = 0
+            descShown = false
             appList.positionViewAtBeginning()
             searchInput.forceActiveFocus()
         }
@@ -205,6 +215,9 @@ Item {
                                 ? root.filteredApps.length - 1
                                 : root.selectedIndex - 1
                         event.accepted = true
+                    } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
+                        root.descShown = !root.descShown
+                        event.accepted = true
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root.launchSelected()
                         event.accepted = true
@@ -219,7 +232,7 @@ Item {
         ListView {
             id: appList
             width: parent.width
-            height: root.listHeight
+            height: root.viewHeight
             clip: true
             model: root.filteredApps
             currentIndex: root.selectedIndex
@@ -246,8 +259,9 @@ Item {
                 y: appList.currentItem ? appList.currentItem.y : -999
                 width: appList.width - 4
                 height: appList.currentItem ? appList.currentItem.height : root.rowHeight
-                radius: 9
+                radius: 12
                 color: Theme.bgD
+                // height tracks currentItem.height, already animated by the row
                 Behavior on y {
                     NumberAnimation { duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.1 }
                 }
@@ -256,11 +270,31 @@ Item {
             delegate: Rectangle {
                 id: rowDelegate
                 width: appList.width
-                height: root.rowHeight
+
+                readonly property bool selected: index === root.selectedIndex
+                // Tab wraps the description over several lines inside this row
+                readonly property bool expanded: root.descShown && selected && modelData.comment.length > 0
+                readonly property int wrapExtra: expanded ? Math.max(0, rowComment.implicitHeight - commentMetrics.height) : 0
+
+                // 6px of padding, but only once it really took more lines
+                height: root.rowHeight + rowDelegate.wrapExtra + (rowDelegate.wrapExtra > 0 ? 6 : 0)
+                Behavior on height { NumberAnimation { duration: root.openDuration; easing.type: Easing.OutCubic } }
+
+                // fade the wrapped text in on the box's own curve as it opens
+                property real descFade: 1
+                onExpandedChanged: if (expanded) { descFadeAnim.from = 0.25; descFadeAnim.restart() }
+                NumberAnimation {
+                    id: descFadeAnim
+                    target: rowDelegate
+                    property: "descFade"
+                    to: 1
+                    duration: root.openDuration
+                    easing.type: Easing.OutCubic
+                }
+
                 radius: 9
                 color: "transparent"
 
-                readonly property bool selected: index === root.selectedIndex
                 readonly property var iconSrc: Quickshell.iconPath(modelData.icon, true)
 
                 // staggered reveal: fade + slide up, capped so long lists don't lag
@@ -291,6 +325,9 @@ Item {
                 // press feedback
                 scale: rowHover.pressed ? 0.98 : 1
                 Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
+
+                // one line of text, the baseline the wrapped height grows from
+                FontMetrics { id: commentMetrics; font: rowComment.font }
 
                 RowLayout {
                     anchors.fill: parent
@@ -344,13 +381,18 @@ Item {
                             Behavior on Layout.leftMargin { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                         }
                         Text {
+                            id: rowComment
                             text: modelData.comment
                             visible: text.length > 0
-                            color: Theme.fg4
+                            color: rowDelegate.expanded ? Theme.fg3 : Theme.fg4
                             font { family: Theme.fontFamily; pixelSize: 9; weight: 500 }
+                            opacity: rowDelegate.descFade
+                            wrapMode: rowDelegate.expanded ? Text.WordWrap : Text.NoWrap
+                            maximumLineCount: 4 // cap, chatty .desktop comments get elided
                             elide: Text.ElideRight
                             Layout.fillWidth: true
                             Layout.leftMargin: rowDelegate.selected ? 2 : 0
+                            Behavior on color { ColorAnimation { duration: 180 } }
                             Behavior on Layout.leftMargin { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                         }
                     }
