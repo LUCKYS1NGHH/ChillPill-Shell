@@ -119,7 +119,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see 'Know more' below.
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
-- **Cliphist (Clipboard Manager)** - Search, clipboard image preview, item index status, multi select to delete many items at once (`Shift + Up/Down` range, `Shift + Space` pick, `Del` to delete), `Tab` to full preview the clipboard image/text
+- **Cliphist (Clipboard Manager)** - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (`Shift + Up/Down` range, `Shift + Space` pick, `Del` to delete), `Tab` to full preview the clipboard image/text
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button

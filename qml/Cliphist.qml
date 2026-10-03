@@ -21,6 +21,9 @@ Item {
     property string previewText: ""  // full decoded content for text preview
     property string previewTargetId: ""  // entry id the in-flight decode is for
     property bool previewReady: false  // true when previewText matches previewTargetId
+    // only the head of a long entry is matched: rows elide it anyway and a big
+    // history has to stay fast on every keystroke
+    readonly property int fuzzyLabelChars: 120
 
     signal closeRequested()
     signal previewToggled(bool active)
@@ -88,8 +91,35 @@ Item {
 
     function rebuildFilteredModel() {
         listModel.clear()
-        let list = searchQuery.length === 0 ? allEntries : allEntries.filter(e => e.label.toLowerCase().includes(searchQuery.toLowerCase()))
+        let list = allEntries
+        const q = searchQuery.toLowerCase()
+        if (q.length > 0) {
+            if (Config.cliphistFuzzySearch) {
+                // tightest match first, entries that don't match fall out
+                let scored = []
+                for (let i = 0; i < allEntries.length; i++) {
+                    const m = matchLabel(q, allEntries[i].label)
+                    if (m) scored.push({ entry: allEntries[i], score: m.score })
+                }
+                scored.sort((a, b) => b.score - a.score)
+                list = []
+                for (let i = 0; i < scored.length; i++) list.push(scored[i].entry)
+            } else {
+                list = allEntries.filter(e => e.label.toLowerCase().includes(q))
+            }
+        }
         if (list.length > 0) listModel.append(list)
+    }
+
+    function matchLabel(q, label) {
+        return Fuzzy.best(q, label.toLowerCase().slice(0, fuzzyLabelChars))
+    }
+
+    // bold the matched characters, otherwise an out-of-order hit looks arbitrary
+    function highlightLabel(label) {
+        if (!Config.cliphistFuzzySearch || searchQuery.length === 0) return label
+        const m = matchLabel(searchQuery.toLowerCase(), label)
+        return Fuzzy.highlight(label, m ? m.positions : [])
     }
 
     function refresh() {
@@ -916,7 +946,10 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: 12
                     anchors.rightMargin: 8
-                    text: model.label
+                    // StyledText only while fuzzy, plain text needs no escaping
+                    textFormat: Config.cliphistFuzzySearch && searchQuery.length > 0
+                        ? Text.StyledText : Text.PlainText
+                    text: root.highlightLabel(model.label)
                     visible: !model.imagePath && !fullPreview
                     color: Theme.fg
                     font { family: Theme.fontFamily; pixelSize: 10 }

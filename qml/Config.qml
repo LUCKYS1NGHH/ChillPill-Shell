@@ -48,6 +48,7 @@ Singleton {
       property int maxVolume: 100
       property bool separatePreviewTabTypes: true
       property bool appLauncherFuzzySearch: false
+      property bool cliphistFuzzySearch: false
     }
   }
 
@@ -86,4 +87,5 @@ Singleton {
   readonly property alias maxVolume: adapter.maxVolume
   readonly property alias separatePreviewTabTypes: adapter.separatePreviewTabTypes
   readonly property alias appLauncherFuzzySearch: adapter.appLauncherFuzzySearch
+  readonly property alias cliphistFuzzySearch: adapter.cliphistFuzzySearch
 }

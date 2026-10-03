@@ -33,5 +33,6 @@
   "confirmPowerActions": true,
   "maxVolume": 100,
   "separatePreviewTabTypes": true,
-  "appLauncherFuzzySearch": false
+  "appLauncherFuzzySearch": false,
+  "cliphistFuzzySearch": false
 }
