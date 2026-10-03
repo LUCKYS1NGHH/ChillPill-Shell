@@ -1763,6 +1763,8 @@ ShellRoot {
                     Heading { text: "CLIPBOARD" }
                     ToggleRow { label: "Auto delete cliphist image cache"; hint: "Delete the cache image also as you delete the clipboard image"; value: root.get("deleteCliphistImgCache", true); onEdited: (v) => root.set("deleteCliphistImgCache", v) }
                     ToggleRow { label: "Separate preview tab types"; hint: "Skip the previous/next clipboard item if it doesn't match with the current selected item"; value: root.get("separatePreviewTabTypes", true); onEdited: (v) => root.set("separatePreviewTabTypes", v) }
+                    Heading { text: "LAUNCHER" }
+                    ToggleRow { label: "App Launcher Fuzzy Search"; hint: "Match app names with non-consecutive characters"; value: root.get("appLauncherFuzzySearch", false); onEdited: (v) => root.set("appLauncherFuzzySearch", v) }
                 }
 
                 // 6 — Wallpaper

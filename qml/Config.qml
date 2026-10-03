@@ -47,6 +47,7 @@ Singleton {
       property bool confirmPowerActions: true
       property int maxVolume: 100
       property bool separatePreviewTabTypes: true
+      property bool appLauncherFuzzySearch: false
     }
   }
 
@@ -84,4 +85,5 @@ Singleton {
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
   readonly property alias maxVolume: adapter.maxVolume
   readonly property alias separatePreviewTabTypes: adapter.separatePreviewTabTypes
+  readonly property alias appLauncherFuzzySearch: adapter.appLauncherFuzzySearch
 }

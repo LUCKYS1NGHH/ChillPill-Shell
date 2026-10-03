@@ -123,7 +123,7 @@ into your session at all times. It's not bound to any dotfiles.
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
-- **App Launcher**                 - List of applications (`Tab` to read the long app description)
+- **App Launcher**                 - List of applications (`Tab` to read the long app description), optional fuzzy search
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher

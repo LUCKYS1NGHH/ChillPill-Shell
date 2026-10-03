@@ -32,5 +32,6 @@
   "showSensitiveInfo": true,
   "confirmPowerActions": true,
   "maxVolume": 100,
-  "separatePreviewTabTypes": true
+  "separatePreviewTabTypes": true,
+  "appLauncherFuzzySearch": false
 }

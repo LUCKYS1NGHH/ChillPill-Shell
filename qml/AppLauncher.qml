@@ -45,10 +45,22 @@ Item {
     scale: shown ? 1 : 0.94
     Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
 
-    // name-prefix matches first, then name-contains, then comment-only
+    // fuzzy ranks the tiers from matchApp(), best first
     property var filteredApps: {
         if (searchQuery.length === 0) return appsCache
         const q = searchQuery.toLowerCase()
+        if (Config.appLauncherFuzzySearch) {
+            let scored = []
+            for (let i = 0; i < appsCache.length; i++) {
+                const m = matchApp(q, appsCache[i])
+                if (m) scored.push({ app: appsCache[i], tier: m.tier, score: m.score })
+            }
+            scored.sort((a, b) => a.tier - b.tier || b.score - a.score
+                || a.app.name.localeCompare(b.app.name))
+            let out = []
+            for (let i = 0; i < scored.length; i++) out.push(scored[i].app)
+            return out
+        }
         let starts = [], contains = [], comment = []
         for (let i = 0; i < appsCache.length; i++) {
             const a = appsCache[i]
@@ -118,13 +130,103 @@ Item {
         root.closeRequested()
     }
 
+    // one match per app, shared by the list and the highlighter so the bolded
+    // chars match the tier: 0 name in order, 1 name any order, 2 comment
+    function matchApp(q, a) {
+        const name = a.name.toLowerCase()
+        const ordered = fuzzyHit(q, name)
+        if (ordered) return { tier: 0, score: ordered.score, positions: ordered.positions }
+        // any order needs 3+ chars, two loose letters match half the desktop
+        const loose = q.length >= 3 ? scatteredHit(q, name) : null
+        if (loose) return { tier: 1, score: loose.score, positions: loose.positions }
+        const cOrdered = fuzzyHit(q, a.comment.toLowerCase())
+        if (cOrdered) return { tier: 2, score: cOrdered.score, positions: [] }
+        return null
+    }
+
+    // query chars in order; word starts, runs of adjacent hits and early
+    // matches score up, gaps and long tails cost
+    readonly property string separators: " -_.:/"
+    function fuzzyHit(needle, hay) {
+        if (needle.length === 0 || needle.length > hay.length) return null
+        let score = 0
+        let at = 0
+        let prev = -1
+        const positions = []
+        for (let n = 0; n < needle.length; n++) {
+            const c = needle[n]
+            let found = -1
+            while (at < hay.length) {
+                if (hay[at] === c) { found = at; break }
+                at++
+            }
+            if (found < 0) return null
+            positions.push(found)
+            const wordStart = found === 0 || separators.indexOf(hay[found - 1]) >= 0
+            if (wordStart) score += 8
+            if (prev >= 0 && found === prev + 1) score += 6
+            score -= Math.min(8, found * 0.5)
+            prev = found
+            at = found + 1
+        }
+        // a tight, early match beats a loose one over the same letters
+        score -= (hay.length - needle.length) * 0.2
+        return { score: score, positions: positions }
+    }
+
+    // query chars in any order ("tpob" -> btop); only contiguous runs score
+    function scatteredHit(needle, hay) {
+        if (needle.length === 0) return null
+        const taken = []
+        const positions = []
+        for (let n = 0; n < needle.length; n++) {
+            let found = -1
+            for (let h = 0; h < hay.length; h++) {
+                if (hay[h] === needle[n] && taken.indexOf(h) < 0) { found = h; break }
+            }
+            if (found < 0) return null
+            taken.push(found)
+            positions.push(found)
+        }
+        positions.sort((a, b) => a - b)
+        let score = 0
+        let run = 1
+        for (let k = 1; k < positions.length; k++) {
+            run = positions[k] === positions[k - 1] + 1 ? run + 1 : 1
+            score += run * 1.5
+        }
+        score -= Math.min(8, (hay.length - needle.length) * 0.5)
+        return { score: score, positions: positions }
+    }
+
+    // which characters to bold in a row's name, from that row's own match
+    function matchPositions(app) {
+        const q = searchQuery.toLowerCase()
+        if (q.length === 0) return []
+        if (Config.appLauncherFuzzySearch) {
+            const m = matchApp(q, app)
+            return m ? m.positions : []
+        }
+        const i = app.name.toLowerCase().indexOf(q)
+        if (i < 0) return []
+        let pos = []
+        for (let k = 0; k < q.length; k++) pos.push(i + k)
+        return pos
+    }
+
     // bold the matched part of the name (escaped for StyledText)
     function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") }
-    function highlightName(name, q) {
-        if (!q || q.length === 0) return esc(name)
-        const i = name.toLowerCase().indexOf(q.toLowerCase())
-        if (i < 0) return esc(name)
-        return esc(name.slice(0, i)) + "<b>" + esc(name.slice(i, i + q.length)) + "</b>" + esc(name.slice(i + q.length))
+    function highlightName(name, positions) {
+        if (!positions || positions.length === 0) return esc(name)
+        let out = ""
+        let bold = false
+        for (let i = 0; i <= name.length; i++) {
+            const hit = i < name.length && positions.indexOf(i) >= 0
+            if (hit && !bold) { out += "<b>"; bold = true }
+            else if (!hit && bold) { out += "</b>"; bold = false }
+            if (i < name.length) out += esc(name[i])
+        }
+        return out
     }
 
     Rectangle {
@@ -370,7 +472,7 @@ Item {
                         spacing: 1
 
                         Text {
-                            text: root.highlightName(modelData.name, root.searchQuery)
+                            text: root.highlightName(modelData.name, root.matchPositions(modelData))
                             textFormat: Text.StyledText
                             color: Theme.fg
                             font { family: Theme.fontFamily; pixelSize: 11; weight: rowDelegate.selected ? 600 : 500 }
