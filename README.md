@@ -119,11 +119,11 @@ into your session at all times. It's not bound to any dotfiles.
 
 - **Main Pill Bar**                - Battery, volume, workspaces, network, clock (default; customizable) — for more module options, see 'Know more' below.
 - **Control Center**               - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
-- **Cliphist (Clipboard Manager)** - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (`Shift + Up/Down` range, `Shift + Space` pick, `Del` to delete), `Tab` to full preview the clipboard image/text
+- **Cliphist (Clipboard Manager)** - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (<kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> range, <kbd>Shift</kbd> + <kbd>Space</kbd> pick, <kbd>Del</kbd> to delete), <kbd>Tab</kbd> to full preview the clipboard image/text
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
-- **App Launcher**                 - List of applications (`Tab` to read the long app description), optional fuzzy search
+- **App Launcher**                 - List of applications (<kbd>Tab</kbd> to read the long app description), optional fuzzy search
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher
@@ -141,9 +141,9 @@ into your session at all times. It's not bound to any dotfiles.
 
 - 3 pill states are open-able with mouse:
 
-  - Control center: `Left click`
-  - Cliphist: `Middle click`
-  - Mini Dashboard: `Right click`
+  - Control center: <kbd>Left click</kbd>
+  - Cliphist: <kbd>Middle click</kbd>
+  - Mini Dashboard: <kbd>Right click</kbd>
 
   For the rest of states, you have to call the IPC through keybinds in Hyprland, which are provided in [Keybinds](#key-bindings)
   section (including the mouse open-able states)
@@ -174,15 +174,15 @@ into your session at all times. It's not bound to any dotfiles.
   you want these images cache to auto delete when you delete the cliphist (clipboard manager) image item, then there's `deleteCliphistImgCache` config
   option (enabled by default).
 
-- In Cliphist full preview tab (which opens through `Tab` key), you can switch to other item by `Up`/`Down` keys, and can also delete the item from there.
+- In Cliphist full preview tab (which opens through <kbd>Tab</kbd> key), you can switch to other item by <kbd>Up</kbd>/<kbd>Down</kbd> keys, and can also delete the item from there.
 
-- Cliphist items can be multi selected through keys, then deleted in one go with `Del`:
+- Cliphist items can be multi selected through keys, then deleted in one go with <kbd>Del</kbd>:
 
-  - `Shift + Up` / `Shift + Down`: mark a range of items, editor style (grows and shrinks from where the range started)
-  - `Shift + Space`: mark/unmark the item under the cursor (works in the full preview too, the marked count shows as a chip there)
-  - `Ctrl + Click` / `Shift + Click`: same toggle with the mouse
-  - `Del`: deletes the marked items, or the highlighted one when nothing is marked
-  - `Esc`: drops the marks first, closes the panel on the second press
+  - <kbd>Shift</kbd> + <kbd>Up</kbd> / <kbd>Shift</kbd> + <kbd>Down</kbd>: mark a range of items, editor style (grows and shrinks from where the range started)
+  - <kbd>Shift</kbd> + <kbd>Space</kbd>: mark/unmark the item under the cursor (works in the full preview too, the marked count shows as a chip there)
+  - <kbd>Ctrl</kbd> + <kbd>Click</kbd> / <kbd>Shift</kbd> + <kbd>Click</kbd>: same toggle with the mouse
+  - <kbd>Del</kbd>: deletes the marked items, or the highlighted one when nothing is marked
+  - <kbd>Esc</kbd>: drops the marks first, closes the panel on the second press
 
 - Notifications, brightness and volume are able to show in slide animation (similar to iOS mute) while you playing video game or watching movie
   in full screen.
