@@ -185,7 +185,7 @@ info "Copying QML files"
 install -m 644 qml/* /usr/share/chillpill-shell
 
 # copy launcher (bash)
-info "Creating launchers (main shell and config-app)"
+info "Copying bash launchers (main shell and config-app)"
 install -m 755 launcher.sh /usr/local/bin/chillpill-shell
 install -m 755 config-launcher.sh /usr/local/bin/chillpill-config
 
@@ -203,7 +203,9 @@ chmod 644 /usr/share/chillpill-shell/share/*
 chmod 755 /usr/share/chillpill-shell/scripts
 chmod 755 /usr/share/chillpill-shell/scripts/*
 chmod 755 /usr/share/chillpill-shell/config-app
-chmod 666 /usr/share/chillpill-shell/config-app/*
+# config-app has subdirectories (components, pages), so using find here to set permissions
+find /usr/share/chillpill-shell/config-app -type d -exec chmod 755 {} +
+find /usr/share/chillpill-shell/config-app -type f -exec chmod 644 {} +
 chmod 755 /usr/share/chillpill-shell/IslandBackend
 chmod 644 /usr/share/chillpill-shell/IslandBackend/*
 chmod 755 "$REAL_HOME/.config/chillpill-shell/modules"
