@@ -85,6 +85,7 @@ Rectangle {
     folder: "file://" + Config.wallpapersDir.replace("~", Quickshell.env("HOME"))
     nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
     showDirs: false
+    showHidden: false
     caseSensitive: false
     sortField: FolderListModel.Name
 
@@ -158,6 +159,12 @@ Rectangle {
       Keys.onEnterPressed: wallpaperPopup.activateCurrent()
 
       Keys.onPressed: (event) => {
+        // Ctrl+H or . toggles dot-prefixed (hidden) wallpapers
+        if (event.key === Qt.Key_Period || ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_H)) {
+          wallpaperModel.showHidden = !wallpaperModel.showHidden
+          event.accepted = true
+          return
+        }
         switch (event.key) {
           case Qt.Key_W: wallGrid.moveCurrentIndexUp();    event.accepted = true; break
           case Qt.Key_S: wallGrid.moveCurrentIndexDown();  event.accepted = true; break
@@ -256,7 +263,7 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.margins: 8
-                text: fileBaseName
+                text: fileName.replace(/\.[^.]+$/, "")
                 color: "white"
                 elide: Text.ElideMiddle
                 font { family: Theme.fontFamily; pixelSize: 9 }

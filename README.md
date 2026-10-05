@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.11.0](https://img.shields.io/badge/CP--Shell-0.11.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![ChillPill-Shell 0.12.0](https://img.shields.io/badge/CP--Shell-0.12.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -126,7 +126,7 @@ into your session at all times. It's not bound to any dotfiles.
 - **App Launcher**                 - List of applications (<kbd>Tab</kbd> to read the long app description), optional fuzzy search
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
-- **Wallpaper switcher**           - A wallpaper switcher
+- **Wallpaper switcher**           - A wallpaper switcher. <kbd>.</kbd> or <kbd>CTRL</kbd> + <kbd>H</kbd> to see hidden images (dot prefixed)
 - **Power Menu**                   - 5 actions (Lock, Sleep, Logout, Restart, Shutdown) and action confirmation prompt
 
 <details>
