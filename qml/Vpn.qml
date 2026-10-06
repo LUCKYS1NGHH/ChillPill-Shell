@@ -38,7 +38,7 @@ RowLayout {
     id: vpnCheck
     property int gen: 0
     command: ["bash", "-c",
-      "nmcli -t -f TYPE,NAME con show --active | awk -F: '$1==\"vpn\"||$1==\"wireguard\"{print $2; exit}'"]
+      "nmcli -t -f TYPE,STATE,NAME con show --active | awk -F: '($1==\"vpn\"||$1==\"wireguard\") && $2==\"activated\"{print $3; exit}'"]
     stdout: StdioCollector {
       onStreamFinished: {
         if (vpnCheck.gen !== root.vpnCheckGen) return
