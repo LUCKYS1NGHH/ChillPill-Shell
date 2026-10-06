@@ -751,10 +751,8 @@ ShellRoot {
           brightnessPercent: brightnessModule.percent
 
           onVolumeChangeRequested: (fraction) => {
-            if (box.volumeModule) {
-              box.volumeModule.intendedVol = Math.round(Math.max(0, Math.min(1, fraction)) * Config.maxVolume)
-              box.volumeModule.sink.audio.volume = box.volumeModule.intendedVol / 100
-            }
+            if (box.volumeModule)
+              box.volumeModule.setVolume(Math.round(Math.max(0, Math.min(1, fraction)) * Config.maxVolume))
           }
           onBrightnessChangeRequested: (fraction) => {
             let pct = Math.round(Math.max(0, Math.min(1, fraction)) * 100)

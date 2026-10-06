@@ -29,7 +29,10 @@ RowLayout {
   anchors.rightMargin: 5 * dpi
 
   onControlCenterOpenChanged: {
-    if (!controlCenterOpen) root.wifiPanelOpened = false; root.btPanelOpened = false
+    if (!controlCenterOpen) {
+      root.wifiPanelOpened = false
+      root.btPanelOpened = false
+    }
   }
 
   // wifi
@@ -86,7 +89,10 @@ RowLayout {
   }
 
   onNotificationPopupChanged: {
-    if (root.notificationPopup) root.wifiPanelOpened = false; root.btPanelOpened = false
+    if (root.notificationPopup) {
+      root.wifiPanelOpened = false
+      root.btPanelOpened = false
+    }
   }
 
   // silent notifications

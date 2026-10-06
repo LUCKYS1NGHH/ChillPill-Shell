@@ -7,11 +7,36 @@ import QtQuick.Layouts
 RowLayout {
   id: root
   signal volumeChanged
+
+  // tells our own slider writes apart from external ones (media keys,
+  // pavucontrol, wpctl/pactl) so the display keeps the boosted value while
+  // our write is still travelling, but always follows real external changes
+  property bool selfWrite: false
+
+  Timer {
+    id: selfWriteGuard
+    interval: 200
+    onTriggered: {
+      root.selfWrite = false
+      // settle on the real value (also covers PipeWire clamping)
+      if (root.ready && root.intendedVol !== root.vol)
+        root.intendedVol = root.vol
+    }
+  }
+
+  // single entry point for changing the volume through the UI
+  function setVolume(pct) {
+    selfWrite = true
+    selfWriteGuard.restart()
+    intendedVol = pct
+    sink.audio.volume = pct / 100
+  }
+
   onVolChanged: {
-    // sync the displayed value with the real volume for external changes
-    // (media keys, pavucontrol). `intendedVol` only stays above 100% for
-    // over-amplification set through the slider, so skip those cases.
-    if (ready && intendedVol <= 100)
+    // sync the displayed value with the real volume for external changes;
+    // must also run above 100% (maxVolume > 100) or lowering the volume
+    // would leave the pill/OSD stuck on the old value
+    if (ready && !selfWrite && intendedVol !== vol)
       intendedVol = vol
     root.volumeChanged()
   }
