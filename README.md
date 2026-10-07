@@ -174,7 +174,9 @@ into your session at all times. It's not bound to any dotfiles.
   you want these images cache to auto delete when you delete the cliphist (clipboard manager) image item, then there's `deleteCliphistImgCache` config
   option (enabled by default).
 
-- In Cliphist full preview tab (which opens through <kbd>Tab</kbd> key), you can switch to other item by <kbd>Up</kbd>/<kbd>Down</kbd> keys, and can also delete the item from there.
+- In Cliphist full preview tab (which opens through <kbd>Tab</kbd> key), you can switch to other item by <kbd>Up</kbd>/<kbd>Down</kbd> keys,
+  and can also delete the item from there. Full preview tab also shows previous/next item type (Image / Text) badges in bottom area,
+  only if you toggle off the `separatePreviewTabTypes` (enabled by default).
 
 - Cliphist items can be multi selected through keys, then deleted in one go with <kbd>Del</kbd>:
 

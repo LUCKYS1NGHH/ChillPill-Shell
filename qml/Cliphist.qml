@@ -599,22 +599,116 @@ Item {
 
                 sourceComponent: Component {
                     Item {
+                        id: previewRoot
                         anchors.fill: parent
 
-                        readonly property string currentEntryId: {
+                        // item info chrome: stats strip on top, prev / next type badges
+                        // with the list position at the bottom
+                        readonly property int headerHeight: 21
+                        readonly property int footerHeight: 22
+                        readonly property real gutter: 12
+
+                        readonly property var entry: {
                             let idx = root.selectedIndex
-                            if (idx < 0 || idx >= listModel.count) return ""
-                            return listModel.get(idx).id
+                            if (idx < 0 || idx >= listModel.count) return null
+                            return listModel.get(idx)
                         }
-                        readonly property bool currentIsImage: {
-                            let idx = root.selectedIndex
-                            if (idx < 0 || idx >= listModel.count) return false
-                            return !!listModel.get(idx).imagePath
+                        readonly property string currentEntryId: entry ? entry.id : ""
+                        readonly property bool currentIsImage: entry ? !!entry.imagePath : false
+
+                        // raw neighbours in the list, the side badges tell what type
+                        // the previous / next row holds before you move to it
+                        readonly property var prevEntry: root.selectedIndex > 0 ? listModel.get(root.selectedIndex - 1) : null
+                        readonly property var nextEntry: root.selectedIndex + 1 < listModel.count ? listModel.get(root.selectedIndex + 1) : null
+                        readonly property bool prevIsImage: prevEntry ? !!prevEntry.imagePath : false
+                        readonly property bool nextIsImage: nextEntry ? !!nextEntry.imagePath : false
+                        // the badge lights up when the neighbour holds another type than
+                        // the row you are looking at, so "the next one differs" reads at a glance
+                        readonly property bool prevDiffers: prevEntry ? prevIsImage !== currentIsImage : false
+                        readonly property bool nextDiffers: nextEntry ? nextIsImage !== currentIsImage : false
+                        // with separated preview tabs Up/Down only ever lands on the same
+                        // type, so a raw list neighbour would promise a move that does not exist
+                        readonly property bool typeBadgesMakeSense: !Config.separatePreviewTabTypes
+
+                        // cliphist already reports the interesting bits of a binary item in the
+                        // list label, e.g. "[[ binary data 1 MiB png 720x960 ]]"
+                        function parseImageInfo(label) {
+                            let head = /^\[\[\s*binary data\b([\s\S]*?)\]\]$/i.exec(label || "")
+                            if (!head) return null
+                            let body = head[1]
+                            let dim = /(\d+)\s*x\s*(\d+)/.exec(body)
+                            let size = /([\d.]+\s*[KMGT]?i?B)\b/i.exec(body)
+                            let fmt = /\b(png|jpe?g|gif|webp|bmp|tiff?|svg)\b/i.exec(body)
+                            return {
+                                w: dim ? parseInt(dim[1]) : 0,
+                                h: dim ? parseInt(dim[2]) : 0,
+                                size: size ? size[1].replace(/\s+/g, " ") : "",
+                                format: fmt ? fmt[1].toUpperCase() : ""
+                            }
                         }
-                        readonly property string lineNumbers: {
+
+                        // cliphist stores raw bytes while JS strings are utf-16
+                        function utf8Length(s) {
+                            let n = 0
+                            for (let i = 0; i < s.length; i++) {
+                                let c = s.charCodeAt(i)
+                                if (c < 0x80) n += 1
+                                else if (c < 0x800) n += 2
+                                else if (c >= 0xd800 && c <= 0xdbff) { n += 4; i += 1 }
+                                else n += 3
+                            }
+                            return n
+                        }
+
+                        function formatBytes(n) {
+                            if (n < 1024) return n + " B"
+                            if (n < 1048576) return (n / 1024).toFixed(n < 10240 ? 1 : 0) + " KiB"
+                            if (n < 1073741824) return (n / 1048576).toFixed(n < 10485760 ? 1 : 0) + " MiB"
+                            return (n / 1073741824).toFixed(1) + " GiB"
+                        }
+
+                        function formatCount(n) {
+                            return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+
+                        function plural(n, word) {
+                            return formatCount(n) + " " + word + (n === 1 ? "" : "s")
+                        }
+
+                        readonly property var imageInfo: currentIsImage ? parseImageInfo(entry ? entry.label : "") : null
+
+                        readonly property var textInfo: {
                             let content = root.previewText
-                            if (content !== "" && content.endsWith("\n")) content = content.slice(0, -1)
-                            let n = content.length === 0 ? 1 : content.split("\n").length
+                            let body = content.endsWith("\n") ? content.slice(0, -1) : content
+                            let lines = body.split("\n")
+                            let words = body.trim()
+                            return {
+                                chars: content.length,
+                                words: words.length === 0 ? 0 : words.split(/\s+/).length,
+                                lines: lines.length,
+                                bytes: utf8Length(content)
+                            }
+                        }
+
+                        // header middle: dimensions + size for images, content stats for text
+                        readonly property string statsLine: {
+                            if (currentIsImage) {
+                                if (!imageInfo) return ""
+                                let bits = []
+                                if (imageInfo.w > 0 && imageInfo.h > 0)
+                                    bits.push(imageInfo.w + " × " + imageInfo.h)
+                                if (imageInfo.size !== "") bits.push(imageInfo.size)
+                                if (bits.length === 0 && imageInfo.format !== "") bits.push(imageInfo.format)
+                                return bits.join(" • ")
+                            }
+                            if (!textReady) return ""
+                            if (textInfo.chars === 0) return "empty clip"
+                            return [formatBytes(textInfo.bytes), plural(textInfo.chars, "char"),
+                                    plural(textInfo.words, "word"), plural(textInfo.lines, "line")].join(" • ")
+                        }
+
+                        readonly property string lineNumbers: {
+                            let n = textInfo.lines
                             let out = ""
                             for (let i = 1; i <= n; i++) {
                                 if (i > 1) out += "\n"
@@ -622,13 +716,7 @@ Item {
                             }
                             return out
                         }
-                        readonly property int lineNumWidth: {
-                            let content = root.previewText
-                            if (content !== "" && content.endsWith("\n")) content = content.slice(0, -1)
-                            let n = content.split("\n").length
-                            let digits = Math.max(1, String(n).length)
-                            return digits * 7 + 12
-                        }
+                        readonly property int lineNumWidth: Math.max(1, String(textInfo.lines).length) * 7 + 12
                         readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
                         readonly property bool currentDeleting: root.isDeleting(currentEntryId)
                         readonly property bool currentCollapsing: root.isCollapsing(currentEntryId)
@@ -665,10 +753,181 @@ Item {
                             }
                         }
 
+                        // ---- item info chrome ----
+
+                        // header: the current item's stats
+                        Item {
+                            id: headerRow
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.leftMargin: previewRoot.gutter
+                            anchors.rightMargin: previewRoot.gutter
+                            height: previewRoot.headerHeight - 1
+
+                            opacity: currentCollapsing ? 0 : 1
+                            Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+
+                            Text {
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                horizontalAlignment: Text.AlignHCenter
+                                text: statsLine
+                                color: Theme.fg3
+                                elide: Text.ElideRight
+                                font { family: Theme.fontFamily; pixelSize: 9 }
+                            }
+                        }
+
+                        // hairline under the header
+                        Rectangle {
+                            anchors.top: parent.top
+                            anchors.topMargin: previewRoot.headerHeight + 3
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.leftMargin: previewRoot.gutter
+                            anchors.rightMargin: previewRoot.gutter
+                            height: 1
+                            color: Theme.borderBg3
+                            opacity: currentCollapsing ? 0 : 1
+                            Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                        }
+
+                        // footer: type of the previous row on the left, the list
+                        // position in the middle, type of the next row on the right
+                        Item {
+                            id: footerRow
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.leftMargin: previewRoot.gutter
+                            anchors.rightMargin: previewRoot.gutter
+                            height: previewRoot.footerHeight + 5
+
+                            opacity: currentCollapsing ? 0 : 1
+                            Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+
+                            // [< IMAGE] / [< TEXT]: what the row above holds
+                            Rectangle {
+                                id: prevBadge
+                                anchors.left: parent.left
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: !!prevEntry && typeBadgesMakeSense
+                                // a hidden badge must not take space, or the position drifts off centre
+                                width: visible ? prevBadgeRow.implicitWidth + 16 : 0
+                                height: 16
+                                radius: 8
+                                // grows/shrinks when IMAGE <-> TEXT swaps, so the badge and the
+                                // centred index slide instead of jumping
+                                Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                                // dark chip with a quiet outline; the outline and the
+                                // label step up a little when the row above holds another type
+                                color: Theme.bg1
+                                border.width: 1
+                                border.color: prevDiffers ? Theme.borderBg : Theme.borderBg2
+                                Behavior on border.color { ColorAnimation { duration: 160 } }
+
+                                Row {
+                                    id: prevBadgeRow
+                                    anchors.centerIn: parent
+                                    spacing: 4
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "\uf053" // angle-left
+                                        color: prevDiffers ? Theme.fg4 : Theme.fg5
+                                        Behavior on color { ColorAnimation { duration: 160 } }
+                                        font { family: Theme.nerdFontFamily; pixelSize: 9 }
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: prevIsImage ? "\uf03e" : "\uf15c" // image / file-text glyph
+                                        color: prevDiffers ? Theme.fg4 : Theme.fg5
+                                        Behavior on color { ColorAnimation { duration: 160 } }
+                                        font { family: Theme.nerdFontFamily; pixelSize: 9 }
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: prevIsImage ? "IMAGE" : "TEXT"
+                                        color: prevDiffers ? Theme.fg3 : Theme.fg4
+                                        Behavior on color { ColorAnimation { duration: 160 } }
+                                        font { family: Theme.fontFamily; pixelSize: 8; weight: 700; letterSpacing: 0.8 }
+                                    }
+                                }
+                            }
+
+                            // [TEXT >] / [IMAGE >]: what the row below holds
+                            Rectangle {
+                                id: nextBadge
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: !!nextEntry && typeBadgesMakeSense
+                                width: visible ? nextBadgeRow.implicitWidth + 16 : 0
+                                height: 16
+                                radius: 8
+                                // grows/shrinks when IMAGE <-> TEXT swaps, so the badge and the
+                                // centred index slide instead of jumping
+                                Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                                // dark chip with a quiet outline; the outline and the
+                                // label step up a little when the row below holds another type
+                                color: Theme.bg1
+                                border.width: 1
+                                border.color: nextDiffers ? Theme.borderBg : Theme.borderBg2
+                                Behavior on border.color { ColorAnimation { duration: 160 } }
+
+                                Row {
+                                    id: nextBadgeRow
+                                    anchors.centerIn: parent
+                                    spacing: 4
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: nextIsImage ? "\uf03e" : "\uf15c" // image / file-text glyph
+                                        color: nextDiffers ? Theme.fg4 : Theme.fg5
+                                        Behavior on color { ColorAnimation { duration: 160 } }
+                                        font { family: Theme.nerdFontFamily; pixelSize: 9 }
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: nextIsImage ? "IMAGE" : "TEXT"
+                                        color: nextDiffers ? Theme.fg3 : Theme.fg4
+                                        Behavior on color { ColorAnimation { duration: 160 } }
+                                        font { family: Theme.fontFamily; pixelSize: 8; weight: 700; letterSpacing: 0.8 }
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "\uf054" // angle-right
+                                        color: nextDiffers ? Theme.fg4 : Theme.fg5
+                                        Behavior on color { ColorAnimation { duration: 160 } }
+                                        font { family: Theme.nerdFontFamily; pixelSize: 9 }
+                                    }
+                                }
+                            }
+
+                            Text {
+                                anchors.left: prevBadge.right
+                                anchors.right: nextBadge.left
+                                anchors.leftMargin: 8
+                                anchors.rightMargin: 8
+                                anchors.verticalCenter: parent.verticalCenter
+                                horizontalAlignment: Text.AlignHCenter
+                                text: (root.selectedIndex + 1) + " / " + listModel.count
+                                color: Theme.fg3
+                                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+                            }
+                        }
+
                         // sliding container for both preview types
                         Item {
                             id: previewContent
                             anchors.fill: parent
+                            anchors.topMargin: previewRoot.headerHeight + 8
+                            anchors.bottomMargin: previewRoot.footerHeight + 3
 
                             property real slideY: 0
                             transform: Translate { y: previewContent.slideY }
@@ -676,11 +935,8 @@ Item {
                             // image preview
                             Image {
                                 id: previewImage
-                                width: parent.width - 15
-                                height: parent.height - 25
-                                anchors.bottom: parent.bottom
-                                anchors.bottomMargin: 25
-                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.fill: parent
+                                anchors.margins: 2
                                 fillMode: Image.PreserveAspectFit
                                 asynchronous: true
                                 sourceSize: Qt.size(500, 500)
@@ -692,7 +948,7 @@ Item {
                                 Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
-                                source: currentIsImage ? ("file://" + listModel.get(root.selectedIndex).imagePath) : ""
+                                source: currentIsImage && entry ? ("file://" + entry.imagePath) : ""
                             }
 
                             // text preview
@@ -702,8 +958,6 @@ Item {
                                 anchors.fill: parent
                                 anchors.leftMargin: 10
                                 anchors.rightMargin: 12
-                                anchors.topMargin: 12
-                                anchors.bottomMargin: 25
                                 clip: true
                                 boundsBehavior: Flickable.StopAtBounds
                                 flickableDirection: Flickable.HorizontalAndVerticalFlick
@@ -801,8 +1055,7 @@ Item {
                         // red tint flash on delete confirm
                         Rectangle {
                             anchors.fill: parent
-                            anchors.bottomMargin: 26
-                            radius: 15
+                            radius: 22
                             color: Theme.deleting
                             opacity: currentDeleting ? 0.70 : 0
                             Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
@@ -825,7 +1078,7 @@ Item {
                         Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 30
+                            anchors.bottomMargin: previewRoot.footerHeight + 16
                             width: copiedLabel.implicitWidth + 18
                             height: copiedLabel.implicitHeight + 10
                             opacity: copiedFlash ? 1 : 0
@@ -873,15 +1126,6 @@ Item {
                                 color: Theme.fg3
                                 font { family: Theme.fontFamily; pixelSize: 9 }
                             }
-                        }
-
-                        Text {
-                            anchors.bottom: parent.bottom
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.margins: 2
-                            text: (root.selectedIndex + 1) + " / " + listModel.count
-                            color: Theme.fg4
-                            font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
                         }
                     }
                 }
