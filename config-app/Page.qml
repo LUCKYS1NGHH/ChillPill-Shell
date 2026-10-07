@@ -9,9 +9,89 @@ Item {
     property string title: ""
     readonly property alias flickable: flick
     readonly property alias scrollbar: vbar
+
+    // ── search ──
+    // Query from the sidebar. Rows match on label + hint; a matching Heading
+    // reveals its whole section, a matching row only itself. Label-less
+    // controls (ModulesEditor, NumChips) follow their section.
+    property string filter: ""
+    property int matchCount: 0
+
+    onFilterChanged: applyFilter()
+    Component.onCompleted: applyFilter()
+    // a hidden page can't read back its rows' visible, so re-apply on show
+    onVisibleChanged: if (visible) applyFilter()
+
+    function applyFilter() {
+        if (!col) return // ids resolve after creation
+        var q = filter.trim().toLowerCase()
+        var list = col.data
+        var i, it
+        if (q === "") {
+            for (i = 0; i < list.length; i++) list[i].visible = true
+            matchCount = 0
+            return
+        }
+
+        // 2 = heading, 1 = labelled row, 0 = section control
+        var kind = [], hay = []
+        for (i = 0; i < list.length; i++) {
+            it = list[i]
+            if (it.label !== undefined) {
+                kind.push(1)
+                hay.push((it.label + " " + (it.hint || "")).toLowerCase())
+            } else if (it.text !== undefined) {
+                kind.push(2)
+                hay.push(it.text.toLowerCase())
+            } else {
+                kind.push(0)
+                hay.push("")
+            }
+        }
+
+        // per heading: own text hit? section hit?
+        var headText = [], headHit = []
+        var cur = -1
+        for (i = 0; i < list.length; i++) {
+            if (kind[i] === 2) {
+                cur = i
+                headText[i] = hay[i].indexOf(q) >= 0
+                headHit[i] = headText[i]
+            } else if (cur >= 0 && kind[i] === 1 && hay[i].indexOf(q) >= 0) {
+                headHit[cur] = true
+            }
+        }
+
+        // decide then write; reading visible back gives false on hidden pages
+        var show = [], n = 0
+        cur = -1
+        for (i = 0; i < list.length; i++) {
+            var s
+            if (kind[i] === 2) {
+                cur = i
+                s = headHit[i]
+            } else if (cur < 0) {
+                // rows above the first heading stand alone
+                s = kind[i] === 1 && hay[i].indexOf(q) >= 0
+            } else if (kind[i] === 1) {
+                s = headText[cur] || hay[i].indexOf(q) >= 0
+            } else {
+                // no label of its own, follow the section
+                s = headHit[cur]
+            }
+            show[i] = s
+            if (s && kind[i] !== 2) n++
+        }
+        for (i = 0; i < list.length; i++) list[i].visible = show[i]
+        matchCount = n
+    }
+
+    readonly property bool empty: filter !== "" && matchCount === 0
+
     Flickable {
         id: flick
         anchors.fill: parent
+        visible: !pg.empty
         contentHeight: col.implicitHeight + 60
         clip: true
         boundsBehavior: Flickable.StopAtBounds
@@ -22,9 +102,18 @@ Item {
             spacing: 0
         }
     }
+    // empty state
+    Text {
+        anchors.centerIn: parent
+        visible: pg.empty
+        text: "No settings match \u201C" + pg.filter + "\u201D"
+        color: Theme.fg5
+        font.family: Theme.fontFamily
+        font.pixelSize: 13
+    }
     Item {
         id: vbar
-        visible: flick.visibleArea.heightRatio < 1.0
+        visible: flick.visibleArea.heightRatio < 1.0 && !pg.empty
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom

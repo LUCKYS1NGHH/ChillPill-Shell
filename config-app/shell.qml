@@ -26,6 +26,30 @@ ShellRoot {
         visible: true
 
         property int current: 0
+        // query from the sidebar; each page filters itself and counts the hits
+        property string search: ""
+
+        function matches(index) {
+            var p = stack.children[index]
+            return p && p.matchCount !== undefined ? p.matchCount : 0
+        }
+        // jump to a page that has hits; 0ms lets every page's filter settle
+        onSearchChanged: jumpTimer.restart()
+        Timer {
+            id: jumpTimer
+            interval: 0
+            onTriggered: {
+                if (win.search.trim() === "" || win.matches(win.current) > 0) return
+                for (var i = 0; i < win.pages.length; i++)
+                    if (win.matches(i) > 0) { win.current = i; return }
+            }
+        }
+        // "/" summons the box; inert while focused so "/" can still be typed
+        Shortcut {
+            sequence: "/"
+            enabled: !si.activeFocus
+            onActivated: { si.forceActiveFocus(); si.selectAll() }
+        }
         // fade the content in when switching sections; the sidebar highlight
         // already eases via its own color animation
         onCurrentChanged: pageFade.restart()
@@ -83,6 +107,76 @@ ShellRoot {
                             font.letterSpacing: 3
                         }
                     }
+                    // one query filters every page; badges show the hits per page
+                    Rectangle {
+                        id: searchBox
+                        Layout.fillWidth: true
+                        height: 30
+                        radius: 6
+                        color: Theme.bg1
+                        border.color: si.activeFocus ? Theme.borderBgFocus : Theme.borderBg2
+                        Behavior on border.color { ColorAnimation { duration: 90 } }
+                        // idle hint
+                        Text {
+                            id: hint
+                            anchors.left: srow.left
+                            anchors.leftMargin: sic.width + srow.spacing
+                            anchors.verticalCenter: srow.verticalCenter
+                            visible: si.text === "" && !si.activeFocus
+                            text: "type '/' to search"
+                            color: Theme.fg5
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 12
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: { si.forceActiveFocus(); si.selectAll() }
+                            }
+                        }
+                        RowLayout {
+                            id: srow
+                            anchors.fill: parent
+                            anchors.leftMargin: 9
+                            anchors.rightMargin: 8
+                            spacing: 7
+                            Text {
+                                id: sic
+                                text: String.fromCodePoint(0xf002) // fa-search
+                                color: si.activeFocus ? Theme.accent : Theme.fg5
+                                font.family: Theme.nerdFontFamily
+                                font.pixelSize: 11
+                            }
+                            TextInput {
+                                id: si
+                                Layout.fillWidth: true
+                                verticalAlignment: TextInput.AlignVCenter
+                                color: Theme.fg
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 12
+                                selectByMouse: true
+                                clip: true
+                                // no text: binding; typing writes win.search directly
+                                onTextChanged: win.search = text
+                                // clear and unfocus
+                                Keys.onEscapePressed: { si.text = ""; si.focus = false; event.accepted = true }
+                            }
+                            Text {
+                                visible: si.text !== ""
+                                text: "\u2715"
+                                color: clrMa.containsMouse ? Theme.fg : Theme.fg5
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 11
+                                MouseArea {
+                                    id: clrMa
+                                    anchors.fill: parent
+                                    anchors.margins: -5
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: { si.text = ""; si.focus = false }
+                                }
+                            }
+                        }
+                    }
                     Repeater {
                         model: win.pages
                         Rectangle {
@@ -93,6 +187,9 @@ ShellRoot {
                             implicitHeight: 38; radius: 8
                             color: win.current === nav.index ? Theme.bg6 : (nma.containsMouse ? Theme.bg3 : "transparent")
                             Behavior on color { ColorAnimation { duration: 90 } }
+                            // dim pages the query misses
+                            opacity: win.search !== "" && win.matches(nav.index) === 0 ? 0.35 : 1
+                            Behavior on opacity { NumberAnimation { duration: 90 } }
                             Rectangle {
                                 // active-page indicator
                                 x: 2
@@ -116,6 +213,17 @@ ShellRoot {
                                     color: win.current === nav.index ? Theme.fg : Theme.fg3
                                     font.family: Theme.fontFamily
                                 }
+                            }
+                            // hits on this page
+                            Text {
+                                anchors.right: parent.right
+                                anchors.rightMargin: 10
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: win.search !== "" && win.matches(nav.index) > 0
+                                text: win.matches(nav.index)
+                                color: Theme.accent
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 10
                             }
                             MouseArea {
                                 id: nma
@@ -159,13 +267,13 @@ ShellRoot {
                 currentIndex: win.current
                 enabled: ConfigStore.loaded
 
-                AppearancePage {}
-                PillPage {}
-                NotificationsPage {}
-                MediaOsdPage {}
-                WeatherDataPage {}
-                SystemPage {}
-                WallpaperPage {}
+                AppearancePage { filter: win.search }
+                PillPage { filter: win.search }
+                NotificationsPage { filter: win.search }
+                MediaOsdPage { filter: win.search }
+                WeatherDataPage { filter: win.search }
+                SystemPage { filter: win.search }
+                WallpaperPage { filter: win.search }
             }
         }
     }
