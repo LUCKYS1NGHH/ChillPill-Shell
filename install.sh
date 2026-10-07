@@ -46,22 +46,22 @@ if [[ "$skip_arg" != "--skip-deps" ]]; then
 
       PY=/usr/bin/python3
 
-      if ! sudo -u "$SUDO_USER" "$PY" -m pip show holidays >/dev/null 2>/dev/null; then
+      if ! sudo -u "${SUDO_USER:-$USER}" "$PY" -m pip show holidays >/dev/null 2>/dev/null; then
          read -p "Do you want event dates in calendar popup? It just needs a python lib 'holidays' to run [y/N]: " ask
 
          if [[ "$ask" == "y" || "$ask" == "Y" ]]; then
-            if ! sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
+            if ! sudo -u "${SUDO_USER:-$USER}" "$PY" -m pip --version >/dev/null 2>/dev/null; then
                read -p "Pip not exists in your system. install? [Y/n]: " pip_install
                if [[ "$pip_install" != "n" && "$pip_install" != "N" ]]; then
                   pacman -S --noconfirm python-pip
                fi
             fi
 
-            if sudo -u "$SUDO_USER" "$PY" -m pip --version >/dev/null 2>/dev/null; then
-               sudo -u "$SUDO_USER" "$PY" -m pip install holidays --break-system-packages 2>/dev/null \
+            if sudo -u "${SUDO_USER:-$USER}" "$PY" -m pip --version >/dev/null 2>/dev/null; then
+               sudo -u "${SUDO_USER:-$USER}" "$PY" -m pip install holidays --break-system-packages 2>/dev/null \
                  || warn "something wrong with pip, 'holidays' python lib fail to install."
 
-               sudo -u "$SUDO_USER" "$PY" -c "import holidays" 2>/dev/null \
+               sudo -u "${SUDO_USER:-$USER}" "$PY" -c "import holidays" 2>/dev/null \
                  || warn "holidays installed but failing to import. check the dependency manually."
             fi
          fi
@@ -222,12 +222,14 @@ install -m 644 config.jsonc /usr/share/chillpill-shell/config.jsonc.example
 if [[ -f "$REAL_HOME/.config/chillpill-shell/config.jsonc" ]]; then
    info "Updating your config file..."
    if [[ -f scripts/config_update.py ]] && bin_exists python3; then
-      python3 scripts/config_update.py "$SUDO_USER" || warn "Config file update failed."
+      python3 scripts/config_update.py "${SUDO_USER:-$USER}" || warn "Config file update failed."
    else
       warn "scripts/config_update.py missing OR python not installed, skipping config update."
    fi
 else
    install -m 644 config.jsonc "$REAL_HOME/.config/chillpill-shell/config.jsonc"
+   # this file is created after the chown block above, so chown it explicitly (else it stays root-owned and config app can't save)
+   chown "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$REAL_HOME/.config/chillpill-shell/config.jsonc"
 fi
 
 # place systemd file
