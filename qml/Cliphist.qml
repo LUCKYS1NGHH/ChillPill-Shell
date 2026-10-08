@@ -544,9 +544,9 @@ Item {
         // search box
         Rectangle {
             width: parent.width
-            height: 26
-            radius: 6
-            color: Theme.bg4
+            height: 27
+            radius: 7
+            color: Theme.bg3
             border.color: searchInput.activeFocus ? Theme.borderBgFocus : Theme.borderBg
             border.width: 1
             visible: !fullPreview
@@ -566,7 +566,7 @@ Item {
 
                 Text {
                     text: "search items..."
-                    color: Theme.fg3
+                    color: Theme.fg2
                     font: searchInput.font
                     visible: searchInput.text.length === 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -1150,7 +1150,7 @@ Item {
                 width: listView.width
                 height: root.isCollapsing(model.id) ? 5 : (model.imagePath ? 55 : 30)
                 radius: 7
-                color: root.isDeleting(model.id) ? Theme.deleting : (index === root.selectedIndex ? Theme.focusBg1 : (root.isMarked(model.id) ? Theme.bg4 : "transparent"))
+                color: root.isDeleting(model.id) ? Theme.deleting : (index === root.selectedIndex ? Theme.focusBg : (root.isMarked(model.id) ? Theme.bg4 : "transparent"))
                 clip: true
                 opacity: root.isCollapsing(model.id) ? 0 : 1
                 scale: root.isCollapsing(model.id) ? 0.75 : 1

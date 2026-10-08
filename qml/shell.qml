@@ -73,7 +73,7 @@ ShellRoot {
   property string fontFamily: Theme.fontFamily
   property int avatarSize: 48
   property int buttonSize: 20
-  property string buttonBg: Theme.bg6
+  property string buttonBg: Theme.bg5
   property string buttonHoverBg: Theme.focusFg1
   property int buttonHoverSpeed: 120
   property int buttonctlRadius: 6
@@ -257,8 +257,8 @@ ShellRoot {
       property real ccButtonWidth: 85.3
       property int ccButtonHeight: 35
       property int ccButtonRadius: 10
-      property string ccButtonBgOff: Theme.bg1
-      property string ccButtonFgOff: Theme.fg3
+      property string ccButtonBgOff: Theme.bg2
+      property string ccButtonFgOff: Theme.fg2
       property int sliderHeight: 4
       property int sliderRadius: 4
       property string sliderColor: Theme.sliderBg
@@ -350,7 +350,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: controlCenter ? Theme.bgD1 : bg
+      color: bg
 
       onMiniDashboardChanged: {
           if (!box.miniDashboard) {
@@ -935,7 +935,7 @@ ShellRoot {
 
         // rectangle where poweroff, sleep etc. buttons placed
         Rectangle {
-          color: Theme.bg1
+          color: Theme.bg2
           implicitWidth: 15
           implicitHeight: 30
           radius: 8

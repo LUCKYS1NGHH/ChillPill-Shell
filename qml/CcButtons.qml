@@ -43,7 +43,7 @@ RowLayout {
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
     color: WifiController.enabled
-            ? (wifiHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
+            ? (wifiHover.hovered ? Qt.lighter("#1f2631", 1.2) : "#1f2631")
             : (wifiHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
     scale: wifiMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
@@ -53,7 +53,7 @@ RowLayout {
         anchors.centerIn: parent
         spacing: 5 * root.dpi
         icon: "\uf1eb"
-        iconColor: WifiController.enabled ? "#4282e9" : root.buttonFgOff
+        iconColor: WifiController.enabled ? "#4888ef" : root.buttonFgOff
         iconFontFamily: Theme.nerdFontFamily
         iconPixelSize: 12
 
@@ -131,7 +131,7 @@ RowLayout {
     implicitHeight: root.buttonHeight
     radius: root.buttonRadius
     color: countdownModule.running
-           ? (timerHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
+           ? (timerHover.hovered ? Qt.lighter("#20232a", 1.2) : "#20232a")
            : (timerHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
     scale: timerMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
@@ -297,7 +297,7 @@ RowLayout {
     radius: root.buttonRadius
     visible: root.controlCenterOpen && !root.mediaAutoOpened
     color: BluetoothController.enabled
-            ? (btHover.hovered ? Qt.lighter("#212529", 1.2) : "#212529")
+            ? (btHover.hovered ? Qt.lighter("#1f2631", 1.2) : "#1f2631")
             : (btHover.hovered ? Qt.lighter(root.buttonBgOff, 1.3) : root.buttonBgOff)
     scale: btMouse.pressed ? 0.93 : 1.0
     Behavior on color { ColorAnimation { duration: 150 } }
@@ -307,7 +307,7 @@ RowLayout {
       spacing: 5 * root.dpi
       Text {
         text: "\uf294"
-        color: BluetoothController.enabled ? "#4282e9" : root.buttonFgOff
+        color: BluetoothController.enabled ? "#4888ef" : root.buttonFgOff
         font { family: Theme.nerdFontFamily; pixelSize: 15 }
       }
       MarqueeText {

@@ -6,16 +6,16 @@ SRow {
     property bool value: false
     signal edited(bool v)
     Rectangle {
-        width: 46; height: 26; radius: 13
-        color: t.value ? Theme.accent : (tMa.containsMouse ? Theme.bg8 : Theme.bg6)
+        width: 40; height: 22; radius: 15
+        color: t.value ? Theme.accent : (tMa.containsMouse ? Theme.bg8 : Theme.bg5)
         border.width: 1
-        border.color: t.value ? "transparent" : Theme.borderBg3
-        Behavior on color { ColorAnimation { duration: 140 } }
-        Behavior on border.color { ColorAnimation { duration: 140 } }
+        border.color: t.value ? "transparent" : Theme.borderBg2
+        Behavior on color { ColorAnimation { duration: 100 } }
+        Behavior on border.color { ColorAnimation { duration: 100 } }
         Rectangle {
             id: knob
-            width: tMa.pressed ? 24 : 20
-            height: 20
+            width: tMa.pressed ? 20 : 16
+            height: 16
             radius: knob.width / 2
             y: 3
             x: t.value ? parent.width - knob.width - 3 : 3

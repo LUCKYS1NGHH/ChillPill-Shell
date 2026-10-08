@@ -9,7 +9,7 @@ SRow {
     property alias input: ti
     signal edited(string v)
     Rectangle {
-        width: tr.fieldWidth; height: 32; radius: 6; color: Theme.bg1
+        width: tr.fieldWidth; height: 32; radius: 6; color: Theme.bg2
         border.color: ti.activeFocus ? Theme.borderBgFocus : Theme.borderBg2
         TextInput {
             id: ti

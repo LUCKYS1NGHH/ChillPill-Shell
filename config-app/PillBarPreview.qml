@@ -117,7 +117,7 @@ Item {
         width: Math.max(140, bar.groupWidth() + 62 * bar.ps)
         height: bar.barH
         radius: 20 * bar.ps
-        color: "#0d0d0d"
+        color: "#090909"
         clip: true
         anchors.centerIn: parent
 

@@ -4,19 +4,19 @@ import QtQuick
 
 Singleton {
     // more darker (descending)
-    property string bg: "#161616"
-    property string bg1: "#212121"
-    property string bg2: "#232323"
-    property string bg3: "#252525"
-    property string bg4: "#282828"
+    property string bg: "#111111"
+    property string bg1: "#141414"
+    property string bg2: "#191919"
+    property string bg3: "#242424"
+    property string bg4: "#292929"
     property string bg5: "#323232"
-    property string bg6: "#353535"
+    property string bg6: "#363636"
     property string bg7: "#404040"
-    property string bg8: "#454545"
+    property string bg8: "#444444"
     property string bg9: "#505050"
 
-    property string bgD: "#141414"
-    property string bgD1: "#191919"
+    property string bgD: "#0b0b0b"
+    property string bgD1: "#121212"
 
     // more darker (ascending)
     property string fg: "#dadada"
@@ -45,7 +45,7 @@ Singleton {
     property string borderBgFocus1: "#4f4f4f"
 
     // focus bg
-    property string focusBg: "#282828"
+    property string focusBg: "#252525"
     property string focusBg1: "#2e2e2e"
     property string focusBgD: "#222222"
     property string focusBgL: "#353535" // L == lighter

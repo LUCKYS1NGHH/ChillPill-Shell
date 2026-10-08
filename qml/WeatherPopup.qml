@@ -5,13 +5,13 @@ import QtQuick.Layouts
 Rectangle {
   id: weatherPopup
 
-  readonly property color tileBg: "#242424"
+  readonly property color tileBg: Theme.bg2
   readonly property int tileRadius: 11
-  readonly property color dividerColor: "#2a2a2a"
-  readonly property color labelText: "#7b7b7b"
-  readonly property color valueText: "#dcdcdc"
-  readonly property color secondaryText: "#d8d8d8"
-  readonly property color headerText: "#c9c9c9"
+  readonly property color dividerColor: Theme.bg3
+  readonly property color labelText: Theme.fg1
+  readonly property color valueText: Theme.fg2
+  readonly property color secondaryText: Theme.fg2
+  readonly property color headerText: Theme.fg1
   readonly property int iconSizeMedium: 13
   readonly property int iconSizeForecast: 16
   readonly property int fontSizeTiny: 8
@@ -26,7 +26,7 @@ Rectangle {
   height: contentCol.implicitHeight + 26 * box.dpi
   x: (Screen.width - weatherPopup.width) / 2
   y: box.y + box.height * box.dpi + 5 * box.dpi
-  color: Theme.bgD
+  color: Theme.bg
   radius: 20 * box.dpi
 
   Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutExpo } }

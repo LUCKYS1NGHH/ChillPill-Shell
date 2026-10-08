@@ -303,7 +303,7 @@ Item {
         Rectangle {
             id: searchBox
             width: parent.width
-            height: 30
+            height: 29
             radius: 8
             color: Theme.bg3
             border.color: searchInput.activeFocus ? Theme.borderBgFocus : Theme.borderBg
@@ -321,7 +321,7 @@ Item {
                 anchors.rightMargin: 28
                 verticalAlignment: TextInput.AlignVCenter
                 color: Theme.fg
-                font { family: Theme.fontFamily; pixelSize: 11 }
+                font { family: Theme.fontFamily; pixelSize: 10 }
                 clip: true
                 selectByMouse: true
 
@@ -329,7 +329,7 @@ Item {
 
                 Text {
                     text: "search apps, =math, ?web, >cmd"
-                    color: Theme.fg3
+                    color: Theme.fg2
                     font: searchInput.font
                     anchors.verticalCenter: parent.verticalCenter
                     opacity: searchInput.text.length === 0 ? 1 : 0

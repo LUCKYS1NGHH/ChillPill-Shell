@@ -81,7 +81,7 @@ ShellRoot {
             Rectangle {
                 Layout.fillHeight: true
                 Layout.preferredWidth: 200
-                color: Theme.bgD1
+                color: Theme.bg
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.topMargin: 20
@@ -123,9 +123,9 @@ ShellRoot {
                             anchors.leftMargin: sic.width + srow.spacing
                             anchors.verticalCenter: srow.verticalCenter
                             visible: si.text === "" && !si.activeFocus
-                            text: "type '/' to search"
-                            color: Theme.fg5
-                            font.family: Theme.fontFamily
+                            text: "/ to search"
+                            color: Theme.fg4
+                            font.family: Theme.nerdFontFamily
                             font.pixelSize: 12
                             MouseArea {
                                 anchors.fill: parent
@@ -185,7 +185,7 @@ ShellRoot {
                             required property var modelData
                             Layout.fillWidth: true
                             implicitHeight: 38; radius: 8
-                            color: win.current === nav.index ? Theme.bg6 : (nma.containsMouse ? Theme.bg3 : "transparent")
+                            color: win.current === nav.index ? Theme.bg5 : (nma.containsMouse ? Theme.bg2 : "transparent")
                             Behavior on color { ColorAnimation { duration: 90 } }
                             // dim pages the query misses
                             opacity: win.search !== "" && win.matches(nav.index) === 0 ? 0.35 : 1
@@ -244,8 +244,8 @@ ShellRoot {
                     }
                     Text {
                         text: ConfigStore.configPath
-                        color: Theme.fg6
-                        font.family: Theme.fontFamily
+                        color: Theme.fg5
+                        font.family: Theme.nerdFontFamily
                         font.pixelSize: 10
                         wrapMode: Text.WrapAnywhere
                         Layout.fillWidth: true
@@ -253,8 +253,8 @@ ShellRoot {
                     RowLayout {
                         Layout.fillWidth: true
                         Layout.bottomMargin: 6
-                        Text { text: ConfigStore.status; color: ConfigStore.statusError ? Theme.deleting : Theme.fg4; font.family: Theme.fontFamily; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
-                        MiniBtn { label: "⟳"; onClicked: ConfigStore.reload() }
+                        Text { text: ConfigStore.status; color: ConfigStore.statusError ? Theme.deleting : Theme.fg3; font.family: Theme.fontFamily; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideRight }
+                        MiniBtn { label: ""; onClicked: ConfigStore.reload(); fontSize: 15; rectRadius: 8 }
                     }
                 }
             }

@@ -1,26 +1,22 @@
 pragma Singleton
-// Quickshell re-exports the Singleton type; a bare QtQml import does not
-// resolve it in this Qt build (same import qml/Theme.qml relies on).
 import Quickshell
 import QtQuick
 
 Singleton {
-    id: th
-
     // more darker (descending)
-    readonly property string bg: "#141414"
-    readonly property string bg1: "#202020"
-    readonly property string bg2: "#222222"
-    readonly property string bg3: "#252525"
-    readonly property string bg4: "#282828"
-    readonly property string bg5: "#323232"
-    readonly property string bg6: "#353535"
-    readonly property string bg7: "#404040"
-    readonly property string bg8: "#454545"
-    readonly property string bg9: "#505050"
+    readonly property string bg: "#121212"
+    readonly property string bg1: "#151515"
+    readonly property string bg2: "#181818"
+    readonly property string bg3: "#212121"
+    readonly property string bg4: "#242424"
+    readonly property string bg5: "#292929"
+    readonly property string bg6: "#323232"
+    readonly property string bg7: "#363636"
+    readonly property string bg8: "#414141"
+    readonly property string bg9: "#434343"
 
-    readonly property string bgD: "#141414"
-    readonly property string bgD1: "#191919"
+    readonly property string bgD: "#0f0f0f"
+    readonly property string bgD1: "#111111"
 
     // more darker (ascending)
     readonly property string fg: "#dadada"
@@ -49,7 +45,7 @@ Singleton {
     readonly property string borderBgFocus1: "#4f4f4f"
 
     // focus bg
-    readonly property string focusBg: "#282828"
+    readonly property string focusBg: "#252525"
     readonly property string focusBg1: "#2e2e2e"
     readonly property string focusBgD: "#222222"
     readonly property string focusBgL: "#353535" // L == lighter
@@ -60,7 +56,7 @@ Singleton {
 
     // live from config store, with the same fallbacks
     readonly property string fontFamily: ConfigStore.get("textFontFamily", "Monocraft")
-    readonly property string nerdFontFamily: ConfigStore.get("nerdFontFamily", "JetBrainsMono Nerd Font Propo")
+    readonly property string nerdFontFamily: ConfigStore.get("nerdFontFamily", "JetBrainsMono Nerd Font Propo")  
 
     readonly property string warning: "#fac94a"
     readonly property string deleting: "#e32626"
@@ -69,5 +65,5 @@ Singleton {
     readonly property string coverArtGlowShadow: "#80aae6" // hardcored for now
 
     readonly property int fontSizeBase: 13
-    readonly property int fontSize: fontSizeBase
+    readonly property int fontSize: Math.round(fontSizeBase * Config.pillScale)
 }

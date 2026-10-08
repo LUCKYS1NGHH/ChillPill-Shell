@@ -24,7 +24,7 @@ SRow {
         spacing: 6
         MiniBtn { label: "−"; onClicked: n.edited(n.clamp(n.value - n.step)) }
         Rectangle {
-            width: 84; height: 28; radius: 6; color: Theme.bg1
+            width: 84; height: 28; radius: 6; color: Theme.bg2
             border.color: inp.activeFocus ? Theme.borderBgFocus : Theme.borderBg2
             TextInput {
                 id: inp

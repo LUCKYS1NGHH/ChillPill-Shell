@@ -25,7 +25,7 @@ Item {
     topRightRadius: 13
     bottomLeftRadius: 0
     bottomRightRadius: 0
-    color: Theme.bg5
+    color: Theme.bg3
     visible: notifBox.visible
     z: 0
 
