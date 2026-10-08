@@ -340,31 +340,26 @@ end)
 
 ## Key Bindings
 
-Keybindings are highly recommended for ChillPill-Shell in your Hyprland, Just paste this code in your Hyprland (Lua) config file.
+Keybindings are highly recommended for ChillPill-Shell in your Hyprland config. They call the shell's IPC to toggle its pill states — adjust the key combinations to your preferences.
 
-> Adjust key combinations by your preferences
+| State (IPC target) | Example Keybinds | Opens |
+|---|---|---|
+| `controlCenter` | `MOD + CTRL + C` | Media, sliders, buttons, notifications |
+| `cliphist` | `MOD + CTRL + V` | Clipboard history |
+| `miniDashboard` | `MOD + CTRL + B` | Profile, weather, data usage, calendar etc. |
+| `spotlight` | `MOD + D` | Apps list to open, web search, math and basic shell run |
+| `wallpaperSwitcher` | `MOD + W` | Wallpaper switcher |
+| `powerMenu` | `MOD + Escape` | Power menu actions |
 
-```lua
-hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
-hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
-hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call spotlight toggle"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call wallpaperSwitcher toggle"))
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call powerMenu toggle"))
+`MOD` is the `mainMod` variable (typically <kbd>SUPER</kbd> key) from your config, e.g. `hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call spotlight toggle"))`.
+On NixOS the command is `chillpill-shell-ipc call <state> toggle` instead of `qs ipc -p /usr/share/chillpill-shell`
+
+```bash
+qs ipc -p /usr/share/chillpill-shell call <target> <toggle|show|hide>
 ```
 
-<details>
-<summary>NixOS version</summary>
-
-```lua
-hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("chillpill-shell-ipc call controlCenter toggle"))
-hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("chillpill-shell-ipc call cliphist toggle"))
-hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("chillpill-shell-ipc call miniDashboard toggle"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call spotlight toggle"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSwitcher toggle"))
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("chillpill-shell-ipc call powerMenu toggle"))
-```
-</details>
+> [!TIP]
+> The config app can auto-paste these binds into `~/.config/hypr/hyprland.lua` in one click — open the **Keybinds** page and press *Auto paste keybinds*.
 
 ---
 

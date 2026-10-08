@@ -71,6 +71,7 @@ ShellRoot {
             { name: "Weather & Data", icon: String.fromCodePoint(0xf015f) }, // md-cloud
             { name: "System",         icon: String.fromCodePoint(0xf0493) }, // md-cog
             { name: "Dependencies",   icon: String.fromCodePoint(0xf21e)  }, // fa-heartbeat
+            { name: "Keybinds",        icon: String.fromCodePoint(0xf11c)  }, // fa-keyboard
             { name: "Wallpaper",      icon: String.fromCodePoint(0xf0e09) }  // md-wallpaper
         ]
 
@@ -275,6 +276,7 @@ ShellRoot {
                 WeatherDataPage { filter: win.search }
                 SystemPage { filter: win.search }
                 HealthPage { filter: win.search }
+                KeybindsPage { filter: win.search }
                 WallpaperPage { filter: win.search }
             }
         }
