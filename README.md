@@ -95,8 +95,8 @@ into your session at all times. It's not bound to any dotfiles.
   </tr>
   <tr>
     <td width="50%">
-      <p align="center"><b>App launcher</b></p>
-      <img src="screenshots/image_9.webp" width="100%" alt="App launcher with search support and apps index status">
+      <p align="center"><b>Spotlight</b></p>
+      <img src="screenshots/image_9.webp" width="100%" alt="Spotlight with applications list, web search, math and shell commands run support">
     </td>
     <td width="50%">
       <p align="center"><b>Control center — Wifi and Bluetooth panel</b></p>
@@ -123,7 +123,7 @@ into your session at all times. It's not bound to any dotfiles.
 - **Mini Dashboard**               - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar Popup**             - Previous/Next month buttons, event dates
   - **Weather Popup**              - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
-- **App Launcher**                 - List of applications (<kbd>Tab</kbd> to read the long app description), optional fuzzy search
+- **Spotlight**                    - List of applications (<kbd>Tab</kbd> to read the long app description), optional fuzzy search for apps, web search (<kbd>Tab</kbd> to expand the full search url), math and shell commands run
 - **DBus Notification**            - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                          - Battery, volume, brightness, timer
 - **Wallpaper switcher**           - A wallpaper switcher. <kbd>.</kbd> or <kbd>CTRL</kbd> + <kbd>H</kbd> to see hidden images (dot prefixed)
@@ -348,7 +348,7 @@ Keybindings are highly recommended for ChillPill-Shell in your Hyprland, Just pa
 hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call controlCenter toggle"))
 hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call cliphist toggle"))
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call miniDashboard toggle"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call appLauncher toggle"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call spotlight toggle"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call wallpaperSwitcher toggle"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-shell call powerMenu toggle"))
 ```
@@ -360,7 +360,7 @@ hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("qs ipc -p /usr/share/chillpill-
 hl.bind(mainMod .. " + CTRL + C",  hl.dsp.exec_cmd("chillpill-shell-ipc call controlCenter toggle"))
 hl.bind(mainMod .. " + CTRL + V",  hl.dsp.exec_cmd("chillpill-shell-ipc call cliphist toggle"))
 hl.bind(mainMod .. " + CTRL + B",  hl.dsp.exec_cmd("chillpill-shell-ipc call miniDashboard toggle"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call appLauncher toggle"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("chillpill-shell-ipc call spotlight toggle"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chillpill-shell-ipc call wallpaperSwitcher toggle"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("chillpill-shell-ipc call powerMenu toggle"))
 ```

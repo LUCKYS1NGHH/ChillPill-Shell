@@ -49,6 +49,8 @@ Singleton {
       property bool separatePreviewTabTypes: true
       property bool appLauncherFuzzySearch: false
       property bool cliphistFuzzySearch: false
+      // Spotlight "?" mode template, %s is replaced by the url-encoded query
+      property string webSearchUrl: "https://duckduckgo.com/?q=%s"
     }
   }
 
@@ -88,4 +90,5 @@ Singleton {
   readonly property alias separatePreviewTabTypes: adapter.separatePreviewTabTypes
   readonly property alias appLauncherFuzzySearch: adapter.appLauncherFuzzySearch
   readonly property alias cliphistFuzzySearch: adapter.cliphistFuzzySearch
+  readonly property alias webSearchUrl: adapter.webSearchUrl
 }

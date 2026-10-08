@@ -13,7 +13,7 @@ Row {
            && !box.powerMenu
            && box.activeOsd === ""
            && !box.wallpaperSwitcherOpen
-           && !box.appLauncher ? 1 : 0
+           && !box.spotlight ? 1 : 0
   visible: opacity > 0
 
   Behavior on opacity { NumberAnimation { duration: 100 } }

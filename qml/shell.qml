@@ -14,43 +14,51 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
       function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true; box.powerMenu = false; }
       function hide(): void { box.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
-      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
       function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.powerMenu = false; }
       function hide(): void { box.controlCenter = false }
   }
 
   IpcHandler {
       target: "miniDashboard"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
       function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; }
       function hide(): void { box.miniDashboard = false }
   }
 
+  // alias for spotlight
   IpcHandler {
     target: "appLauncher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = !box.appLauncher; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = true; box.powerMenu = false; }
-    function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
+    function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
+  }
+
+  IpcHandler {
+    target: "spotlight"
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
+    function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "wallpaperSwitcher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen; box.powerMenu = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = true; box.powerMenu = false; }
-    function hide(): void { box.appLauncher = false; box.wallpaperSwitcherOpen = false }
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen; box.powerMenu = false }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = true; box.powerMenu = false; }
+    function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "powerMenu"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = !box.powerMenu; if (!box.powerMenu) box.powerMenuInitialAction = "" }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.appLauncher = false; box.wallpaperSwitcherOpen = false; box.powerMenu = true }
+    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = !box.powerMenu; if (!box.powerMenu) box.powerMenuInitialAction = "" }
+    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = true }
     function hide(): void { box.powerMenu = false; box.powerMenuInitialAction = "" }
   }
 
@@ -102,7 +110,7 @@ ShellRoot {
   PanelWindow {
     id: panelWindow
     WlrLayershell.layer: WlrLayershell.Top
-    WlrLayershell.keyboardFocus: (box.cliphistOpen || box.appLauncher || box.wallpaperSwitcherOpen || box.powerMenu) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: (box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.powerMenu) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     implicitHeight: Math.max(885 * scale, calendarPopup.visible ? calendarPopup.y + calendarPopup.height : 0)
     onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
     property real scale: screen ? screen.devicePixelRatio : 1.0
@@ -185,7 +193,7 @@ ShellRoot {
         || controlCenter
         || miniDashboard
         || cliphistOpen
-        || appLauncher
+        || spotlight
         || wallpaperSwitcherOpen
         || powerMenu
         || mediaAutoOpened
@@ -212,7 +220,7 @@ ShellRoot {
       property real tooltipX: 0
       property real tooltipY: 0
 
-      property bool appLauncher: false
+      property bool spotlight: false
       property bool hovered: false
       property bool miniDashboard: false
       property bool controlCenter: false
@@ -269,9 +277,9 @@ ShellRoot {
       }
 
       onImplicitHeightChanged: {
-          // follow launcher live while typing (stacked height animations wobble); animate open/close jumps
+          // follow spotlight live while typing (stacked height animations wobble); animate open/close jumps
           heightAnim.stop()
-          if (box.appLauncher && Math.abs(implicitHeight - height) < 120) {
+          if (box.spotlight && Math.abs(implicitHeight - height) < 120) {
               height = implicitHeight
           } else {
               heightAnim.to = implicitHeight
@@ -293,7 +301,7 @@ ShellRoot {
                      : (notificationModule.active && !notifFullscreenMode) ? 320
                      : powerMenu ? 342
                      : controlCenter ? 390
-                     : appLauncher ? 350
+                     : spotlight ? 350
                      : miniDashboard ? 420
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
@@ -313,8 +321,8 @@ ShellRoot {
                       ? (118 + notifBump)
                   : (cliphistOpen && cliphistPreviewing) ? 380
                   : miniDashboard ? 155
-                  : appLauncher
-                      ? (appLauncherLoader.item ? appLauncherLoader.item.height + 15 : 250)
+                  : spotlight
+                      ? (spotlightLoader.item ? spotlightLoader.item.height + 15 : 250)
                   : wallpaperSwitcherOpen ? 308
                   : cliphistOpen ? 276
                   : mediaAutoOpened ? 90
@@ -326,7 +334,7 @@ ShellRoot {
         : controlCenter ? (notificationModule.notifications.length > 0
           ? (mprisModule.hasPlayer ? 27 : 25)
           : (mprisModule.hasPlayer ? 26 : 22))
-        : appLauncher ? 29
+        : spotlight ? 29
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
         : mediaAutoOpened ? 22
@@ -406,7 +414,7 @@ ShellRoot {
             console.log("Left click detected, opening control center")
             box.controlCenter = !box.controlCenter
             mediaAutoOpened = false
-            box.appLauncher = false
+            box.spotlight = false
             box.wallpaperSwitcherOpen = false
             box.powerMenu = false
             box.powerMenuInitialAction = ""
@@ -416,7 +424,7 @@ ShellRoot {
           if (mouse.button === Qt.MiddleButton) {
             console.log("Middle click detected, opening cliphist")
             mediaAutoOpened = false
-            box.appLauncher = false
+            box.spotlight = false
             box.wallpaperSwitcherOpen = false
             box.powerMenu = false
             box.powerMenuInitialAction = ""
@@ -426,7 +434,7 @@ ShellRoot {
           if (mouse.button === Qt.RightButton) {
               console.log("Right click detected, opening mini dashboard")
               mediaAutoOpened = false
-              box.appLauncher = false
+              box.spotlight = false
               box.wallpaperSwitcherOpen = false
               box.powerMenu = false
               box.powerMenuInitialAction = ""
@@ -552,7 +560,7 @@ ShellRoot {
                  && !box.controlCenter
                  && !box.miniDashboard
                  && !box.cliphistOpen
-                 && !box.appLauncher
+                 && !box.spotlight
                  && !box.powerMenu ? 1 : 0
         visible: opacity > 0
 
@@ -583,13 +591,13 @@ ShellRoot {
         }
       }
 
-      // app launcher opens through IPC
+      // spotlight (formerly app launcher) opens through IPC
       Item {
           anchors.centerIn: parent
           width: box.implicitWidth - 16
-          // height follows launcher (shrinks with results)
-          height: appLauncherLoader.item ? appLauncherLoader.item.height : 388
-          opacity: box.appLauncher
+          // height follows spotlight (shrinks with results)
+          height: spotlightLoader.item ? spotlightLoader.item.height : 388
+          opacity: box.spotlight
                    && !notificationModule.active
                    && box.activeOsd === ""
                    && !box.controlCenter
@@ -600,23 +608,23 @@ ShellRoot {
 
           Behavior on opacity {
               SequentialAnimation {
-                  PauseAnimation { duration: box.appLauncher ? 15 : 0 }
+                  PauseAnimation { duration: box.spotlight ? 15 : 0 }
                   NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
               }
           }
 
           Loader {
-              id: appLauncherLoader
+              id: spotlightLoader
               width: parent.width
               anchors.horizontalCenter: parent.horizontalCenter
-              // keep the launcher alive so its app cache/height persist between opens
+              // keep the spotlight alive so its app cache/height persist between opens
               // (avoids the open-time fallback -> empty -> full resize race)
               active: true
               asynchronous: false
 
-              sourceComponent: AppLauncher {
-                  shown: box.appLauncher
-                  onCloseRequested: box.appLauncher = false
+              sourceComponent: Spotlight {
+                  shown: box.spotlight
+                  onCloseRequested: box.spotlight = false
               }
           }
       }
@@ -632,7 +640,7 @@ ShellRoot {
                    && !box.controlCenter
                    && !box.miniDashboard
                    && !box.cliphistOpen
-                   && !box.appLauncher
+                   && !box.spotlight
                    && !box.wallpaperSwitcherOpen ? 1 : 0
           visible: opacity > 0
 
@@ -681,7 +689,7 @@ ShellRoot {
                    && !box.controlCenter
                    && !box.cliphistOpen
                    && !box.miniDashboard
-                   && !box.appLauncher
+                   && !box.spotlight
                    && !box.wallpaperSwitcherOpen
                    && !box.powerMenu
                    ? 1 : 0

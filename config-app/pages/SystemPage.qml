@@ -13,4 +13,5 @@ Page {
     ToggleRow { label: "Fuzzy search"; hint: "Match clipboard items with non-consecutive characters"; value: ConfigStore.get("cliphistFuzzySearch", false); onEdited: (v) => ConfigStore.set("cliphistFuzzySearch", v) }
     Heading { text: "LAUNCHER" }
     ToggleRow { label: "Fuzzy search"; hint: "Match app names with non-consecutive characters"; value: ConfigStore.get("appLauncherFuzzySearch", false); onEdited: (v) => ConfigStore.set("appLauncherFuzzySearch", v) }
+    TextRow { label: "Web search URL"; hint: "Spotlight '?' mode, %s is replaced by the query"; fieldWidth: 260; value: ConfigStore.get("webSearchUrl", "https://duckduckgo.com/?q=%s"); onEdited: (v) => ConfigStore.set("webSearchUrl", v) }
 }

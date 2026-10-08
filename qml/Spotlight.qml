@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -15,6 +16,92 @@ Item {
     property string searchQuery: ""
     property var appsCache: []
 
+    // ---- modes, picked off the first character of the query (rofi style) ----
+    // ""     apps  filter the .desktop entries
+    // "="    math  evaluate the expression, Enter copies the result
+    // "?"    web   open the query in the default browser via xdg-open,
+    //              Tab wraps the full search url over several lines
+    // ">"    shell run the command, its output takes over the result list
+    readonly property string mode: {
+        const c = searchQuery.charAt(0)
+        if (c === "=") return "math"
+        if (c === "?") return "web"
+        if (c === ">") return "shell"
+        return "apps"
+    }
+    readonly property string modeArg: searchQuery.slice(1).trim()
+    readonly property var calc: mode === "math" ? Calc.evaluate(modeArg) : null
+
+    // ">" state: the command that produced the current output, its streams and
+    // exit code. Matching against modeArg means editing the query drops back to
+    // the command row without wiping the output of a finished run.
+    property string shellCmd: ""
+    property string shellOut: ""
+    property string shellErr: ""
+    property var shellExit: null
+    readonly property bool shellBusy: shellProc.running
+    readonly property string shellText: shellOut + shellErr
+    readonly property bool shellShown: mode === "shell" && modeArg === shellCmd
+        && (shellBusy || shellExit !== null)
+
+    function webUrl(q) {
+        const tpl = Config.webSearchUrl && Config.webSearchUrl.length > 0
+            ? Config.webSearchUrl : "https://duckduckgo.com/?q=%s"
+        const enc = encodeURIComponent(q)
+        return tpl.indexOf("%s") >= 0 ? tpl.split("%s").join(enc) : tpl + enc
+    }
+
+    // the single row non-app modes put in the list (null = show nothing)
+    readonly property var actionRow: {
+        if (mode === "math") {
+            if (modeArg === "") return { glyph: "", name: "type an expression", comment: "e.g. 12 * (3 + 4)", action: "none" }
+            if (!calc.ok) return { glyph: "", name: modeArg, comment: calc.error, action: "none" }
+            return { glyph: "", name: modeArg, comment: "= " + calc.text, action: "copy" }
+        }
+        if (mode === "web") {
+            if (modeArg === "") return { glyph: "?", name: "search the web", comment: "type a query", action: "none" }
+            return { glyph: "?", name: modeArg, comment: webUrl(modeArg), action: "web" }
+        }
+        if (modeArg === "") return { glyph: "", name: "type a command", comment: "output is shown in this list", action: "none" }
+        return { glyph: "", name: modeArg, comment: shellBusy ? "running…" : "run in " + Config.defaultTerminal, action: "run" }
+    }
+
+    // what the list shows: apps, one action row, or nothing while the output
+    // of a ">" command takes the list's place
+    readonly property var results: mode === "apps" ? filteredApps
+        : shellShown ? [] : (actionRow ? [actionRow] : [])
+
+    Process {
+        id: shellProc
+        running: false
+        stdout: StdioCollector { onStreamFinished: root.shellOut = this.text }
+        stderr: StdioCollector { onStreamFinished: root.shellErr = this.text }
+        onExited: (exitCode) => root.shellExit = exitCode
+    }
+
+    function runShell(cmd) {
+        shellCmd = cmd
+        shellOut = ""
+        shellErr = ""
+        shellExit = null
+        shellProc.running = false
+        shellProc.command = ["sh", "-c", cmd]
+        shellProc.running = true
+    }
+
+    function runAction(row) {
+        if (!row || row.action === "none") return
+        if (row.action === "copy") {
+            Quickshell.execDetached(["wl-copy", calc.text])
+            closeRequested()
+        } else if (row.action === "web") {
+            Quickshell.execDetached(["xdg-open", webUrl(modeArg)])
+            closeRequested()
+        } else if (row.action === "run") {
+            runShell(modeArg)
+        }
+    }
+
     signal closeRequested()
 
     width: 315
@@ -27,13 +114,18 @@ Item {
     // the pill, the row and the text fade all run OutCubic over this, so they stay in step
     readonly property int openDuration: 200
 
-    readonly property int listHeight: root.filteredApps.length === 0
+    readonly property int listHeight: root.results.length === 0
         ? root.rowHeight
-        : Math.min(root.filteredApps.length * root.rowHeight + (root.filteredApps.length - 1) * root.rowSpacing, root.maxListHeight)
+        : Math.min(root.results.length * root.rowHeight + (root.results.length - 1) * root.rowSpacing, root.maxListHeight)
     readonly property int baseHeight: 12 + root.headerHeight + 8 + 30 + 8 + 12
-    // the description opens inside its row, so the launcher keeps its height; the viewport
+    // output of a ">" command sizes its own panel, otherwise the description
+    // opens inside its row so the spotlight keeps its height; the viewport
     // only stretches when a lone result is too short to hold the opened row
-    readonly property int viewHeight: Math.max(root.listHeight, root.descShown && appList.currentItem ? appList.currentItem.height : 0)
+    readonly property int outputLines: root.shellText.length === 0
+        ? 1 : root.shellText.split("\n").length
+    readonly property int outputHeight: Math.min(Math.max(70, root.outputLines * 14 + 34), root.maxListHeight)
+    readonly property int viewHeight: root.shellShown ? root.outputHeight
+        : Math.max(root.listHeight, root.descShown && appList.currentItem ? appList.currentItem.height : 0)
     height: root.baseHeight + root.viewHeight
     Behavior on height { NumberAnimation { duration: root.openDuration; easing.type: Easing.OutCubic } }
 
@@ -72,7 +164,9 @@ Item {
         return starts.concat(contains, comment)
     }
 
-    onFilteredAppsChanged: selectedIndex = 0
+    onResultsChanged: selectedIndex = 0
+    // a Tab expansion only belongs to the mode it was opened in
+    onModeChanged: descShown = false
 
     // keep the selection visible when moved by keyboard / on reset
     onSelectedIndexChanged: if (keyboardNav) appList.positionViewAtIndex(selectedIndex, ListView.Contain)
@@ -92,6 +186,11 @@ Item {
             searchInput.text = ""
             selectedIndex = 0
             descShown = false
+            // forget the previous ">" run so a fresh open never shows stale output
+            shellCmd = ""
+            shellOut = ""
+            shellErr = ""
+            shellExit = null
             appList.positionViewAtBeginning()
             searchInput.forceActiveFocus()
         }
@@ -116,6 +215,15 @@ Item {
     }
 
     function launchSelected() {
+        // finished command on screen: Enter re-runs it
+        if (shellShown) {
+            if (!shellBusy) runShell(shellCmd)
+            return
+        }
+        if (mode !== "apps") {
+            runAction(actionRow)
+            return
+        }
         if (filteredApps.length === 0) return
         const app = filteredApps[selectedIndex].entry
         if (app.runInTerminal) {
@@ -143,7 +251,7 @@ Item {
     // which characters to bold in a row's name, from that row's own match
     function matchPositions(app) {
         const q = searchQuery.toLowerCase()
-        if (q.length === 0) return []
+        if (q.length === 0 || mode !== "apps") return []
         if (Config.appLauncherFuzzySearch) {
             const m = matchApp(q, app)
             return m ? m.positions : []
@@ -172,7 +280,7 @@ Item {
             width: parent.width
 
             Text {
-                text: "Applications"
+                text: "Spotlight"
                 color: Theme.fg
                 font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
                 Layout.alignment: Qt.AlignLeft
@@ -182,9 +290,9 @@ Item {
             Item { Layout.fillWidth: true }
 
             Text {
-                text: root.filteredApps.length === 0
+                text: root.results.length === 0
                     ? "0 / 0"
-                    : (root.selectedIndex + 1) + " / " + root.filteredApps.length
+                    : (root.selectedIndex + 1) + " / " + root.results.length
                 color: Theme.fg4
                 font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
                 Layout.alignment: Qt.AlignRight
@@ -220,7 +328,7 @@ Item {
                 onTextChanged: root.searchQuery = text
 
                 Text {
-                    text: "search apps..."
+                    text: "search apps, =math, ?web, >cmd"
                     color: Theme.fg3
                     font: searchInput.font
                     anchors.verticalCenter: parent.verticalCenter
@@ -230,27 +338,41 @@ Item {
                     Behavior on x { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                 }
 
+                // active mode, right aligned in the box
+                Text {
+                    visible: root.mode !== "apps"
+                    text: root.mode
+                    color: Theme.accent
+                    font { family: Theme.fontFamily; pixelSize: 9; weight: 700 }
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Down) {
                         root.keyboardNav = true
-                        if (root.filteredApps.length > 0)
-                            root.selectedIndex = (root.selectedIndex + 1) % root.filteredApps.length
+                        if (root.results.length > 0)
+                            root.selectedIndex = (root.selectedIndex + 1) % root.results.length
                         event.accepted = true
                     } else if (event.key === Qt.Key_Up) {
                         root.keyboardNav = true
-                        if (root.filteredApps.length > 0)
+                        if (root.results.length > 0)
                             root.selectedIndex = root.selectedIndex <= 0
-                                ? root.filteredApps.length - 1
+                                ? root.results.length - 1
                                 : root.selectedIndex - 1
                         event.accepted = true
                     } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
-                        root.descShown = !root.descShown
+                        // apps: long description, web: the full search url
+                        if (root.mode === "apps" || root.mode === "web") root.descShown = !root.descShown
                         event.accepted = true
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root.launchSelected()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Escape) {
-                        root.closeRequested()
+                        // first Esc drops back from finished output to the command
+                        if (root.shellShown && !root.shellBusy) root.shellCmd = ""
+                        else root.closeRequested()
                         event.accepted = true
                     }
                 }
@@ -262,7 +384,8 @@ Item {
             width: parent.width
             height: root.viewHeight
             clip: true
-            model: root.filteredApps
+            visible: !root.shellShown
+            model: root.results
             currentIndex: root.selectedIndex
             highlightFollowsCurrentItem: false
             spacing: root.rowSpacing
@@ -300,8 +423,10 @@ Item {
                 width: appList.width
 
                 readonly property bool selected: index === root.selectedIndex
-                // Tab wraps the description over several lines inside this row
-                readonly property bool expanded: root.descShown && selected && modelData.comment.length > 0
+                // Tab wraps the description (or web url) over several lines inside this row
+                readonly property bool expanded: root.descShown && selected
+                    && modelData.comment.length > 0
+                    && (root.mode === "apps" || root.mode === "web")
                 readonly property int wrapExtra: expanded ? Math.max(0, rowComment.implicitHeight - commentMetrics.height) : 0
 
                 // 6px of padding, but only once it really took more lines
@@ -323,7 +448,7 @@ Item {
                 radius: 9
                 color: "transparent"
 
-                readonly property var iconSrc: Quickshell.iconPath(modelData.icon, true)
+                readonly property var iconSrc: Quickshell.iconPath(modelData.icon || "", true)
 
                 // staggered reveal: fade + slide up, capped so long lists don't lag
                 property real reveal: 0
@@ -387,7 +512,9 @@ Item {
                         color: Theme.bg4
                         Text {
                             anchors.centerIn: parent
-                            text: modelData.name.length > 0 ? modelData.name[0].toUpperCase() : "?"
+                            text: modelData.glyph
+                                ? modelData.glyph
+                                : (modelData.name.length > 0 ? modelData.name[0].toUpperCase() : "?")
                             color: Theme.fg
                             font { family: Theme.fontFamily; pixelSize: 12; weight: 700 }
                         }
@@ -448,9 +575,71 @@ Item {
                 text: "No apps found"
                 color: Theme.fg3
                 font { family: Theme.fontFamily; pixelSize: 10 }
-                opacity: root.filteredApps.length === 0 ? 1 : 0
+                opacity: root.results.length === 0 ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 180 } }
+            }
+        }
+
+        // ">" command output: hides the list above and takes its place
+        ColumnLayout {
+            id: outputPanel
+            visible: root.shellShown
+            width: parent.width
+            height: root.viewHeight
+            spacing: 6
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                radius: 9
+                color: Theme.bgD
+                border.color: Theme.borderBg2
+                border.width: 1
+
+                Flickable {
+                    id: outputFlick
+                    anchors.fill: parent
+                    anchors.margins: 9
+                    contentWidth: width
+                    contentHeight: outputText.implicitHeight
+                    clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    interactive: contentHeight > height
+
+                    Text {
+                        id: outputText
+                        width: outputFlick.width
+                        text: root.shellText.length > 0 ? root.shellText
+                            : (root.shellBusy ? "running…" : "(no output)")
+                        color: Theme.fg2
+                        font { family: Theme.nerdFontFamily; pixelSize: 10 }
+                        wrapMode: Text.WrapAnywhere
+                    }
+
+                    ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AsNeeded
+                        implicitWidth: 3
+                        background: Item {}
+                        contentItem: Rectangle {
+                            implicitWidth: 3
+                            radius: 2
+                            color: Theme.fg4
+                            opacity: parent.active ? 0.7 : 0
+                            Behavior on opacity { NumberAnimation { duration: 200 } }
+                        }
+                    }
+                }
+            }
+
+            Text {
+                Layout.leftMargin: 7
+                text: root.shellBusy ? "running.."
+                    : (root.shellExit === 0 ? " exit 0" : "✕ exit " + root.shellExit)
+                color: root.shellBusy ? Theme.fg4
+                    : (root.shellExit === 0 ? "#46e03b" : Theme.deleting)
+                font { family: Theme.fontFamily; pixelSize: 9; weight: 500 }
+                horizontalAlignment: Text.AlignRight
             }
         }
     }

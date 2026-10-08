@@ -34,5 +34,6 @@
   "maxVolume": 100,
   "separatePreviewTabTypes": true,
   "appLauncherFuzzySearch": false,
-  "cliphistFuzzySearch": false
+  "cliphistFuzzySearch": false,
+  "webSearchUrl": "https://duckduckgo.com/?q=%s"
 }
