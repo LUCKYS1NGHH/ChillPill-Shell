@@ -28,7 +28,7 @@ Item {
         var list = col.data
         var i, it
         if (q === "") {
-            for (i = 0; i < list.length; i++) list[i].visible = true
+            for (i = 0; i < list.length; i++) if (list[i].visible !== undefined) list[i].visible = true
             matchCount = 0
             return
         }
@@ -82,7 +82,7 @@ Item {
             show[i] = s
             if (s && kind[i] !== 2) n++
         }
-        for (i = 0; i < list.length; i++) list[i].visible = show[i]
+        for (i = 0; i < list.length; i++) if (list[i].visible !== undefined) list[i].visible = show[i]
         matchCount = n
     }
 

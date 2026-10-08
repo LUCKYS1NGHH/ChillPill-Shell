@@ -70,6 +70,7 @@ ShellRoot {
             { name: "Media & OSD",    icon: String.fromCodePoint(0xf0387) }, // md-music_note
             { name: "Weather & Data", icon: String.fromCodePoint(0xf015f) }, // md-cloud
             { name: "System",         icon: String.fromCodePoint(0xf0493) }, // md-cog
+            { name: "Dependencies",   icon: String.fromCodePoint(0xf21e)  }, // fa-heartbeat
             { name: "Wallpaper",      icon: String.fromCodePoint(0xf0e09) }  // md-wallpaper
         ]
 
@@ -273,6 +274,7 @@ ShellRoot {
                 MediaOsdPage { filter: win.search }
                 WeatherDataPage { filter: win.search }
                 SystemPage { filter: win.search }
+                HealthPage { filter: win.search }
                 WallpaperPage { filter: win.search }
             }
         }

@@ -60,6 +60,7 @@ Singleton {
 
     readonly property string warning: "#fac94a"
     readonly property string deleting: "#e32626"
+    readonly property string ok: "#3ecf6e"
 
     readonly property string accent: "#979797"
     readonly property string coverArtGlowShadow: "#80aae6" // hardcored for now
