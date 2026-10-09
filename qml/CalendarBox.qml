@@ -16,6 +16,8 @@ Rectangle {
   y: box.y + box.height * box.dpi + 5 * box.dpi
   color: Theme.bg
   radius: 18 * box.dpi
+  layer.enabled: Config.showShadows
+  layer.effect: PanelShadow {}
   Behavior on opacity { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
   Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutExpo } }
 

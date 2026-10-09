@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell.Widgets
 import Quickshell.Services.UPower
 import Quickshell.Services.Notifications
@@ -181,6 +182,42 @@ ShellRoot {
       id: hidePillTimer
       interval: 250
       onTriggered: shellRoot.pillHoverActive = false
+    }
+
+    // shadow under the pill, drawn as its own item so the pill itself stays
+    // unlayered (a layer would re-render it at unscaled size and blur it)
+    Item {
+      id: pillShadow
+      readonly property real pad: 24
+      readonly property real drop: 5 * box.dpi
+      readonly property real visX: box.x - box.width * (box.dpi - 1) / 2
+      readonly property real visW: box.width * box.dpi
+      x: visX - pad
+      y: box.y - pad
+      width: visW + pad * 2
+      height: box.height * box.dpi + pad * 2.2
+      opacity: box.opacity
+      visible: Config.showShadows && box.visible && opacity > 0
+
+      Rectangle {
+        id: pillShadowSource
+        x: pillShadow.pad
+        y: pillShadow.pad + pillShadow.drop
+        width: pillShadow.visW
+        height: pillShadow.height - pillShadow.pad * 2.2 - pillShadow.drop
+        radius: box.radius * box.dpi
+        color: "#b0000000"
+
+        layer.enabled: true
+        layer.smooth: true
+        layer.mipmap: true
+        layer.effect: MultiEffect {
+          blurEnabled: true
+          blur: 1.0
+          blurMax: 30
+          blurMultiplier: 1.6
+        }
+      }
     }
 
     // main dynamic pill bar

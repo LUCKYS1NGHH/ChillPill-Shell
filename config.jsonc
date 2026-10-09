@@ -30,6 +30,7 @@
   "country": "IN",
   "showAudioVisuals": true,
   "showSensitiveInfo": true,
+  "showShadows": true,
   "confirmPowerActions": true,
   "maxVolume": 100,
   "separatePreviewTabTypes": true,

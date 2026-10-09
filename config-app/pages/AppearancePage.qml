@@ -14,4 +14,5 @@ Page {
     NumRow { label: "Pill top margin"; to: 200; suffix: "px"; value: ConfigStore.get("pillTopMargin", 9); onEdited: (v) => ConfigStore.set("pillTopMargin", v) }
     NumRow { label: "Pill bottom margin"; to: 200; suffix: "px"; value: ConfigStore.get("pillBottomMargin", 26); onEdited: (v) => ConfigStore.set("pillBottomMargin", v) }
     ToggleRow { label: "Audio visualizer"; hint: "Live spectrum in the Control Center's Media Player";  value: ConfigStore.get("showAudioVisuals", true); onEdited: (v) => ConfigStore.set("showAudioVisuals", v) }
+    ToggleRow { label: "Shadows"; hint: "Drop shadows under the Pill Bar and its popups"; value: ConfigStore.get("showShadows", true); onEdited: (v) => ConfigStore.set("showShadows", v) }
 }
