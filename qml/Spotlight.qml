@@ -16,6 +16,23 @@ Item {
     property string searchQuery: ""
     property var appsCache: []
 
+    // launch counts, persisted to ~/.cache so the most used apps sit on top
+    property var usage: ({}) // desktop entry id -> launch count
+    readonly property string usagePath: Quickshell.env("HOME") + "/.cache/chillpill-shell/app-usage.json"
+
+    function usageCount(id) {
+        const n = root.usage[id]
+        return n ? n : 0
+    }
+
+    function recordUsage(id) {
+        if (!id) return
+        const u = Object.assign({}, root.usage)
+        u[id] = (u[id] || 0) + 1
+        root.usage = u
+        usageFile.setText(JSON.stringify(u))
+    }
+
     // ---- modes, picked off the first character of the query (rofi style) ----
     // ""     apps  filter the .desktop entries
     // "="    math  evaluate the expression, Enter copies the result
@@ -79,6 +96,25 @@ Item {
         onExited: (exitCode) => root.shellExit = exitCode
     }
 
+    // atomicWrites renames into the cache dir, so make sure it exists first
+    Process {
+        id: usageDirProc
+        command: ["mkdir", "-p", Quickshell.env("HOME") + "/.cache/chillpill-shell"]
+    }
+
+    FileView {
+        id: usageFile
+        path: root.usagePath
+        onLoaded: {
+            try {
+                const d = JSON.parse(usageFile.text())
+                root.usage = (d && typeof d === "object") ? d : {}
+            } catch (e) {
+                root.usage = {}
+            }
+        }
+    }
+
     function runShell(cmd) {
         shellCmd = cmd
         shellOut = ""
@@ -139,7 +175,13 @@ Item {
 
     // fuzzy ranks the tiers from matchApp(), best first
     property var filteredApps: {
-        if (searchQuery.length === 0) return appsCache
+        if (searchQuery.length === 0) {
+            // most used first, then alphabetical
+            let list = appsCache.slice()
+            list.sort((a, b) => root.usageCount(b.entry.id) - root.usageCount(a.entry.id)
+                || a.name.localeCompare(b.name))
+            return list
+        }
         const q = searchQuery.toLowerCase()
         if (Config.appLauncherFuzzySearch) {
             let scored = []
@@ -148,11 +190,14 @@ Item {
                 if (m) scored.push({ app: appsCache[i], tier: m.tier, score: m.score })
             }
             scored.sort((a, b) => a.tier - b.tier || b.score - a.score
+                || root.usageCount(b.app.entry.id) - root.usageCount(a.app.entry.id)
                 || a.app.name.localeCompare(b.app.name))
             let out = []
             for (let i = 0; i < scored.length; i++) out.push(scored[i].app)
             return out
         }
+        const byUse = (a, b) => root.usageCount(b.entry.id) - root.usageCount(a.entry.id)
+            || a.name.localeCompare(b.name)
         let starts = [], contains = [], comment = []
         for (let i = 0; i < appsCache.length; i++) {
             const a = appsCache[i]
@@ -161,6 +206,9 @@ Item {
             else if (n.includes(q)) contains.push(a)
             else if (a.comment.toLowerCase().includes(q)) comment.push(a)
         }
+        starts.sort(byUse)
+        contains.sort(byUse)
+        comment.sort(byUse)
         return starts.concat(contains, comment)
     }
 
@@ -196,7 +244,10 @@ Item {
         }
     }
 
-    Component.onCompleted: loadApps()
+    Component.onCompleted: {
+        loadApps()
+        usageDirProc.running = true
+    }
 
     function loadApps() {
         let entries = DesktopEntries.applications ? DesktopEntries.applications.values : []
@@ -225,15 +276,17 @@ Item {
             return
         }
         if (filteredApps.length === 0) return
-        const app = filteredApps[selectedIndex].entry
-        if (app.runInTerminal) {
+        const app = filteredApps[selectedIndex]
+        root.recordUsage(app.entry.id)
+        const entry = app.entry
+        if (entry.runInTerminal) {
             if (!Config.defaultTerminal || Config.defaultTerminal.length === 0) {
-                console.log("No defaultTerminal configured, cannot launch this terminal app:", app.name)
+                console.log("No defaultTerminal configured, cannot launch this terminal app:", entry.name)
                 return
             }
-            Quickshell.execDetached([Config.defaultTerminal, "-e", "sh", "-c", app.command.join(" ")])
+            Quickshell.execDetached([Config.defaultTerminal, "-e", "sh", "-c", entry.command.join(" ")])
         } else {
-            app.execute()
+            entry.execute()
         }
         root.closeRequested()
     }
