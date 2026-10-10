@@ -52,6 +52,7 @@ Singleton {
       property bool cliphistFuzzySearch: false
       // Spotlight "?" mode template, %s is replaced by the url-encoded query
       property string webSearchUrl: "https://duckduckgo.com/?q=%s"
+      property bool iWantMediaCoverInBackground: false
     }
   }
 
@@ -93,4 +94,5 @@ Singleton {
   readonly property alias appLauncherFuzzySearch: adapter.appLauncherFuzzySearch
   readonly property alias cliphistFuzzySearch: adapter.cliphistFuzzySearch
   readonly property alias webSearchUrl: adapter.webSearchUrl
+  readonly property alias iWantMediaCoverInBackground: adapter.iWantMediaCoverInBackground
 }

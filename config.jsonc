@@ -36,5 +36,6 @@
   "separatePreviewTabTypes": true,
   "appLauncherFuzzySearch": false,
   "cliphistFuzzySearch": false,
-  "webSearchUrl": "https://duckduckgo.com/?q=%s"
+  "webSearchUrl": "https://duckduckgo.com/?q=%s",
+  "iWantMediaCoverInBackground": false
 }
