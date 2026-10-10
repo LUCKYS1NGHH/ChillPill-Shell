@@ -16,4 +16,5 @@ Page {
     ToggleRow { label: "Audio visualizer"; hint: "Live spectrum in the Control Center's Media Player";  value: ConfigStore.get("showAudioVisuals", true); onEdited: (v) => ConfigStore.set("showAudioVisuals", v) }
     ToggleRow { label: "Shadows"; hint: "Drop shadows under the Pill Bar and its popups"; value: ConfigStore.get("showShadows", true); onEdited: (v) => ConfigStore.set("showShadows", v) }
     ToggleRow { label: "Media cover in media player's background"; hint: "Faded cover art in Control center's media player of the current media playing"; value: ConfigStore.get("iWantMediaCoverInBackground", false); onEdited: (v) => ConfigStore.set("iWantMediaCoverInBackground", v) }
+    ToggleRow { label: "Marquee media text"; hint: "Scroll long track titles and artist names in the Control Center's Media Player"; value: ConfigStore.get("marqueeMediaText", false); onEdited: (v) => ConfigStore.set("marqueeMediaText", v) }
 }

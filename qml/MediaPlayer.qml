@@ -56,7 +56,6 @@ Rectangle {
 
     // Two-buffer image: new cover loads in the background and only
     // fades in once ready, while the old one fades out -> crossfade,
-    // no dip to empty between tracks.
     component CrossfadeImage: Item {
         id: cf
         property url source
@@ -311,48 +310,94 @@ Rectangle {
                     width: Math.max(0, parent.width - artBox.width - controls.width - parent.spacing * 2)
                     spacing: 4
 
-                    Text {
-                        id: titleText
+                    // title: marquee when Config.marqueeMediaText, else elided text
+                    Item {
+                        id: titleHolder
                         width: parent.width
-                        text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
-                        color: Theme.fgL
-                        font.pixelSize: 12
-                        font.weight: 600
-                        font.family: Theme.fontFamily
-                        elide: Text.ElideRight
-                        onTextChanged: titleSwap.restart()
+                        height: 15
+
+                        Text {
+                            id: titleText
+                            anchors.fill: parent
+                            text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
+                            color: Theme.fgL
+                            font.pixelSize: 12
+                            font.weight: 600
+                            font.family: Theme.fontFamily
+                            elide: Text.ElideRight
+                            visible: !Config.marqueeMediaText
+                            onTextChanged: titleSwap.restart()
+                        }
+
+                        MarqueeText {
+                            id: titleMarquee
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: Config.marqueeMediaText
+                            maxWidth: width
+                            text: mprisModule.track !== "" ? mprisModule.track : "Nothing playing"
+                            color: Theme.fgL
+                            font.pixelSize: 12
+                            font.weight: 600
+                            font.family: Theme.fontFamily
+                            onTextChanged: titleSwap.restart()
+                        }
 
                         SequentialAnimation {
                             id: titleSwap
-                            PropertyAction { target: titleText; property: "opacity"; value: 0 }
-                            PropertyAction { target: titleText; property: "x"; value: 10 }
+                            PropertyAction { target: titleHolder; property: "opacity"; value: 0 }
+                            PropertyAction { target: titleHolder; property: "x"; value: 10 }
                             ParallelAnimation {
-                                NumberAnimation { target: titleText; property: "opacity"; to: 1; duration: 340; easing.type: Easing.OutCubic }
-                                NumberAnimation { target: titleText; property: "x"; to: 0; duration: 420; easing.type: Easing.OutQuint }
+                                NumberAnimation { target: titleHolder; property: "opacity"; to: 1; duration: 340; easing.type: Easing.OutCubic }
+                                NumberAnimation { target: titleHolder; property: "x"; to: 0; duration: 420; easing.type: Easing.OutQuint }
                             }
                         }
                     }
 
-                    Text {
-                        id: artistText
+                    // artist
+                    Item {
+                        id: artistHolder
                         width: parent.width
-                        text: mprisModule.artist
-                        color: artistFontColor
-                        font.pixelSize: artistFontSize
-                        font.weight: artistFontWeight
-                        font.family: Theme.fontFamily
-                        elide: Text.ElideRight
-                        onTextChanged: artistSwap.restart()
+                        height: 13
+
+                        Text {
+                            id: artistText
+                            anchors.fill: parent
+                            text: mprisModule.artist
+                            color: artistFontColor
+                            font.pixelSize: artistFontSize
+                            font.weight: artistFontWeight
+                            font.family: Theme.fontFamily
+                            elide: Text.ElideRight
+                            visible: !Config.marqueeMediaText
+                            onTextChanged: artistSwap.restart()
+                        }
+
+                        MarqueeText {
+                            id: artistMarquee
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: Config.marqueeMediaText
+                            maxWidth: width
+                            text: mprisModule.artist
+                            color: mediaCard.artistFontColor
+                            font.pixelSize: mediaCard.artistFontSize
+                            font.weight: mediaCard.artistFontWeight
+                            font.family: Theme.fontFamily
+                            onTextChanged: artistSwap.restart()
+                        }
 
                         // staggered slightly behind the title
                         SequentialAnimation {
                             id: artistSwap
-                            PropertyAction { target: artistText; property: "opacity"; value: 0 }
-                            PropertyAction { target: artistText; property: "x"; value: 10 }
+                            PropertyAction { target: artistHolder; property: "opacity"; value: 0 }
+                            PropertyAction { target: artistHolder; property: "x"; value: 10 }
                             PauseAnimation { duration: 70 }
                             ParallelAnimation {
-                                NumberAnimation { target: artistText; property: "opacity"; to: 1; duration: 340; easing.type: Easing.OutCubic }
-                                NumberAnimation { target: artistText; property: "x"; to: 0; duration: 420; easing.type: Easing.OutQuint }
+                                NumberAnimation { target: artistHolder; property: "opacity"; to: 1; duration: 340; easing.type: Easing.OutCubic }
+                                NumberAnimation { target: artistHolder; property: "x"; to: 0; duration: 420; easing.type: Easing.OutQuint }
                             }
                         }
                     }
@@ -398,6 +443,7 @@ Rectangle {
                 width: parent.width
                 spacing: 8
 
+                // layout slot stays 3px tall; visuals and hit area overflow it
                 Item {
                     id: barSlot
                     width: parent.width
