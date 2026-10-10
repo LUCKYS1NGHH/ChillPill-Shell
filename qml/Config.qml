@@ -39,6 +39,10 @@ Singleton {
       property bool wsAnimation: true
       property bool deleteCliphistImgCache: true
       property string country: "Japan"
+      property bool holidaysEnabled: true
+      property bool holidaysAllCategories: false
+      property string holidaysCategories: "public"
+      property string holidaysSubdiv: ""
       property bool showAudioVisuals: true
       property bool showSensitiveInfo: true
       property bool showShadows: true
@@ -84,6 +88,10 @@ Singleton {
   readonly property alias wsAnimation: adapter.wsAnimation
   readonly property alias deleteCliphistImgCache: adapter.deleteCliphistImgCache
   readonly property alias country: adapter.country
+  readonly property alias holidaysEnabled: adapter.holidaysEnabled
+  readonly property alias holidaysAllCategories: adapter.holidaysAllCategories
+  readonly property alias holidaysCategories: adapter.holidaysCategories
+  readonly property alias holidaysSubdiv: adapter.holidaysSubdiv
   readonly property alias showAudioVisuals: adapter.showAudioVisuals
   readonly property alias showSensitiveInfo: adapter.showSensitiveInfo
   readonly property alias showShadows: adapter.showShadows
@@ -99,4 +107,22 @@ Singleton {
   readonly property alias iWantMediaCoverInBackground: adapter.iWantMediaCoverInBackground
   readonly property alias marqueeMediaText: adapter.marqueeMediaText
   readonly property alias iNeedMediaPlayingPopup: adapter.iNeedMediaPlayingPopup
+
+  // cache file name changes with the flags so stale data never leaks in
+  function holidaysCacheSuffix() {
+    const cats = holidaysCategories.trim() || "public"
+    let s = holidaysAllCategories ? "all" : cats.toLowerCase()
+    const sub = holidaysSubdiv.trim().toUpperCase()
+    if (sub) s += "_" + sub
+    return s.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "public"
+  }
+
+  function holidaysCacheName(year) {
+    return `events_${country.trim().toUpperCase()}_${year}_${holidaysCacheSuffix()}.json`
+  }
+
+  function holidaysUsable() {
+    const c = country.trim().toLowerCase()
+    return holidaysEnabled && c !== "" && c !== "none"
+  }
 }

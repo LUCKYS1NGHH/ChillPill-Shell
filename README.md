@@ -252,6 +252,15 @@ Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar
 - JetBrainsMono Nerd Font (`ttf-jetbrains-mono-nerd` on Arch)
 - `qt6-imageformats` (on Arch) more image format support (e.g. WEBP) for wallpaper previews
 - `holidays` (Python lib) event dates in calendar; `install.sh` prompts to install this one
+
+> [!TIP]
+> Holidays are configured under **Weather & Data** in the config app: `Country` picks the
+> nation, `Holidays` is the master toggle, `All categories` includes every category the
+> country supports, `Categories` takes a comma-separated list (e.g. `public,optional`),
+> and `Subdivision` narrows it to a state/province code (e.g. `MH`). These map straight to
+> `calendar_events.py --all / --categories / --subdiv`, and the cache filename changes with
+> them so switching preferences never shows stale data.
+
 - `cava` for showing audio visuals
 - `awww` for wallpaper switcher if you don't use custom wallpaper script
 

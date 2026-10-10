@@ -23,11 +23,23 @@ Rectangle {
 
   onShownChanged: if (shown) holidayLoader.ensureLoaded()
 
-  property bool holidaysEnabled: Config.country.trim() !== "" && Config.country.toLowerCase() !== "none"
+  property bool holidaysEnabled: Config.holidaysUsable()
   property bool fetchFailed: false
   property string cachePath: holidaysEnabled
-    ? `${Quickshell.env("HOME")}/.cache/chillpill-shell/events_${Config.country}_${datetimeItem.viewYear}.json`
+    ? `${Quickshell.env("HOME")}/.cache/chillpill-shell/${Config.holidaysCacheName(datetimeItem.viewYear)}`
     : ""
+
+  // toggling holidays off must clear the highlighted days too
+  onHolidaysEnabledChanged: {
+    if (!holidaysEnabled) {
+      holidays = ({})
+      tooltipDay = -1
+      fetchFailed = false
+    } else if (shown) {
+      fetchFailed = false
+      holidaysFile.reload()
+    }
+  }
 
   FileView {
     id: holidaysFile
@@ -44,14 +56,23 @@ Rectangle {
     }
   }
 
-  Process {
-    id: holidayFetcher
-    command: [
+  function holidayArgs() {
+    const a = [
       "/usr/share/chillpill-shell/scripts/calendar_events.py",
-      Config.country,
+      Config.country.trim(),
       datetimeItem.viewYear.toString(),
       calendarPopup.cachePath
     ]
+    if (Config.holidaysAllCategories) a.push("--all")
+    else if (Config.holidaysCategories.trim()) a.push("--categories", Config.holidaysCategories.trim())
+    const sub = Config.holidaysSubdiv.trim()
+    if (sub) a.push("--subdiv", sub)
+    return a
+  }
+
+  Process {
+    id: holidayFetcher
+    command: calendarPopup.holidayArgs()
     onExited: (code) => {
       if (code === 0) {
         calendarPopup.fetchFailed = false
