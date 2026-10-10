@@ -54,6 +54,7 @@ Singleton {
       property string webSearchUrl: "https://duckduckgo.com/?q=%s"
       property bool iWantMediaCoverInBackground: false
       property bool marqueeMediaText: false
+      property bool iNeedMediaPlayingPopup: true
     }
   }
 
@@ -97,4 +98,5 @@ Singleton {
   readonly property alias webSearchUrl: adapter.webSearchUrl
   readonly property alias iWantMediaCoverInBackground: adapter.iWantMediaCoverInBackground
   readonly property alias marqueeMediaText: adapter.marqueeMediaText
+  readonly property alias iNeedMediaPlayingPopup: adapter.iNeedMediaPlayingPopup
 }

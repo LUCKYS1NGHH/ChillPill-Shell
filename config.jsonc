@@ -38,5 +38,6 @@
   "cliphistFuzzySearch": false,
   "webSearchUrl": "https://duckduckgo.com/?q=%s",
   "iWantMediaCoverInBackground": false,
-  "marqueeMediaText": false
+  "marqueeMediaText": false,
+  "iNeedMediaPlayingPopup": true
 }

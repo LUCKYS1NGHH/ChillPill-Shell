@@ -94,6 +94,15 @@ ShellRoot {
 
   // media player related
   property bool mediaAutoOpened: false
+  // toggle off -> the pill never grows for the popup, even if a track changed
+  readonly property bool mediaPopupShown: Config.iNeedMediaPlayingPopup && mediaAutoOpened
+  // flipping the toggle off collapses the pill right away
+  onMediaPopupShownChanged: {
+    if (!mediaPopupShown) {
+      mediaAutoOpened = false
+      mediaPopupHideTimer.stop()
+    }
+  }
   property var visualizerValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   property bool cavaAvailable: false
   // the pill bar's "audioVisualizer" module draws the same spectrum, so cava has
@@ -233,7 +242,7 @@ ShellRoot {
         || spotlight
         || wallpaperSwitcherOpen
         || powerMenu
-        || mediaAutoOpened
+        || mediaPopupShown
         || (notificationModule.active && !notifFullscreenMode)
         || (activeOsd !== "")
       opacity: revealed && (!fullscreenActive && !notifFullscreenMode) ? 1 : 0
@@ -320,7 +329,7 @@ ShellRoot {
               height = implicitHeight
           } else {
               heightAnim.to = implicitHeight
-              heightAnim.duration = mediaAutoOpened ? 650 : 550
+              heightAnim.duration = shellRoot.mediaPopupShown ? 650 : 550
               heightAnim.start()
           }
       }
@@ -343,7 +352,7 @@ ShellRoot {
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
                      : cliphistOpen ? 440
-                     : mediaAutoOpened ? 340
+                     : mediaPopupShown ? 335
                      : row.implicitWidth + (12 * Config.pillScale) + (Config.pillOnHover || !hovered ? 56 : 68) * Config.pillScale
 
       readonly property real baseHeight: activeOsd === "battery" ? osdHeight
@@ -362,7 +371,7 @@ ShellRoot {
                       ? (spotlightLoader.item ? spotlightLoader.item.height + 15 : 250)
                   : wallpaperSwitcherOpen ? 308
                   : cliphistOpen ? 276
-                  : mediaAutoOpened ? 90
+                  : mediaPopupShown ? 92
                   : (row.implicitHeight * Config.pillScale) + 10
 
       readonly property real baseRadius: notificationModule.active ? 99
@@ -374,7 +383,6 @@ ShellRoot {
         : spotlight ? 29
         : miniDashboard ? 20
         : wallpaperSwitcherOpen ? 30
-        : mediaAutoOpened ? 22
         : 20 * Config.pillScale
 
       implicitWidth: baseWidth
@@ -409,7 +417,7 @@ ShellRoot {
 
         onClicked: (mouse) => {
 
-          if (mediaAutoOpened) return
+          if (mediaPopupShown) return
 
           // clicking outside power menu buttons closes it
           if (box.powerMenu) {
@@ -734,11 +742,11 @@ ShellRoot {
 
           Loader {
               anchors.centerIn: parent
-              active: mediaAutoOpened
+              active: shellRoot.mediaPopupShown
               asynchronous: true
 
               sourceComponent: MediaPopup {
-                  active: mediaAutoOpened
+                  active: shellRoot.mediaPopupShown
               }
           }
       }
@@ -769,7 +777,7 @@ ShellRoot {
           buttonBgOff: box.ccButtonBgOff
           buttonFgOff: box.ccButtonFgOff
           controlCenterOpen: box.controlCenter
-          mediaAutoOpened: mediaAutoOpened
+          mediaAutoOpened: mediaPopupShown
           hasPlayer: mprisModule.hasPlayer
           playerHeight: box.ccButtonHeight
           notificationPopup: notificationModule.active
@@ -1153,7 +1161,7 @@ ShellRoot {
     Connections {
       target: weatherIndicatorItem
       function onToggleWeather() {
-        if (mediaAutoOpened) return
+        if (mediaPopupShown) return
         if (!weatherPopupLoader.active)
           weatherPopupLoader.active = true
         else
@@ -1165,6 +1173,7 @@ ShellRoot {
     Connections {
         target: mprisModule
         function onNowPlaying() {
+            if (!Config.iNeedMediaPlayingPopup) return
             if (box.controlCenter) return
             if (!box.mediaPopup) mediaAutoOpened = true
             mediaPopupHideTimer.restart()

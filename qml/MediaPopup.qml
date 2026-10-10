@@ -7,8 +7,8 @@ Item {
     id: root
     property bool active: false
     anchors.centerIn: parent
-    width: 295
-    height: 70
+    width: 290
+    height: 100
     opacity: active ? 1 : 0
     visible: opacity > 0
     Behavior on opacity { NumberAnimation { duration: 180 } }
