@@ -365,7 +365,7 @@ ShellRoot {
                      : activeOsd === "volume" ? osdWidth
                      : activeOsd === "brightness" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 320
-                     : powerMenu ? 342
+                     : powerMenu ? (342 * Config.pillScale)
                      : controlCenter ? 390
                      : spotlight ? 350
                      : miniDashboard ? 420
@@ -380,7 +380,7 @@ ShellRoot {
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
                   : (notificationModule.active && !notifFullscreenMode) ? 52
-                  : powerMenu ? 100
+                  : powerMenu ? (100 * Config.pillScale)
                   : controlCenter && mprisModule.hasPlayer
                       ? (240 + notifBump)
                   : controlCenter
