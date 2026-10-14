@@ -69,6 +69,14 @@ ShellRoot {
 
   property bool pillHoverActive: false
 
+  // Fix: Ignore audio/battery connection noise for 3 seconds on system boot
+  Timer {
+    id: bootGuardTimer
+    interval: 3000
+    running: true
+    repeat: false
+  }
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
@@ -337,6 +345,13 @@ ShellRoot {
 
       property string activeOsd: "" // volume, brightness, timer, battery
 
+      // Fix: Instantly filter out and clear any initial audio/battery connection noise during boot
+      onActiveOsdChanged: {
+        if (bootGuardTimer.running && activeOsd !== "") {
+          activeOsd = ""
+        }
+      }
+
       Timer {
         id: osdHideTimer
         onTriggered: box.activeOsd = ""
@@ -547,6 +562,8 @@ ShellRoot {
           barWidth: box.volumeModule && box.volumeModule.mutedFg ? 80 : 90
           valueText: box.volumeModule ? (box.volumeModule.muted ? "muted" : box.volumeModule.intendedVol + "%") : ""
       }
+
+      
 
       // brightness
       OsdBar {
