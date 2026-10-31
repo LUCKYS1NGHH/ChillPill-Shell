@@ -370,6 +370,100 @@ QString WifiController::currentSsid() const {
     return m_currentSsid;
 }
 
+int WifiController::currentSignal() const {
+    return m_currentSignal;
+}
+
+int WifiController::currentFrequency() const {
+    return m_currentFrequency;
+}
+
+QString WifiController::currentSecurity() const {
+    return m_currentSecurity;
+}
+
+void WifiController::updateCurrentNetworkInfo() {
+    int signal = -1;
+    int frequency = -1;
+    QString security;
+
+    if (m_enabled && isValidPath(m_wifiDevicePath) && !m_currentSsid.isEmpty()) {
+        if (m_backendName == QLatin1String("iwd")) {
+            // frequency is not exposed by iwd's normal interfaces, the band chip stays hidden
+            const auto network = m_networks.networkForSsid(m_currentSsid);
+            if (network.has_value()) {
+                signal = network->signal;
+                if (network->type == QLatin1String("psk") || network->type == QLatin1String("8021x"))
+                    security = QStringLiteral("WPA2");
+                else if (network->type == QLatin1String("wep"))
+                    security = QStringLiteral("WEP");
+                else
+                    security = QStringLiteral("Open");
+            }
+        } else {
+            const QString accessPointPath = objectPathFromVariant(getProperty(
+                kNetworkManagerService,
+                m_wifiDevicePath,
+                kNetworkManagerWirelessInterface,
+                QStringLiteral("ActiveAccessPoint")
+            ));
+
+            if (isValidPath(accessPointPath)) {
+                signal = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("Strength")
+                ).toInt();
+                frequency = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("Frequency")
+                ).toInt();
+
+                const uint flags = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("Flags")
+                ).toUInt();
+                const uint wpaFlags = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("WpaFlags")
+                ).toUInt();
+                const uint rsnFlags = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("RsnFlags")
+                ).toUInt();
+
+                constexpr uint kSecKeyMgmtSae = 0x400;
+                if (!(flags & kAccessPointPrivacyFlag) && wpaFlags == 0 && rsnFlags == 0)
+                    security = QStringLiteral("Open");
+                else if ((rsnFlags & kSecKeyMgmtSae) != 0)
+                    security = QStringLiteral("WPA3");
+                else if (rsnFlags != 0)
+                    security = QStringLiteral("WPA2");
+                else if (wpaFlags != 0)
+                    security = QStringLiteral("WPA");
+                else
+                    security = QStringLiteral("WEP");
+            }
+        }
+    }
+
+    if (signal != m_currentSignal || frequency != m_currentFrequency || security != m_currentSecurity) {
+        m_currentSignal = signal;
+        m_currentFrequency = frequency;
+        m_currentSecurity = security;
+        emit currentNetworkInfoChanged();
+    }
+}
+
 QString WifiController::statusText() const {
     return m_statusText;
 }
@@ -1032,6 +1126,7 @@ void WifiController::refreshStateInternal() {
         setCurrentSsid({});
         m_networks.clear();
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1042,6 +1137,7 @@ void WifiController::refreshStateInternal() {
         setCurrentSsid({});
         m_networks.clear();
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1079,6 +1175,7 @@ void WifiController::refreshNetworksInternal(bool rescan, bool triggeredBySignal
         if (!triggeredBySignal)
             setScanningState(false);
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1209,6 +1306,7 @@ void WifiController::refreshNetworksInternal(bool rescan, bool triggeredBySignal
         }
 
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1317,6 +1415,7 @@ void WifiController::refreshNetworksInternal(bool rescan, bool triggeredBySignal
     if (!triggeredBySignal && !rescan)
         setScanningState(false);
     updateStatusText();
+    updateCurrentNetworkInfo();
 }
 
 void WifiController::reloadSavedConnections() {

@@ -64,10 +64,20 @@ Item {
     passwordPromptVisible = true
   }
 
+  // the collapsed (connected) row always sorts first, so "first visible"
+  // is just whether it exists
+  function firstVisibleIndex() {
+    if (list.count === 0)
+      return -1
+    return wifiPanel.linked ? 1 : 0
+  }
+
   function moveSelection(delta) {
     if (list.count === 0) return
-    let i = list.currentIndex < 0 ? (delta > 0 ? 0 : list.count - 1) : list.currentIndex + delta
-    i = Math.max(0, Math.min(list.count - 1, i))
+    const start = firstVisibleIndex()
+    if (start < 0 || start >= list.count) return
+    let i = list.currentIndex < start ? start : list.currentIndex + delta
+    i = Math.max(start, Math.min(list.count - 1, i))
     list.currentIndex = i
     revealGroup(list.itemAtIndex(i))
   }
@@ -76,6 +86,7 @@ Item {
     if (list.currentIndex < 0) return
     const group = list.itemAtIndex(list.currentIndex)
     if (!group) return
+    if (group.rowItem.connected) return  // collapsed row, ignore
     if (group.promptOpen) { closePrompt(); return }
     const row = group.rowItem
     activate(String(row.ssid), row.connected, row.savedConnection, row.secure)
@@ -87,7 +98,7 @@ Item {
     // the Loader is asynchronous, so this can run before the panel is in a
     // window: a focus request now would be dropped
     Qt.callLater(() => wifiPanel.forceActiveFocus())
-    if (list.currentIndex < 0) list.currentIndex = 0
+    if (list.currentIndex < 0) list.currentIndex = firstVisibleIndex()
     if (WifiController.enabled) WifiController.refreshNetworks(true)
   }
 
@@ -232,9 +243,10 @@ Item {
         }
 
         // network count, plain text instead of a badge
+        readonly property int visibleNets: list.count - (wifiPanel.linked && list.count > 0 ? 1 : 0)
         Text {
-          visible: WifiController.enabled && list.count > 0
-          text: "(" + list.count + ")"
+          visible: WifiController.enabled && parent.visibleNets > 0
+          text: "(" + parent.visibleNets + ")"
           color: Theme.fg3
           font { family: Theme.fontFamily; pixelSize: 13 }
         }
@@ -307,10 +319,11 @@ Item {
         }
 
         Column {
+          id: heroText
           anchors.left: badge.right
           anchors.leftMargin: 14
-          anchors.right: parent.right
-          anchors.rightMargin: 18
+          anchors.right: heroInfo.left
+          anchors.rightMargin: 12
           anchors.verticalCenter: parent.verticalCenter
           spacing: 3
 
@@ -334,6 +347,55 @@ Item {
             elide: Text.ElideRight
             font { family: Theme.fontFamily; pixelSize: 10 }
             Behavior on color { ColorAnimation { duration: 200 } }
+          }
+        }
+
+        // signal on top, band + security stacked under it, all right-aligned
+        readonly property int heroSignal: WifiController.currentSignal
+        readonly property string heroBand: WifiController.currentFrequency > 0
+            ? WifiController.currentFrequency < 3000 ? "2.4" : WifiController.currentFrequency < 5920 ? "5" : "6"
+            : ""
+        Column {
+          id: heroInfo
+          visible: wifiPanel.linked && !WifiController.busy
+          anchors.right: parent.right
+          anchors.rightMargin: 16
+          anchors.verticalCenter: parent.verticalCenter
+          spacing: 3
+
+          Text {
+            visible: hero.heroSignal >= 0
+            text: hero.heroSignal + "%"
+            color: hero.heroSignal > 55 ? Theme.ok : hero.heroSignal > 30 ? Theme.warnMed : Theme.danger
+            font { family: Theme.fontFamily; pixelSize: 12 }
+            anchors.right: parent.right
+            Behavior on color { ColorAnimation { duration: 200 } }
+          }
+
+          Row {
+            anchors.right: parent.right
+            spacing: 6
+
+            Text {
+              visible: hero.heroBand.length > 0
+              text: hero.heroBand + "GHz"
+              color: Theme.fg4
+              font { family: Theme.fontFamily; pixelSize: 10 }
+            }
+
+            Text {
+              visible: hero.heroBand.length > 0 && WifiController.currentSecurity.length > 0
+              text: "\u00b7"
+              color: Theme.fg7
+              font { family: Theme.fontFamily; pixelSize: 10 }
+            }
+
+            Text {
+              visible: WifiController.currentSecurity.length > 0
+              text: WifiController.currentSecurity
+              color: Theme.fg4
+              font { family: Theme.fontFamily; pixelSize: 10 }
+            }
           }
         }
 
@@ -383,7 +445,7 @@ Item {
           spacing: 5
           boundsBehavior: Flickable.StopAtBounds
           interactive: contentHeight > height
-          reuseItems: true
+          reuseItems: false
           model: (wifiPanel.listLive && WifiController.enabled) ? WifiController.networks : null
 
           opacity: WifiController.busy ? 0.55 : 1
@@ -395,8 +457,8 @@ Item {
 
           onMovementStarted: scrollAnim.stop()
           onCountChanged: {
-            if (currentIndex >= count) currentIndex = count - 1
-            if (currentIndex < 0 && count > 0 && wifiPanel.shown) currentIndex = 0
+            if (currentIndex >= count) currentIndex = firstVisibleIndex()
+            if (currentIndex < 0 && count > 0 && wifiPanel.shown) currentIndex = firstVisibleIndex()
           }
 
           delegate: Item {
@@ -404,7 +466,11 @@ Item {
             required property int index
             required property var model
             width: list.width
-            height: netRow.height + (netPrompt.height > 0 ? netPrompt.height + 4 : 0)
+            // the connected row collapses to nothing: it already lives in the
+            // hero card above, and a collapsed row keeps layout/clicks sane
+            height: model.connected ? 0
+                : netRow.height + (netPrompt.height > 0 ? netPrompt.height + 4 : 0)
+            visible: !model.connected
 
             // the row itself, so callers ignore child order
             readonly property var rowItem: netRow
@@ -536,6 +602,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             text: !WifiController.enabled ? "smoke signals only"
                 : WifiController.scanning ? "sniffing the air.."
+                : wifiPanel.linked ? "connected up top"
                 : "nothing out there. touch grass"
             color: Theme.fg4
             font { family: Theme.fontFamily; pixelSize: 12 }

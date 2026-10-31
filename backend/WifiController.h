@@ -34,6 +34,9 @@ class WifiController final : public QObject {
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool scanning READ scanning NOTIFY scanningChanged)
     Q_PROPERTY(QString currentSsid READ currentSsid NOTIFY currentSsidChanged)
+    Q_PROPERTY(int currentSignal READ currentSignal NOTIFY currentNetworkInfoChanged)
+    Q_PROPERTY(int currentFrequency READ currentFrequency NOTIFY currentNetworkInfoChanged)
+    Q_PROPERTY(QString currentSecurity READ currentSecurity NOTIFY currentNetworkInfoChanged)
     Q_PROPERTY(QString statusText READ statusText NOTIFY statusTextChanged)
     Q_PROPERTY(QString infoMessage READ infoMessage NOTIFY infoMessageChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
@@ -53,6 +56,9 @@ public:
     bool busy() const;
     bool scanning() const;
     QString currentSsid() const;
+    int currentSignal() const;
+    int currentFrequency() const;
+    QString currentSecurity() const;
     QString statusText() const;
     QString infoMessage() const;
     QString errorMessage() const;
@@ -68,6 +74,7 @@ public:
 
 signals:
     void backendNameChanged();
+    void currentNetworkInfoChanged();
     void supportedChanged();
     void readOnlyChanged();
     void availableChanged();
@@ -126,6 +133,7 @@ private:
     void setUnsupportedReason(const QString &unsupportedReason);
     void updateBusyState();
     void updateStatusText();
+    void updateCurrentNetworkInfo();
     void clearUnsupportedState(const QString &backendName, bool available, const QString &reason);
     void clearSupportedState();
 
@@ -140,6 +148,9 @@ private:
     QString m_infoMessage;
     QString m_errorMessage;
     QString m_currentSsid;
+    int m_currentSignal = -1;
+    int m_currentFrequency = -1;
+    QString m_currentSecurity;
     QString m_statusText = QStringLiteral("Unavailable");
     QString m_unsupportedReason;
     bool m_supported = false;
