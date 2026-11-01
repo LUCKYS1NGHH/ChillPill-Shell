@@ -18,6 +18,8 @@ Item {
   property bool passwordPromptVisible: false
   property string passwordPromptSsid: ""
   property string passwordDraft: ""    // survives list rebuilds
+  property bool forgetOpen: false      // hero card forget footer
+  property bool heroActive: false      // keyboard selection is on the hero card
 
   readonly property color accent: Theme.netConnected
   readonly property color accentHover: Qt.lighter(accent, 1.1)
@@ -108,6 +110,8 @@ Item {
     } else {
       liveOff.restart()
       closePrompt()
+      forgetOpen = false
+      heroActive = false
     }
   }
 
@@ -122,11 +126,80 @@ Item {
   // keep clicks off the cc below
   MouseArea { anchors.fill: parent; enabled: wifiPanel.shown }
 
-  Keys.onUpPressed: moveSelection(-1)
-  Keys.onDownPressed: moveSelection(1)
-  Keys.onReturnPressed: activateSelected()
-  Keys.onEnterPressed: activateSelected()
-  Keys.onEscapePressed: closeRequested()
+  Keys.onUpPressed: keyUp()
+  Keys.onDownPressed: keyDown()
+  Keys.onReturnPressed: event => {
+    if (event.modifiers & Qt.ShiftModifier)
+      keyForget()
+    else
+      keyGo()
+  }
+  Keys.onEnterPressed: event => {
+    if (event.modifiers & Qt.ShiftModifier)
+      keyForget()
+    else
+      keyGo()
+  }
+  Keys.onDeletePressed: keyForget()
+  Keys.onEscapePressed: {
+    if (forgetOpen) {
+      forgetOpen = false
+      return
+    }
+    closeRequested()
+  }
+
+  // selection can live on the hero card: up from the first row moves there,
+  // enter disconnects,delete toggles the forget footer, enter confirms it
+  function keyUp() {
+    if (forgetOpen || list.count === 0) {
+      if (!forgetOpen && wifiPanel.linked && !WifiController.busy) {
+        heroActive = true
+        list.currentIndex = -1
+      }
+      return
+    }
+    if (heroActive)
+      return
+    if (list.currentIndex <= firstVisibleIndex()) {
+      if (wifiPanel.linked && !WifiController.busy) {
+        heroActive = true
+        list.currentIndex = -1
+      }
+      return
+    }
+    moveSelection(-1)
+  }
+
+  function keyDown() {
+    if (forgetOpen) return
+    if (heroActive) {
+      heroActive = false
+      list.currentIndex = firstVisibleIndex()
+      revealGroup(list.itemAtIndex(list.currentIndex))
+      return
+    }
+    moveSelection(1)
+  }
+
+  function keyGo() {
+    if (forgetOpen) {
+      WifiController.forgetNetwork(WifiController.currentSsid)
+      forgetOpen = false
+      return
+    }
+    if (heroActive) {
+      if (wifiPanel.linked && !WifiController.busy)
+        WifiController.disconnectCurrent()
+      return
+    }
+    activateSelected()
+  }
+
+  function keyForget() {
+    if (wifiPanel.linked && !WifiController.busy)
+      forgetOpen = !forgetOpen
+  }
 
   // shared bits: Theme only, no dependency on this file's ids
 
@@ -275,9 +348,31 @@ Item {
         Layout.fillWidth: true
         Layout.preferredHeight: 53
         radius: 18
-        color: Theme.heroBg
+        color: {
+          if (heroActive && wifiPanel.linked) return Theme.bg4
+          return heroArea.containsMouse && wifiPanel.linked
+              ? Qt.lighter(Theme.heroBg, 1.06) : Theme.heroBg
+        }
         opacity: wifiPanel.stage(1)
         transform: Translate { y: (1 - wifiPanel.stage(1)) * 8 }
+
+        Behavior on color { ColorAnimation { duration: 140 } }
+
+        // right-click: forget footer, left-click: disconnect
+        MouseArea {
+          id: heroArea
+          anchors.fill: parent
+          enabled: wifiPanel.linked && !WifiController.busy
+          acceptedButtons: Qt.LeftButton | Qt.RightButton
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: mouse => {
+            if (mouse.button === Qt.RightButton)
+              forgetOpen = !forgetOpen
+            else
+              WifiController.disconnectCurrent()
+          }
+        }
 
         // sonar ring
         Rectangle {
@@ -336,17 +431,50 @@ Item {
             font { family: Theme.fontFamily; pixelSize: 12 }
           }
 
-          Text {
+          // status line as a marquee: static when it fits, slides when too long
+          Item {
             width: parent.width
-            text: WifiController.busy ? "connecting\u2026"
-                : wifiPanel.linked ? "connected"
-                : !WifiController.enabled ? "click the toggle to turn on"
-                : WifiController.statusText.length > 0 ? WifiController.statusText
-                : "pick your known network below"
-            color: (wifiPanel.linked && !WifiController.busy) ? wifiPanel.accent : Theme.fg4
-            elide: Text.ElideRight
-            font { family: Theme.fontFamily; pixelSize: 10 }
-            Behavior on color { ColorAnimation { duration: 200 } }
+            height: heroStatus.implicitHeight
+            clip: true
+
+            Text {
+              id: heroStatus
+              text: WifiController.busy ? "connecting\u2026"
+                  : wifiPanel.linked ? "connected \u00b7 tap to disconnect \u00b7 right-click to forget"
+                  : !WifiController.enabled ? "click the toggle to turn on"
+                  : WifiController.statusText.length > 0 ? WifiController.statusText
+                  : "pick your known network below"
+              color: (wifiPanel.linked && !WifiController.busy) ? wifiPanel.accent : Theme.fg4
+              font { family: Theme.fontFamily; pixelSize: 10 }
+              Behavior on color { ColorAnimation { duration: 200 } }
+
+              readonly property bool overflow: implicitWidth > parent.width
+
+              SequentialAnimation on x {
+                running: heroStatus.overflow && wifiPanel.shown
+                loops: Animation.Infinite
+                PauseAnimation { duration: 1800 }
+                NumberAnimation {
+                  duration: 2600
+                  easing.type: Easing.InOutSine
+                  property real endX: heroStatus.parent.width - heroStatus.implicitWidth
+                  from: 0
+                  to: endX
+                }
+                PauseAnimation { duration: 1800 }
+                NumberAnimation {
+                  duration: 2600
+                  easing.type: Easing.InOutSine
+                  from: heroStatus.parent.width - heroStatus.implicitWidth
+                  to: 0
+                }
+              }
+              onOverflowChanged: if (!overflow) x = 0
+              Connections {
+                target: wifiPanel
+                function onCloseRequested() { heroStatus.x = 0 }
+              }
+            }
           }
         }
 
@@ -431,6 +559,105 @@ Item {
         }
       }
 
+      // forget footer, grows under the hero like the wifi password prompt
+      Rectangle {
+        Layout.fillWidth: true
+        Layout.preferredHeight: wifiPanel.forgetOpen ? 44 : 0
+        visible: Layout.preferredHeight > 0.5
+        clip: true
+        radius: 22
+        color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
+        border.width: 1
+        border.color: wifiPanel.linked ? Qt.darker(Theme.warning, 1.25) : Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.06)
+        Behavior on border.color { ColorAnimation { duration: 160 } }
+
+        Behavior on Layout.preferredHeight {
+          NumberAnimation { duration: 200; easing.type: Easing.OutExpo }
+        }
+
+        Text {
+          id: forgetIcon
+          anchors.left: parent.left
+          anchors.leftMargin: 18
+          anchors.verticalCenter: parent.verticalCenter
+          text: "\uf1f8" // nf-fa-trash
+          color: Theme.fg5
+          font { family: Theme.nerdFontFamily; pixelSize: 12 }
+        }
+
+        Text {
+          anchors.left: forgetIcon.right
+          anchors.leftMargin: 10
+          anchors.right: forgetCancelBtn.left
+          anchors.rightMargin: 8
+          anchors.verticalCenter: parent.verticalCenter
+          text: "forget " + WifiController.currentSsid + "?"
+          color: Qt.darker(Theme.warning, 1.12)
+          elide: Text.ElideRight
+          font { family: Theme.fontFamily; pixelSize: 12 }
+        }
+
+        // cancel
+        Rectangle {
+          id: forgetCancelBtn
+          width: 28
+          height: 28
+          radius: 14
+          anchors.right: forgetGo.left
+          anchors.rightMargin: 6
+          anchors.verticalCenter: parent.verticalCenter
+          color: forgetCancelArea.containsMouse ? Theme.bg3 : Theme.bgD
+
+          Text {
+            anchors.centerIn: parent
+            text: "\uf00d" // nf-fa-times
+            color: Theme.fg4
+            font { family: Theme.nerdFontFamily; pixelSize: 12 }
+          }
+
+          MouseArea {
+            id: forgetCancelArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: forgetOpen = false
+          }
+        }
+
+        // confirm: forget + drop the saved profile
+        Rectangle {
+          id: forgetGo
+          width: 28
+          height: 28
+          radius: 14
+          anchors.right: parent.right
+          anchors.rightMargin: 7
+          anchors.verticalCenter: parent.verticalCenter
+          color: Qt.darker(Theme.deleting, 1.08)
+          opacity: wifiPanel.linked ? 1 : 0.5
+          scale: forgetGoArea.pressed ? 0.9 : 1
+          Behavior on scale { NumberAnimation { duration: 100 } }
+
+          Text {
+            anchors.centerIn: parent
+            text: "\uf00c" // nf-fa-check
+            color: Theme.bg
+            font { family: Theme.nerdFontFamily; pixelSize: 12 }
+          }
+
+          MouseArea {
+            id: forgetGoArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+              WifiController.forgetNetwork(WifiController.currentSsid)
+              forgetOpen = false
+            }
+          }
+        }
+      }
+
       // network list
       Item {
         Layout.fillWidth: true
@@ -457,6 +684,7 @@ Item {
 
           onMovementStarted: scrollAnim.stop()
           onCountChanged: {
+            if (heroActive) return  // selection is on the hero card
             if (currentIndex >= count) currentIndex = firstVisibleIndex()
             if (currentIndex < 0 && count > 0 && wifiPanel.shown) currentIndex = firstVisibleIndex()
           }
@@ -542,7 +770,15 @@ Item {
           target: WifiController.networks
           ignoreUnknownSignals: true
           function onModelAboutToBeReset() { restoreView.savedY = list.contentY }
-          function onModelReset() { restoreView.restart() }
+          function onModelReset() {
+            restoreView.restart()
+            // a reset re-asserts currentIndex onto the first row; keep it
+            // cleared while the selection lives on the hero card
+            Qt.callLater(() => {
+              if (heroActive && list.currentIndex !== -1)
+                list.currentIndex = -1
+            })
+          }
         }
 
         Timer {

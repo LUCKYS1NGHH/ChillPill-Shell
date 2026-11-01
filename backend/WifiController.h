@@ -69,6 +69,7 @@ public:
     Q_INVOKABLE void refreshNetworks(bool rescan = false);
     Q_INVOKABLE void setEnabled(bool enabled);
     Q_INVOKABLE void disconnectCurrent();
+    Q_INVOKABLE void forgetNetwork(const QString &ssid);
     Q_INVOKABLE void connectToNetwork(const QString &ssid, const QString &password = QString());
     Q_INVOKABLE void clearMessages();
 

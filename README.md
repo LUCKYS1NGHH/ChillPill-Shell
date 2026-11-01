@@ -79,7 +79,7 @@ into your session at all times. It's not bound to any dotfiles.
 <img src="screenshots/wifiState.webp" width="49%" alt="Wi-Fi state">
 <img src="screenshots/bluetoothState.webp" width="49%" alt="Bluetooth state">
 
-<strong>Media Popup · Spotlight</strong><br>
+<strong>Spotlight · Media Popup</strong><br>
 <img src="screenshots/spotlight.webp" width="49%" alt="Spotlight">
 <img src="screenshots/mediaPopup.webp" width="49%" alt="Media popup">
 
@@ -93,8 +93,8 @@ into your session at all times. It's not bound to any dotfiles.
 
 - **Main pill bar**                  - Battery, volume, workspaces, network, clock (default; fully customizable in the config app) — for more module options, see 'Know more' below.
 - **Control center**                 - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
-  - **Wifi state**
-  - **Bluetooth state**
+  - **Wifi state**                   - List of available networks, hero card, password prompt, forget prompt, USB tethering, network info (band, signal strength and security), refresh networks button etc.
+  - **Bluetooth state**              - List of available devices, hero card, tips in footer, refresh devices button etc.
 - **Cliphist (clipboard manager)**   - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (<kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> range, <kbd>Shift</kbd> + <kbd>Space</kbd> pick, <kbd>Del</kbd> to delete), <kbd>Tab</kbd> to full preview the clipboard image/text
 - **Mini dashboard**                 - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
   - **Calendar popup**              - Previous/Next month buttons, event dates

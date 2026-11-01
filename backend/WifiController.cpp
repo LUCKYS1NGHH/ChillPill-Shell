@@ -49,6 +49,7 @@ constexpr auto kIwdAgentManagerInterface = "net.connman.iwd.AgentManager";
 constexpr auto kIwdDeviceInterface = "net.connman.iwd.Device";
 constexpr auto kIwdStationInterface = "net.connman.iwd.Station";
 constexpr auto kIwdNetworkInterface = "net.connman.iwd.Network";
+constexpr auto kIwdKnownNetworkInterface = "net.connman.iwd.KnownNetwork";
 constexpr auto kIwdAgentObjectPath = "/com/tideisland/PillBackend/IwdAgent";
 constexpr auto kObjectManagerInterface = "org.freedesktop.DBus.ObjectManager";
 constexpr auto kIwdAgentCanceledError = "net.connman.iwd.Agent.Error.Canceled";
@@ -589,6 +590,104 @@ void WifiController::disconnectCurrent() {
 
     setInfoMessage(QStringLiteral("Disconnected from Wi-Fi."));
     refreshStateInternal();
+}
+
+// drops the saved profile for a network: NetworkManager DeleteConnection, iwd ForgetNetwork
+void WifiController::forgetNetwork(const QString &ssid) {
+    clearMessages();
+
+    const QString trimmedSsid = ssid.trimmed();
+    if (trimmedSsid.isEmpty() || !m_supported)
+        return;
+
+    if (!m_available || !isValidPath(m_wifiDevicePath)) {
+        setErrorMessage(QStringLiteral("No Wi-Fi device is available."));
+        return;
+    }
+
+    if (m_backendName == QLatin1String("iwd")) {
+        QString knownNetworkPath;
+        const auto network = m_networks.networkForSsid(trimmedSsid);
+        if (network.has_value() && !network->objectPath.isEmpty()) {
+            knownNetworkPath = objectPathFromVariant(getProperty(
+                kIwdService,
+                network->objectPath,
+                QString::fromLatin1(kIwdNetworkInterface),
+                QStringLiteral("KnownNetwork")
+            ));
+        }
+
+        // the saved network may be out of scan range, so fall back to the object tree
+        if (!isValidPath(knownNetworkPath)) {
+            const QDBusMessage objectsReply = callMethod(
+                kIwdService,
+                kRootPath,
+                kObjectManagerInterface,
+                QStringLiteral("GetManagedObjects")
+            );
+            const IwdManagedObjectMap managedObjects = objectsReply.type() == QDBusMessage::ErrorMessage
+                ? IwdManagedObjectMap {}
+                : managedObjectsFromVariant(objectsReply.arguments().value(0));
+
+            for (auto it = managedObjects.constBegin(); it != managedObjects.constEnd(); ++it) {
+                const QVariantMap properties = it.value().value(QString::fromLatin1(kIwdKnownNetworkInterface));
+                if (properties.value(QStringLiteral("Name")).toString().trimmed() == trimmedSsid) {
+                    knownNetworkPath = it.key().path();
+                    break;
+                }
+            }
+        }
+
+        if (!isValidPath(knownNetworkPath)) {
+            setErrorMessage(QStringLiteral("This network is not saved, nothing to forget."));
+            return;
+        }
+
+        const QDBusMessage reply = callMethod(
+            kIwdService,
+            knownNetworkPath,
+            QString::fromLatin1(kIwdKnownNetworkInterface),
+            QStringLiteral("ForgetNetwork")
+        );
+
+        if (reply.type() == QDBusMessage::ErrorMessage) {
+            setErrorMessage(errorTextForReply(reply, QStringLiteral("Unable to forget the network.")));
+            return;
+        }
+
+        setInfoMessage(QStringLiteral("Forgot %1.").arg(trimmedSsid));
+        refreshStateInternal();
+        return;
+    }
+
+    const QString connectionPath = m_savedConnectionsBySsid.value(trimmedSsid);
+    if (connectionPath.isEmpty()) {
+        setErrorMessage(QStringLiteral("This network is not saved, nothing to forget."));
+        return;
+    }
+
+    if (trimmedSsid == m_currentSsid)
+        disconnectCurrent();
+
+    const QDBusMessage reply = callMethod(
+        kNetworkManagerService,
+        connectionPath,
+        kNetworkManagerSettingsConnectionInterface,
+        QStringLiteral("Delete")
+    );
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        setErrorMessage(errorTextForReply(reply, QStringLiteral("Unable to forget the network.")));
+        return;
+    }
+
+    m_savedConnectionsBySsid.remove(trimmedSsid);
+    m_savedConnectionsDirty = true;
+    setInfoMessage(QStringLiteral("Forgot %1.").arg(trimmedSsid));
+
+    // forget a background profile -> the list has to lose its "saved" badge now
+    if (trimmedSsid != m_currentSsid)
+        refreshNetworksInternal(false, true);
 }
 
 void WifiController::connectToNetwork(const QString &ssid, const QString &password) {
