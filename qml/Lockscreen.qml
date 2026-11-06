@@ -104,6 +104,7 @@ Scope {
         xhr.send();
     }
 
+    // timer for the weather refresh
     Timer {
         id: wxTimer
         interval: Math.max(60000, Config.weatherRefreshInterval)
@@ -111,6 +112,102 @@ Scope {
         running: sessionLock.locked && root.wLocation !== ""
         triggeredOnStart: true
         onTriggered: root.refreshWeather()
+    }
+
+    // ---------- idle dim: drop the backlight after N idle seconds, wake on input ----------
+    property int savedBrightness: -1
+    property bool dimmed: false
+    property bool dimPending: false
+    property int lastBright: -1
+    readonly property int dimTarget: Math.max(1, Math.round(savedBrightness * Config.lockscreenIdleDimTo / 100))
+
+    Process {
+        id: brightGet
+        command: ["brightnessctl", "get"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const v = parseInt(text.trim());
+                if (isNaN(v) || v <= 0) {
+                    root.dimPending = false;
+                    return;
+                }
+                root.savedBrightness = v;
+                root.lastBright = v;
+                if (!root.dimPending)
+                    return;
+                root.dimPending = false;
+                root.dimmed = true;
+                startBrightAnim(v, root.dimTarget, dimDuration)
+            }
+        }
+    }
+
+    Process {
+        id: brightSet
+    }
+
+    // smooth backlight transitions: stepped brightnessctl commands on a timer
+    property int dimDuration: 1400
+    property int wakeDuration: 500
+
+    Timer {
+        id: brightAnim
+        interval: 80
+        repeat: true
+        running: false
+        property int fromV: 0
+        property int toV: 0
+        property int durationMs: 1
+        property real progress: 0
+        onTriggered: {
+            progress = Math.min(1, progress + interval / durationMs);
+            const e = progress < 0.5 ? 2 * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2;   // easeInOutQuad
+            const v = Math.round(fromV + (toV - fromV) * e);
+            if (v !== root.lastBright) {
+                root.lastBright = v;
+                brightSet.command = ["brightnessctl", "set", v];
+                brightSet.running = true;
+            }
+            if (progress >= 1)
+                stop();
+        }
+    }
+
+    function startBrightAnim(fromV, toV, duration) {
+        brightAnim.fromV = fromV;
+        brightAnim.toV = toV;
+        brightAnim.durationMs = duration;
+        brightAnim.progress = 0;
+        brightAnim.restart();
+    }
+
+    function dimScreen() {
+        if (Config.lockscreenIdleDim <= 0 || root.dimmed || root.dimPending)
+            return;
+        root.dimPending = true;
+        brightGet.running = true;
+    }
+
+    function wakeScreen() {
+        root.dimPending = false;
+        if (!root.dimmed)
+            return;
+        root.dimmed = false;
+        if (root.savedBrightness > 0)
+            startBrightAnim(root.lastBright, root.savedBrightness, wakeDuration)
+    }
+
+    function activity() {
+        idleDim.restart();
+        wakeScreen();
+    }
+
+    Timer {
+        id: idleDim
+        interval: Math.max(1, Config.lockscreenIdleDim) * 1000
+        running: sessionLock.locked && Config.lockscreenIdleDim > 0 && !root.unlocking
+        onTriggered: root.dimScreen()
     }
 
     // ---------- shared state (all monitors) ----------
@@ -411,8 +508,11 @@ Scope {
                 failReset.stop();
                 refreshFailTally();
                 wpFile.reload();
+                wakeScreen();
                 if (root.showBattery && !batProc.running)
                     batProc.running = true;
+            } else {
+                wakeScreen();
             }
         }
 
@@ -516,8 +616,25 @@ Scope {
 
                 Component.onCompleted: forceActiveFocus()
 
+                // any input wakes the screen: keys (above), mouse move, click, wheel
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.NoButton
+                    hoverEnabled: true
+                    onPositionChanged: root.activity()
+                }
+
+                TapHandler {
+                    onTapped: root.activity()
+                }
+
+                WheelHandler {
+                    onWheel: root.activity()
+                }
+
                 Keys.onPressed: event => {
                     event.accepted = true;
+                    root.activity();
                     if (root.checking || root.unlocking)
                         return;
                     if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {

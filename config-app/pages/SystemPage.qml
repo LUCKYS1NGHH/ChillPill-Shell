@@ -6,8 +6,11 @@ Page {
     Heading { text: "APPLICATIONS" }
     TextRow { label: "Default terminal"; hint: "To open Console-Only apps in the Terminal"; fieldWidth: 200; value: ConfigStore.get("defaultTerminal", ""); onEdited: (v) => ConfigStore.set("defaultTerminal", v) }
     TextRow { label: "Screen lock app command"; placeholder: "chillpill-lock"; fieldWidth: 200; value: ConfigStore.get("screenLockAppCommand", ""); onEdited: (v) => ConfigStore.set("screenLockAppCommand", v) }
+    Heading { text: "LOCKSCREEN (ChillPill)"}
     ToggleRow { label: "Lockscreen power buttons"; hint: "Show suspend / restart / shutdown on the lockscreen surface (hide them on shared machines)"; value: ConfigStore.get("lockscreenPowerActions", true); onEdited: (v) => ConfigStore.set("lockscreenPowerActions", v) }
     ToggleRow { label: "Lockscreen media player"; hint: "Show the media card on the lockscreen card (only when something plays)"; value: ConfigStore.get("lockscreenMedia", true); onEdited: (v) => ConfigStore.set("lockscreenMedia", v) }
+    NumRow { label: "Lockscreen idle dim"; hint: "Drop the backlight after this many idle seconds on the lockscreen (0 = off)"; from: 0; to: 3600; suffix: "s"; value: ConfigStore.get("lockscreenIdleDim", 0); onEdited: (v) => ConfigStore.set("lockscreenIdleDim", v) }
+    NumRow { label: "Idle dim level"; hint: "Backlight percent to fall back to when the idle dim kicks in; any input restores it"; from: 1; to: 90; suffix: "%"; value: ConfigStore.get("lockscreenIdleDimTo", 25); onEdited: (v) => ConfigStore.set("lockscreenIdleDimTo", v) }
     ToggleRow { label: "Confirm power actions"; hint: "Confirm the power action prompt (Shutdown, Restart, Logout)"; value: ConfigStore.get("confirmPowerActions", true); onEdited: (v) => ConfigStore.set("confirmPowerActions", v) }
     Heading { text: "CLIPBOARD" }
     ToggleRow { label: "Auto delete cliphist image cache"; hint: "Delete the image cache also as you delete the image from the Cliphist (Clipboard Manager) state"; value: ConfigStore.get("deleteCliphistImgCache", true); onEdited: (v) => ConfigStore.set("deleteCliphistImgCache", v) }

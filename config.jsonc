@@ -39,6 +39,8 @@
   "confirmPowerActions": true,
   "lockscreenPowerActions": true,
   "lockscreenMedia": true,
+  "lockscreenIdleDim": 3,
+  "lockscreenIdleDimTo": 5,
   "maxVolume": 100,
   "separatePreviewTabTypes": true,
   "appLauncherFuzzySearch": false,

@@ -55,6 +55,10 @@ Singleton {
       property bool lockscreenPowerActions: true
       // media player strip on the lockscreen card (hidden when nothing plays)
       property bool lockscreenMedia: true
+      // dim the backlight after N idle seconds on the lockscreen (0 = off)
+      property int lockscreenIdleDim: 3
+      // idle dim target as a percent of the current backlight level
+      property int lockscreenIdleDimTo: 25
       property int maxVolume: 100
       property bool separatePreviewTabTypes: true
       property bool appLauncherFuzzySearch: false
@@ -113,6 +117,8 @@ Singleton {
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
   readonly property alias lockscreenPowerActions: adapter.lockscreenPowerActions
   readonly property alias lockscreenMedia: adapter.lockscreenMedia
+  readonly property alias lockscreenIdleDim: adapter.lockscreenIdleDim
+  readonly property alias lockscreenIdleDimTo: adapter.lockscreenIdleDimTo
   readonly property alias maxVolume: adapter.maxVolume
   readonly property alias separatePreviewTabTypes: adapter.separatePreviewTabTypes
   readonly property alias appLauncherFuzzySearch: adapter.appLauncherFuzzySearch
