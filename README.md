@@ -95,10 +95,10 @@ into your session at all times. It's not bound to any dotfiles.
 - **Control center**                 - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
   - **Wifi state**                   - List of available networks, hero card, password prompt, forget prompt, USB tethering, network info (band, signal strength and security), refresh networks button etc.
   - **Bluetooth state**              - List of available devices, hero card, tips in footer, refresh devices button etc.
-- **Cliphist (clipboard manager)**   - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (<kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> range, <kbd>Shift</kbd> + <kbd>Space</kbd> pick, <kbd>Del</kbd> to delete), <kbd>Tab</kbd> to full preview the clipboard image/text
+- **Cliphist (clipboard manager)**   - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (<kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> range, <kbd>Shift</kbd> + <kbd>Space</kbd> pick, <kbd>Del</kbd> to delete), <kbd>Tab</kbd> to full preview the clipboard image/text, <kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> to scroll multi lines clipboard text in full preview
 - **Mini dashboard**                 - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
-  - **Calendar popup**              - Previous/Next month buttons, event dates
-  - **Weather popup**               - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
+  - **Calendar popup**               - Previous/Next month buttons, event dates
+  - **Weather popup**                - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
 - **Spotlight**                      - List of applications (<kbd>Tab</kbd> to read the long app description), optional fuzzy search for apps, web search (<kbd>Tab</kbd> to expand the full search url), math and shell commands run
 - **DBus notification**              - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                            - Battery, volume, brightness, timer

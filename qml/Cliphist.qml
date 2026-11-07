@@ -266,6 +266,13 @@ Item {
         root.previewToggled(fullPreview)
     }
 
+    // Shift+Up/Down in preview scrolls the text; images can't scroll so fall back to navigation
+    function scrollPreview(dir) {
+        let p = previewLoad.item
+        if (p && p.scrollLines(dir)) return
+        root.moveSelection(dir)
+    }
+
     function findAdjacentTypeIndex(direction, wantImage) {
         if (listModel.count === 0) return -1
         let idx = root.selectedIndex
@@ -320,12 +327,16 @@ Item {
     // or the (focused) preview text holds the active focus.
     function onShortcutPressed(event) {
         if (event.key === Qt.Key_Down) {
-            if (event.modifiers & Qt.ShiftModifier && !root.fullPreview) root.extendMark(1)
-            else root.moveSelection(1)
+            if (event.modifiers & Qt.ShiftModifier) {
+                if (root.fullPreview) root.scrollPreview(1)
+                else root.extendMark(1)
+            } else root.moveSelection(1)
             event.accepted = true
         } else if (event.key === Qt.Key_Up) {
-            if (event.modifiers & Qt.ShiftModifier && !root.fullPreview) root.extendMark(-1)
-            else root.moveSelection(-1)
+            if (event.modifiers & Qt.ShiftModifier) {
+                if (root.fullPreview) root.scrollPreview(-1)
+                else root.extendMark(-1)
+            } else root.moveSelection(-1)
             event.accepted = true
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             root.copySelected()
@@ -593,6 +604,7 @@ Item {
             visible: fullPreview
 
             Loader {
+                id: previewLoad
                 anchors.fill: parent
                 active: fullPreview
                 asynchronous: true
@@ -707,17 +719,31 @@ Item {
                                     plural(textInfo.words, "word"), plural(textInfo.lines, "line")].join(" • ")
                         }
 
-                        readonly property string lineNumbers: {
-                            let n = textInfo.lines
-                            let out = ""
-                            for (let i = 1; i <= n; i++) {
-                                if (i > 1) out += "\n"
-                                out += i
+                        readonly property int lineNumWidth: Math.max(1, String(textInfo.lines).length) * 7 + 12
+                        readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
+                        readonly property string lineGutter: {
+                            // touch the inputs so the binding re-evaluates when they change
+                            let dep = [root.previewText, textReady, textPreview.lineCount, textPreview.width]
+                            return buildGutter()
+                        }
+                        // number each VISUAL row: a wrapped logical line shows its number on the
+                        // first row and its continuations stay blank, so the gutter stays aligned
+                        function buildGutter() {
+                            if (!textReady) return ""
+                            let body = root.previewText.endsWith("\n") ? root.previewText.slice(0, -1) : root.previewText
+                            if (body === "") return ""
+                            let lines = body.split("\n")
+                            let out = "", rowNext = 0, pos = 0
+                            for (let i = 0; i < lines.length; i++) {
+                                let r = textPreview.positionToRectangle(pos)
+                                let s = r.height > 0 ? Math.round(r.y / r.height) : 0
+                                if (rowNext === 0) out = String(i + 1)
+                                else out += "\n".repeat(Math.max(1, s - rowNext + 1)) + String(i + 1)
+                                rowNext = s + 1
+                                pos += lines[i].length + 1
                             }
                             return out
                         }
-                        readonly property int lineNumWidth: Math.max(1, String(textInfo.lines).length) * 7 + 12
-                        readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
                         readonly property bool currentDeleting: root.isDeleting(currentEntryId)
                         readonly property bool currentCollapsing: root.isCollapsing(currentEntryId)
                         // brief "Copied" toast shown when text is copied from the preview
@@ -726,6 +752,18 @@ Item {
                         function flashCopied() {
                             copiedFlash = true
                             copiedFlashTimer.restart()
+                        }
+
+                        // Shift+Up/Down: step the text preview by a few lines, false when it can't scroll (image)
+                        function scrollLines(dir) {
+                            if (!textFlick.visible) return false
+                            let max = Math.max(0, textFlick.contentHeight - textFlick.height)
+                            let step = textPreview.font.pixelSize * 5 + 4
+                            let target = Math.max(0, Math.min(textFlick.contentY + dir * step, max))
+                            if (target === textFlick.contentY) return true
+                            textScrollAnim.to = target
+                            textScrollAnim.restart()
+                            return true
                         }
 
                         Component.onCompleted: {
@@ -960,18 +998,31 @@ Item {
                                 anchors.rightMargin: 12
                                 clip: true
                                 boundsBehavior: Flickable.StopAtBounds
-                                flickableDirection: Flickable.HorizontalAndVerticalFlick
-                                contentWidth: codeArea.implicitWidth
+                                flickableDirection: Flickable.VerticalFlick
+                                contentWidth: width
                                 contentHeight: codeArea.implicitHeight
 
-                                Row {
+                                // smooth Shift+Up/Down scrolling, stops when the user grabs it manually
+                                NumberAnimation {
+                                    id: textScrollAnim
+                                    target: textFlick
+                                    property: "contentY"
+                                    duration: 170
+                                    easing.type: Easing.OutCubic
+                                }
+                                onMovementStarted: textScrollAnim.stop()
+
+                                Item {
                                     id: codeArea
-                                    spacing: 8
+                                    width: textFlick.width
+                                    implicitHeight: Math.max(lineNumText.height, textPreview.height)
+                                    height: implicitHeight
 
                                     Text {
                                         id: lineNumText
                                         width: lineNumWidth
-                                        text: lineNumbers
+                                        text: lineGutter
+                                        anchors.left: parent.left
                                         color: Theme.fg6
                                         font { family: Theme.fontFamily; pixelSize: 12 }
                                         horizontalAlignment: Text.AlignRight
@@ -986,10 +1037,13 @@ Item {
                                     // can be mouse-selected (and copied) in the full preview.
                                     TextEdit {
                                         id: textPreview
+                                        anchors.left: lineNumText.right
+                                        anchors.leftMargin: 8
+                                        anchors.right: parent.right
                                         text: root.previewText
                                         color: Theme.fg
                                         font { family: Theme.fontFamily; pixelSize: 12 }
-                                        wrapMode: TextEdit.NoWrap
+                                        wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                                         textFormat: TextEdit.PlainText
                                         readOnly: true
                                         selectByMouse: true
@@ -1020,7 +1074,6 @@ Item {
                                         }
                                         // TextEdit doesn't auto-size like Text does,
                                         // so track its content size explicitly.
-                                        width: implicitWidth
                                         height: implicitHeight
 
                                         opacity: currentCollapsing ? 0 : (textReady ? 1 : 0)
