@@ -30,7 +30,7 @@ Rectangle {
   y: 0    // the loader positions this popup, see calendarLoader in shell.qml
   color: Theme.bg
   radius: 18 * box.dpi
-  layer.enabled: Config.showShadows
+  layer.enabled: calendarPopup.opacity > 0
   layer.effect: PanelShadow {}
   Behavior on opacity { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
   Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutExpo } }

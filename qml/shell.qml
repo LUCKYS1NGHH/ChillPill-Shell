@@ -229,8 +229,10 @@ ShellRoot {
       y: box.y - pad
       width: visW + pad * 2
       height: box.height * box.dpi + pad * 2.2
-      opacity: box.opacity
-      visible: Config.showShadows && box.visible && opacity > 0
+      property real t: Config.showShadows ? 1 : 0
+      Behavior on t { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+      opacity: box.opacity * t
+      visible: box.visible && opacity > 0
 
       Rectangle {
         id: pillShadowSource

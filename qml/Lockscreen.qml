@@ -832,14 +832,15 @@ Scope {
                         }
 
                         RectangularShadow {
-                            visible: Config.showShadows
+                            property real t: Config.showShadows ? 1 : 0
+                            Behavior on t { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
                             anchors.fill: box
                             radius: box.radius
                             blur: 18 + 32 * scene.morph
                             spread: 1 + 2 * scene.morph
                             offset: Qt.vector2d(0, 4 + 14 * scene.morph)
                             color: Qt.rgba(0, 0, 0, 0.5)
-                            opacity: Math.min(1, scene.morph * 2.5)
+                            opacity: Math.min(1, scene.morph * 2.5) * t
                         }
 
                         Rectangle {
@@ -956,13 +957,15 @@ Scope {
                                                 visible: height > 0
 
                                                 RectangularShadow {
-                                                    visible: Config.showShadows
+                                                    property real t: Config.showShadows ? 1 : 0
+                                                    Behavior on t { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
                                                     anchors.fill: mediaCard
                                                     radius: mediaCard.radius
                                                     blur: 28
                                                     spread: 1.5
                                                     offset: Qt.vector2d(0, 8)
                                                     color: Qt.rgba(0, 0, 0, 0.60)
+                                                    opacity: t
                                                 }
 
                                                 MediaPlayer {
