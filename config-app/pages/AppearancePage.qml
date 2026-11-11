@@ -4,7 +4,7 @@ import ".."
 
 Page {
     Heading { text: "IDENTITY" }
-    TextRow { label: "Display picture"; hint: "Shown in the Mini Dashboard"; value: ConfigStore.get("displayPicture", ""); onEdited: (v) => ConfigStore.set("displayPicture", v) }
+    TextRow { label: "Display picture"; hint: "Shown in the Dashboard"; value: ConfigStore.get("displayPicture", ""); onEdited: (v) => ConfigStore.set("displayPicture", v) }
     Heading { text: "FONTS" }
     TextRow { label: "Text font"; value: ConfigStore.get("textFontFamily", ""); onEdited: (v) => ConfigStore.set("textFontFamily", v) }
     TextRow { label: "Nerd font"; hint: "Used for icons"; value: ConfigStore.get("nerdFontFamily", ""); onEdited: (v) => ConfigStore.set("nerdFontFamily", v) }

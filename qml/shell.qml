@@ -15,73 +15,73 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true; box.powerMenu = false; }
+      function toggle(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = !box.cliphistOpen; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
+      function show(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = true; box.powerMenu = false; }
       function hide(): void { box.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
-      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-      function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.powerMenu = false; }
+      function toggle(): void { box.controlCenter = !box.controlCenter; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
+      function show(): void { box.controlCenter = true; box.dashboard = false; box.cliphistOpen = false; box.powerMenu = false; }
       function hide(): void { box.controlCenter = false }
   }
 
   IpcHandler {
-      target: "miniDashboard"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; }
-      function hide(): void { box.miniDashboard = false }
+      target: "dashboard"
+      function toggle(): void { box.controlCenter = false; box.dashboard = !box.dashboard; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
+      function show(): void { box.controlCenter = false; box.dashboard = true; box.cliphistOpen = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; }
+      function hide(): void { box.dashboard = false }
   }
 
   // alias for spotlight
   IpcHandler {
     target: "appLauncher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
+    function toggle(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
+    function show(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
     function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "theme"
-    function toggle(): void { box.themePicker = !box.themePicker; box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
-    function show(): void { box.themePicker = true; box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+    function toggle(): void { box.themePicker = !box.themePicker; box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
+    function show(): void { box.themePicker = true; box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
     function hide(): void { box.themePicker = false }
     function apply(name: string): void { Theme.applyTheme(name) }
   }
 
   IpcHandler {
     target: "spotlight"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
+    function toggle(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
+    function show(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
     function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "wallpaperSwitcher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen; box.powerMenu = false; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = true; box.powerMenu = false; }
+    function toggle(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen; box.powerMenu = false; box.themePicker = false }
+    function show(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = true; box.powerMenu = false; }
     function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "powerMenu"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = !box.powerMenu; if (!box.powerMenu) box.powerMenuInitialAction = ""; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = true }
+    function toggle(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = !box.powerMenu; if (!box.powerMenu) box.powerMenuInitialAction = ""; box.themePicker = false }
+    function show(): void { box.controlCenter = false; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = true }
     function hide(): void { box.powerMenu = false; box.powerMenuInitialAction = "" }
   }
 
   IpcHandler {
     target: "wifiState"
-    function toggle(): void { box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.bluetoothPanelOpen = false; box.wifiPanelOpen = !box.wifiPanelOpen; box.controlCenter = box.wifiPanelOpen; box.themePicker = false }
-    function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.bluetoothPanelOpen = false; box.wifiPanelOpen = true }
+    function toggle(): void { box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.bluetoothPanelOpen = false; box.wifiPanelOpen = !box.wifiPanelOpen; box.controlCenter = box.wifiPanelOpen; box.themePicker = false }
+    function show(): void { box.controlCenter = true; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.bluetoothPanelOpen = false; box.wifiPanelOpen = true }
     function hide(): void { box.powerMenu = false; box.wifiPanelOpen = false }
   }
 
   IpcHandler {
     target: "bluetoothState"
-    function toggle(): void { box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.wifiPanelOpen = false; box.bluetoothPanelOpen = !box.bluetoothPanelOpen; box.controlCenter = box.bluetoothPanelOpen; box.themePicker = false }
-    function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.wifiPanelOpen = false; box.bluetoothPanelOpen = true }
+    function toggle(): void { box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.wifiPanelOpen = false; box.bluetoothPanelOpen = !box.bluetoothPanelOpen; box.controlCenter = box.bluetoothPanelOpen; box.themePicker = false }
+    function show(): void { box.controlCenter = true; box.dashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.wifiPanelOpen = false; box.bluetoothPanelOpen = true }
     function hide(): void { box.powerMenu = false; box.bluetoothPanelOpen = false }
   }
 
@@ -143,8 +143,7 @@ ShellRoot {
     id: panelWindow
     WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.keyboardFocus: (box.wifiPanelOpen || box.bluetoothPanelOpen || box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.themePicker || box.powerMenu ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
-    implicitHeight: Math.max(885 * scale, calendarLoader.item && calendarLoader.item.visible
-            ? calendarLoader.y + calendarLoader.item.height : 0)
+    implicitHeight: 885 * scale
     onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
     property real scale: screen ? screen.devicePixelRatio : 1.0
 
@@ -172,20 +171,6 @@ ShellRoot {
         x: 0; y: 0
         width: (Config.pillOnHover && !box.revealed) ? Math.ceil(panelWindow.width) : 0
         height: (Config.pillOnHover && !box.revealed) ? Math.ceil(hoverRevealAreaItem.height) : 0
-      }
-      Region {
-        intersection: Intersection.Combine
-        x: calendarLoader.item ? Math.floor(calendarLoader.x + calendarLoader.item.x) : 0
-        y: calendarLoader.item ? Math.floor(calendarLoader.y + calendarLoader.item.y) : 0
-        width: calendarLoader.item && calendarLoader.item.shown ? Math.ceil(calendarLoader.item.width) : 0
-        height: calendarLoader.item && calendarLoader.item.shown ? Math.ceil(calendarLoader.item.height) : 0
-      }
-      Region {
-          intersection: Intersection.Combine
-          x: weatherPopupLoader.item ? Math.floor(weatherPopupLoader.item.x) : 0
-          y: weatherPopupLoader.item ? Math.floor(weatherPopupLoader.item.y) : 0
-          width: weatherPopupLoader.item && weatherPopupLoader.item.shown ? Math.ceil(weatherPopupLoader.item.width) : 0
-          height: weatherPopupLoader.item && weatherPopupLoader.item.shown ? Math.ceil(weatherPopupLoader.item.height) : 0
       }
     }
 
@@ -263,7 +248,7 @@ ShellRoot {
       readonly property bool revealed: !Config.pillOnHover
         || shellRoot.pillHoverActive
         || controlCenter
-        || miniDashboard
+        || dashboard
         || cliphistOpen
         || spotlight
         || wallpaperSwitcherOpen
@@ -294,8 +279,6 @@ ShellRoot {
       property real tooltipY: 0
 
       property bool spotlight: false
-      // the calendar is only built while it is (or is fading out) visible
-      property bool calendarShown: false
       // spotlight is heavy (app cache), so it is only built the first time it is
       // opened and dropped a while after it closes again
       readonly property int spotlightUnloadDelay: 60000
@@ -315,7 +298,7 @@ ShellRoot {
         onTriggered: box.spotlightLoaded = false
       }
       property bool hovered: false
-      property bool miniDashboard: false
+      property bool dashboard: false
       property bool controlCenter: false
       property bool wifiPanelOpen: false
       // the panel is a Loader (see wifiPanelHost): built on first open, kept
@@ -447,7 +430,7 @@ ShellRoot {
                      : powerMenu ? 350
                      : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : ccBaseWidth)
                      : spotlight ? 328
-                     : miniDashboard ? 420
+                     : dashboard ? (dashboardLoader.item ? dashboardLoader.item.implicitWidth + 14 : 546)
                      : themePicker ? 310
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
@@ -467,7 +450,7 @@ ShellRoot {
                       ? Math.max((mprisModule.hasPlayer ? 240 : 118) + notifBump)
                   : (cliphistOpen && cliphistPreviewing) ? 380
                   : themePicker ? 320
-                  : miniDashboard ? 155
+                  : dashboard ? (dashboardLoader.item ? dashboardLoader.item.implicitHeight + 16 : 480)
                   : spotlight
                       ? (spotlightLoader.item ? spotlightLoader.item.height + 15 : 250)
                   : wallpaperSwitcherOpen ? 308
@@ -484,7 +467,7 @@ ShellRoot {
           ? (mprisModule.hasPlayer ? 27 : 25)
           : (mprisModule.hasPlayer ? 26 : 22))
         : spotlight ? 29
-        : miniDashboard ? 20
+        : dashboard ? 24
         : themePicker ? 26
         : wallpaperSwitcherOpen ? 30
         : activeOsd !== "" ? 20
@@ -503,15 +486,6 @@ ShellRoot {
       }
 
       color: wifiPanelOpen || bluetoothPanelOpen ? Theme.bgD : bg
-
-      onCalendarShownChanged: if (calendarLoader.item) calendarLoader.item.shown = box.calendarShown
-
-      onMiniDashboardChanged: {
-          if (!box.miniDashboard) {
-              box.calendarShown = false
-              if (weatherPopupLoader.item) weatherPopupLoader.item.shown = false
-          }
-      }
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
       NumberAnimation { id: heightAnim; target: box; property: "height"; easing.type: Easing.OutExpo }
@@ -552,10 +526,10 @@ ShellRoot {
             return
           }
 
-          // mini dashboard accept only right
-          if (box.miniDashboard) {
+          // dashboard accept only right
+          if (box.dashboard) {
             if (mouse.button === Qt.RightButton) {
-              box.miniDashboard = false
+              box.dashboard = false
             }
             return
           }
@@ -595,13 +569,13 @@ ShellRoot {
           }
 
           if (mouse.button === Qt.RightButton) {
-              console.log("Right click detected, opening mini dashboard")
+              console.log("Right click detected, opening dashboard")
               mediaAutoOpened = false
               box.spotlight = false
               box.wallpaperSwitcherOpen = false
               box.powerMenu = false
               box.powerMenuInitialAction = ""
-              box.miniDashboard = !box.miniDashboard
+              box.dashboard = !box.dashboard
           }
         }
       }
@@ -721,7 +695,7 @@ ShellRoot {
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !box.controlCenter
-                 && !box.miniDashboard
+                 && !box.dashboard
                  && !box.cliphistOpen
                  && !box.spotlight
                  && !box.powerMenu ? 1 : 0
@@ -764,7 +738,7 @@ ShellRoot {
                    && !notificationModule.active
                    && box.activeOsd === ""
                    && !box.controlCenter
-                   && !box.miniDashboard
+                   && !box.dashboard
                    && !box.cliphistOpen
                    && !box.powerMenu ? 1 : 0
           visible: opacity > 0
@@ -801,7 +775,7 @@ ShellRoot {
                    && !notificationModule.active
                    && box.activeOsd === ""
                    && !box.controlCenter
-                   && !box.miniDashboard
+                   && !box.dashboard
                    && !box.cliphistOpen
                    && !box.spotlight
                    && !box.wallpaperSwitcherOpen ? 1 : 0
@@ -851,7 +825,7 @@ ShellRoot {
                    && !notificationModule.active
                    && !box.controlCenter
                    && !box.cliphistOpen
-                   && !box.miniDashboard
+                   && !box.dashboard
                    && !box.spotlight
                    && !box.wallpaperSwitcherOpen
                    && !box.powerMenu
@@ -957,12 +931,12 @@ ShellRoot {
         }
       }
 
-      // mini dashboard opens on right click
+      // dashboard opens on right click
       Item {
         anchors.centerIn: parent
-        width: box.implicitWidth - 30
-        height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard
+        width: box.implicitWidth - 14
+        height: box.dashboard ? box.implicitHeight - 14 : 0  // don't fight the animation
+        opacity: box.dashboard
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !box.cliphistOpen
@@ -971,7 +945,7 @@ ShellRoot {
 
         Behavior on opacity {
           SequentialAnimation {
-            PauseAnimation { duration: box.miniDashboard ? 1 : 0 }
+            PauseAnimation { duration: box.dashboard ? 1 : 0 }
             NumberAnimation { duration: 300; easing.type: Easing.OutExpo }
           }
         }
@@ -981,18 +955,18 @@ ShellRoot {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: (mouse) => {
                 if (mouse.button === Qt.RightButton)
-                    box.miniDashboard = !box.miniDashboard
+                    box.dashboard = !box.dashboard
             }
         }
 
-        // only exists while the mini dashboard is open
+        // only exists while the dashboard is open
         Loader {
-          id: miniDashboardLoader
+          id: dashboardLoader
           anchors.fill: parent
-          active: box.miniDashboard
+          active: box.dashboard
           asynchronous: true
 
-          sourceComponent: MiniDashboard {}
+          sourceComponent: Dashboard {}
         }
       }
 
@@ -1031,58 +1005,6 @@ ShellRoot {
       SystemClock {
         id: clock
         precision: SystemClock.Minutes
-      }
-    }
-
-    // built on the first open, then freed once it has faded out
-    Loader {
-      id: calendarLoader
-      x: (parent.width - 225 * box.dpi) / 2      // centering lives here now
-      y: box.y + box.height * box.dpi + 5 * box.dpi  // stays live while the pill animates
-      active: box.calendarShown || (item && item.opacity > 0)
-      asynchronous: true
-
-      sourceComponent: CalendarBox {}
-      onLoaded: item.shown = box.calendarShown
-    }
-
-    Loader {
-        id: weatherPopupLoader
-        active: false
-        asynchronous: false
-
-        sourceComponent: WeatherPopup {
-            onShownChanged: if (!shown) closeTimer.start()
-        }
-
-        onLoaded: item.shown = true
-        Timer {
-            id: closeTimer
-            interval: 250
-            onTriggered: weatherPopupLoader.active = false
-        }
-    }
-
-    // open calendar when click on date in mini dashboard
-    Connections {
-      target: miniDashboardLoader.item
-      function onToggleCalendar() {
-        box.calendarShown = !box.calendarShown
-        if (box.calendarShown && calendarLoader.item) calendarLoader.item.resetView()
-        if (weatherPopupLoader.item) weatherPopupLoader.item.shown = false
-      }
-    }
-
-    // open weather when click on weather in mini dashboard
-    Connections {
-      target: miniDashboardLoader.item
-      function onToggleWeather() {
-        if (mediaPopupShown) return
-        if (!weatherPopupLoader.active)
-          weatherPopupLoader.active = true
-        else
-          weatherPopupLoader.item.shown = !weatherPopupLoader.item.shown
-        box.calendarShown = false
       }
     }
 

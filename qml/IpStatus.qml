@@ -39,7 +39,7 @@ Item {
     // refresh every minute
     Timer {
         interval: 60000
-        running: box.miniDashboard
+        running: box.dashboard
         repeat: true
         triggeredOnStart: true
         onTriggered: {
@@ -64,7 +64,7 @@ Item {
             Text {
                 text: root.ip
                 color: Theme.fg
-                font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
+                font { family: Theme.fontFamily; pixelSize: 11; weight: 600 }
             }
         }
 
@@ -72,7 +72,7 @@ Item {
             text: root.iface + (root.vpn ? "  VPN" : "")
             color: Theme.fg
             opacity: 0.5
-            font { family: Theme.fontFamily; pixelSize: 8 }
+            font { family: Theme.fontFamily; pixelSize: 11 }
         }
     }
 }

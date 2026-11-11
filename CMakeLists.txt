@@ -16,6 +16,8 @@ qt_add_qml_module(PillBackend
         backend/WifiController.cpp
         backend/WifiNetworkModel.h
         backend/WifiNetworkModel.cpp
+        backend/BandwidthMonitor.h
+        backend/BandwidthMonitor.cpp
         backend/BluetoothPairingAgent.h
         backend/BluetoothPairingAgent.cpp
         backend/BluetoothController.h

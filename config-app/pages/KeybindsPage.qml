@@ -52,7 +52,7 @@ Page {
     readonly property var defaultBinds: [
         { state: "controlCenter",     expr: "mainMod .. \" + CTRL + C\"" },
         { state: "cliphist",          expr: "mainMod .. \" + CTRL + V\"" },
-        { state: "miniDashboard",     expr: "mainMod .. \" + CTRL + B\"" },
+        { state: "dashboard",         expr: "mainMod .. \" + CTRL + B\"" },
         { state: "spotlight",         expr: "mainMod .. \" + D\"" },
         { state: "wallpaperSwitcher", expr: "mainMod .. \" + W\"" },
         { state: "powerMenu",         expr: "mainMod .. \" + Escape\"" },
@@ -94,7 +94,7 @@ Page {
     function parseCheck(t) {
         try {
             var rep = JSON.parse(t)
-            var order = ["controlCenter", "cliphist", "miniDashboard", "spotlight", "wallpaperSwitcher", "powerMenu", "wifiState", "bluetoothState", "theme"]
+            var order = ["controlCenter", "cliphist", "dashboard", "spotlight", "wallpaperSwitcher", "powerMenu", "wifiState", "bluetoothState", "theme"]
             var arr = []
             for (var i = 0; i < order.length; i++) {
                 var s = order[i]

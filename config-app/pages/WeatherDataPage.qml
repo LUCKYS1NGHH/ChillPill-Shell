@@ -14,5 +14,5 @@ Page {
     TextRow { label: "Categories"; hint: "Comma separated, e.g. public,optional. Ignored when All categories is on"; fieldWidth: 160; value: ConfigStore.get("holidaysCategories", "public"); onEdited: (v) => ConfigStore.set("holidaysCategories", v) }
     TextRow { label: "Subdivision"; hint: "State/province code, e.g. MH. Empty means nationwide"; fieldWidth: 80; value: ConfigStore.get("holidaysSubdiv", ""); onEdited: (v) => ConfigStore.set("holidaysSubdiv", v.toUpperCase()) }
     Heading { text: "NETWORK USAGE" }
-    NumRow { label: "Data usage refresh"; hint: "Only refreshes while the Mini Dashboard is open"; from: 60000; to: 86400000; step: 60000; divisor: 60000; suffix: "min"; value: ConfigStore.get("dataUsageRefreshInterval", 300000); onEdited: (v) => ConfigStore.set("dataUsageRefreshInterval", v) }
+    NumRow { label: "Data usage refresh"; hint: "Only refreshes while the Dashboard is open"; from: 60000; to: 86400000; step: 60000; divisor: 60000; suffix: "min"; value: ConfigStore.get("dataUsageRefreshInterval", 300000); onEdited: (v) => ConfigStore.set("dataUsageRefreshInterval", v) }
 }

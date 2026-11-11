@@ -47,6 +47,7 @@ Singleton {
       property bool showAudioVisuals: true
       property bool showSensitiveInfo: true
       property bool showShadows: true
+      property bool internetSpeedTestInDashboard: false
       property var pillModules: ["battery", "volume", "workspaces", "network", "clock"]
       property string customWallpaperScript: ""
       property bool pillOnHover: false
@@ -111,6 +112,7 @@ Singleton {
   readonly property alias showAudioVisuals: adapter.showAudioVisuals
   readonly property alias showSensitiveInfo: adapter.showSensitiveInfo
   readonly property alias showShadows: adapter.showShadows
+  readonly property alias internetSpeedTestInDashboard: adapter.internetSpeedTestInDashboard
   readonly property alias pillModules: adapter.pillModules
   readonly property alias customWallpaperScript: adapter.customWallpaperScript
   readonly property alias pillOnHover: adapter.pillOnHover

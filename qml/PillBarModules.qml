@@ -9,7 +9,7 @@ Row {
            && !notificationModule.active
            && !mediaAutoOpened
            && !box.controlCenter
-           && !box.miniDashboard
+           && !box.dashboard
            && !box.powerMenu
            && box.activeOsd === ""
            && !box.wallpaperSwitcherOpen
