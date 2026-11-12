@@ -20,6 +20,7 @@ Item {
     property int previewSlideDir: 1  // 1 = down/next, -1 = up/prev
     property string previewText: ""  // full decoded content for text preview
     property string previewTargetId: ""  // entry id the in-flight decode is for
+    property bool pendingG: false
     property bool previewReady: false  // true when previewText matches previewTargetId
     // only the head of a long entry is matched: rows elide it anyway and a big
     // history has to stay fast on every keystroke
@@ -284,6 +285,32 @@ Item {
         return -1
     }
 
+    // gg / G: jump to the first / last entry, staying on the preview's type
+    function findEdgeTypeIndex(last, wantImage) {
+        if (listModel.count === 0) return -1
+        let idx = last ? listModel.count - 1 : 0
+        let step = last ? -1 : 1
+        for (let i = 0; i < listModel.count; i++, idx += step) {
+            let e = listModel.get(idx)
+            if (wantImage ? !!e.imagePath : !e.imagePath) return idx
+        }
+        return -1
+    }
+
+    function jumpTo(dir) {
+        if (listModel.count === 0) return
+        if (root.fullPreview && Config.separatePreviewTabTypes) {
+            let target = root.findEdgeTypeIndex(dir === 1, root.currentIsImage())
+            if (target === -1) return
+            root.previewSlideDir = dir
+            root.selectedIndex = target
+        } else {
+            root.previewSlideDir = dir
+            root.selectedIndex = dir === 1 ? listModel.count - 1 : 0
+        }
+        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+    }
+
     function moveSelection(dir) {
         if (root.fullPreview) {
             if (Config.separatePreviewTabTypes) {
@@ -326,6 +353,11 @@ Item {
     // Shared keyboard shortcuts so they keep working whether the search box
     // or the (focused) preview text holds the active focus.
     function onShortcutPressed(event) {
+        // pending gg expires if another key comes first (vim-style)
+        if (root.pendingG && event.key !== Qt.Key_G) {
+            root.pendingG = false
+            gSeqTimer.stop()
+        }
         if (event.key === Qt.Key_Down) {
             if (event.modifiers & Qt.ShiftModifier) {
                 if (root.fullPreview) root.scrollPreview(1)
@@ -357,7 +389,28 @@ Item {
             console.log("Tab key clicked for clipboard full preview")
             root.fullPreviewSelected()
             event.accepted = true
+        } else if (event.key === Qt.Key_G && root.searchQuery.length === 0) {
+            // gg jumps to top, G to bottom; with search text, g/G just types
+            if (event.modifiers & Qt.ShiftModifier) {
+                root.jumpTo(1)
+                root.pendingG = false
+                gSeqTimer.stop()
+            } else if (root.pendingG) {
+                root.jumpTo(-1)
+                root.pendingG = false
+                gSeqTimer.stop()
+            } else {
+                root.pendingG = true
+                gSeqTimer.restart()
+            }
+            event.accepted = true
         }
+    }
+
+    Timer {
+        id: gSeqTimer
+        interval: 600
+        onTriggered: root.pendingG = false
     }
 
     Timer {

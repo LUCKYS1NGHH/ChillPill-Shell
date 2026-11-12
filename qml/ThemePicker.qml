@@ -112,18 +112,29 @@ Item {
 
   focus: true
   Keys.enabled: true
+  property bool pendingG: false
   Keys.onPressed: (e) => {
     const k = e.key
     e.accepted = true
+    if (k !== Qt.Key_G && pendingG) { pendingG = false; gSeqTimer.stop() }
     if (k === Qt.Key_Escape) closeRequested()
     else if (k === Qt.Key_Up   || k === Qt.Key_K) step(-1)
     else if (k === Qt.Key_Down || k === Qt.Key_J) step(1)
     else if (k === Qt.Key_Home) jumpTo(0)
     else if (k === Qt.Key_End) jumpTo(count - 1)
+    else if (k === Qt.Key_G && (e.modifiers & Qt.ShiftModifier)) jumpTo(count - 1)
+    else if (k === Qt.Key_G && pendingG) { jumpTo(0); pendingG = false; gSeqTimer.stop() }
+    else if (k === Qt.Key_G) { pendingG = true; gSeqTimer.restart() }
     else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) applyAt(current)
     else if (k === Qt.Key_R) resetTheme()
     else if (k >= Qt.Key_1 && k <= Qt.Key_9) applyAt(k - Qt.Key_1)
     else e.accepted = false
+  }
+
+  Timer {
+    id: gSeqTimer
+    interval: 600
+    onTriggered: root.pendingG = false
   }
 
   // header button: flat until hovered

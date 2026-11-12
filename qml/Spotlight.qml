@@ -14,6 +14,7 @@ Item {
     property bool descShown: false
     property int selectedIndex: 0
     property string searchQuery: ""
+    property bool pendingG: false
     property var appsCache: []
 
     // launch counts, persisted to ~/.cache so the most used apps sit on top
@@ -23,6 +24,12 @@ Item {
     function usageCount(id) {
         const n = root.usage[id]
         return n ? n : 0
+    }
+
+    Timer {
+        id: gSeqTimer
+        interval: 600
+        onTriggered: root.pendingG = false
     }
 
     function recordUsage(id) {
@@ -403,6 +410,10 @@ Item {
                 }
 
                 Keys.onPressed: (event) => {
+                    if (root.pendingG && event.key !== Qt.Key_G) {
+                        root.pendingG = false
+                        gSeqTimer.stop()
+                    }
                     if (event.key === Qt.Key_Down) {
                         root.keyboardNav = true
                         if (root.results.length > 0)
@@ -426,6 +437,22 @@ Item {
                         // first Esc drops back from finished output to the command
                         if (root.shellShown && !root.shellBusy) root.shellCmd = ""
                         else root.closeRequested()
+                        event.accepted = true
+                    } else if (event.key === Qt.Key_G && root.searchQuery.length === 0) {
+                        // gg to top, G to bottom; with search text g/G just types
+                        root.keyboardNav = true
+                        if (event.modifiers & Qt.ShiftModifier) {
+                            if (root.results.length > 0) root.selectedIndex = root.results.length - 1
+                            root.pendingG = false
+                            gSeqTimer.stop()
+                        } else if (root.pendingG) {
+                            root.selectedIndex = 0
+                            root.pendingG = false
+                            gSeqTimer.stop()
+                        } else {
+                            root.pendingG = true
+                            gSeqTimer.restart()
+                        }
                         event.accepted = true
                     }
                 }
