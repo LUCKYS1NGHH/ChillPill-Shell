@@ -128,8 +128,31 @@ Item {
     viewMonth = new Date().getMonth()
   }
 
-  // footer: clicked day shows its event name alone; otherwise the date
+  // next upcoming holiday in the viewed year, for the countdown footer
+  readonly property var nextHoliday: {
+    if (!holidaysEnabled || fetchFailed) return null
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    let best = null
+    for (const key in holidays) {
+      const parts = key.split("-")
+      const d = new Date(+parts[0], parts[1] - 1, +parts[2])
+      if (d < today) continue
+      if (!best || d < best.date) best = { name: holidays[key], date: d }
+    }
+    if (!best) return null
+    best.days = Math.round((best.date - today) / 86400000)
+    return best
+  }
+
+  // footer: clicked day shows its event name alone; otherwise the next
+  // holiday countdown, or today's date as fallback
   readonly property string footerText: {
+    if (selectedDay === -1 && nextHoliday) {
+      const h = nextHoliday
+      if (h.days === 0) return h.name + " · today"
+      return h.name + " in " + h.days + " day" + (h.days === 1 ? "" : "s")
+    }
     const d = selectedDay !== -1 ? new Date(viewYear, viewMonth, selectedDay) : new Date()
     const name = holidayFor(d)
     if (selectedDay !== -1 && name !== "") return name
@@ -656,20 +679,20 @@ Item {
             }
           }
 
-          // inset footer: selected day, or today, plus holiday name
+          // inset footer: selected day, or next-holiday countdown, marquee on overflow
           Rectangle {
             Layout.fillWidth: true
             Layout.rightMargin: 3
             implicitHeight: 22
             radius: 6
             color: Theme.bg
-            Text {
+            MarqueeText {
               anchors.verticalCenter: parent.verticalCenter
               anchors.left: parent.left
               anchors.right: parent.right
               anchors.leftMargin: 8
               anchors.rightMargin: 8
-              elide: Text.ElideRight
+              maxWidth: width
               text: root.footerText
               color: Theme.fg4
               font { family: Theme.fontFamily; pixelSize: 10; weight: 500 }
