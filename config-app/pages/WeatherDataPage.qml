@@ -5,7 +5,10 @@ import ".."
 Page {
     Heading { text: "WEATHER" }
     TextRow { label: "Location"; hint: "City name for weather"; fieldWidth: 200; value: ConfigStore.get("weatherLocation", ""); onEdited: (v) => ConfigStore.set("weatherLocation", v) }
-    ChoiceRow { label: "Units"; options: ["metric", "imperial"]; value: ConfigStore.get("weatherUnits", "metric"); onEdited: (v) => ConfigStore.set("weatherUnits", v) }
+    ScopeRow {
+      label: "Units"; optionKey: "weatherUnits"; fallback: "metric";
+      choices: ["Metric", "Imperial"]; scopeValues: ["metric", "imperial"]
+    }
     NumRow { label: "Refresh interval"; from: 60000; to: 86400000; step: 60000; divisor: 60000; suffix: "min"; value: ConfigStore.get("weatherRefreshInterval", 3600000); onEdited: (v) => ConfigStore.set("weatherRefreshInterval", v) }
     Heading { text: "CALENDAR" }
     TextRow { label: "Country"; hint: "ISO 3166-1 alpha-2 (IN) or Country Name (India), blank disables holidays"; fieldWidth: 80; value: ConfigStore.get("country", ""); onEdited: (v) => ConfigStore.set("country", v.toUpperCase()) }
@@ -15,4 +18,9 @@ Page {
     TextRow { label: "Subdivision"; hint: "State/province code, e.g. MH. Empty means nationwide"; fieldWidth: 80; value: ConfigStore.get("holidaysSubdiv", ""); onEdited: (v) => ConfigStore.set("holidaysSubdiv", v.toUpperCase()) }
     Heading { text: "NETWORK USAGE" }
     NumRow { label: "Data usage refresh"; hint: "Only refreshes while the Dashboard is open"; from: 60000; to: 86400000; step: 60000; divisor: 60000; suffix: "min"; value: ConfigStore.get("dataUsageRefreshInterval", 300000); onEdited: (v) => ConfigStore.set("dataUsageRefreshInterval", v) }
+    ScopeRow {
+      label: "Data Usage Default Range"; hint: "Which time range the data usage graph shows in the Dashboard"
+      optionKey: "dataUsageDefaultRange"; fallback: "thisweek";
+      choices: ["Today", "Thisweek", "Year"]; scopeValues: ["today", "thisweek", "year"]
+    }
 }

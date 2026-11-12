@@ -14,6 +14,7 @@
   "notificationDisplayTime": 3000,
   "maxNotificationsInStack": 20,
   "dataUsageRefreshInterval": 300000,
+  "dataUsageDefaultRange": "thisweek",
   "screenLockAppCommand": "chillpill-lock",
   "osdDuration": 800,
   "weatherLocation": "Delhi",

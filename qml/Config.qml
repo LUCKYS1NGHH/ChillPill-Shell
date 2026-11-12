@@ -26,6 +26,7 @@ Singleton {
       property int notificationDisplayTime: 3000
       property int maxNotificationsInStack: 20
       property int dataUsageRefreshInterval: 300000
+      property string dataUsageDefaultRange: "thisweek"
       property string screenLockAppCommand: "hyprlock"
       property int osdDuration: 800
       property string weatherUnits: "metric"
@@ -91,6 +92,7 @@ Singleton {
   readonly property alias notificationDisplayTime: adapter.notificationDisplayTime
   readonly property alias maxNotificationsInStack: adapter.maxNotificationsInStack
   readonly property alias dataUsageRefreshInterval: adapter.dataUsageRefreshInterval
+  readonly property alias dataUsageDefaultRange: adapter.dataUsageDefaultRange
   readonly property alias screenLockAppCommand: adapter.screenLockAppCommand
   readonly property alias osdDuration: adapter.osdDuration
   readonly property alias weatherUnits: adapter.weatherUnits

@@ -1049,14 +1049,14 @@ Item {
             Layout.bottomMargin: 3
             spacing: 3
             Repeater {
-              model: 7
+              model: usageWeek.bars.length > 0 ? usageWeek.bars.length : 7
               delegate: Item {
                 id: dayBar
-                readonly property real val: usageWeek.week.length > index ? usageWeek.week[index] : 0
-                readonly property var detail: usageWeek.weekDetails.length > index ? usageWeek.weekDetails[index] : null
-                readonly property bool isToday: index === (new Date().getDay() + 6) % 7
+                readonly property real val: usageWeek.bars.length > index ? usageWeek.bars[index] : 0
+                readonly property var detail: usageWeek.barDetails.length > index ? usageWeek.barDetails[index] : null
+                readonly property bool isToday: index === usageWeek.barMark
                 readonly property var dayDate: new Date(Date.now() - ((new Date().getDay() + 6) % 7) * 86400000 + index * 86400000)
-                readonly property string dayName: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][index]
+                readonly property string dayName: usageWeek.barLabels.length > index ? usageWeek.barLabels[index] : ""
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignBottom
                 Layout.preferredHeight: 24
@@ -1065,7 +1065,7 @@ Item {
                   width: parent.width
                   anchors.bottom: parent.bottom
                   height: parent.val > 0
-                    ? Math.max(3, Math.min(1, parent.val / Math.max(0.001, usageWeek.weekMax)) * 24)
+                    ? Math.max(3, Math.min(1, parent.val / Math.max(0.001, usageWeek.barMax)) * 24)
                     : 2
                   radius: 3
                   color: dayArea.containsMouse ? Theme.fg
@@ -1106,7 +1106,8 @@ Item {
                     spacing: 1
 
                     Text {
-                      text: dayBar.dayName + "  " + dayBar.dayDate.getDate() + "/" + (dayBar.dayDate.getMonth() + 1)
+                      text: usageWeek.range !== "thisweek" ? dayBar.dayName
+                          : dayBar.dayName + "  " + dayBar.dayDate.getDate() + "/" + (dayBar.dayDate.getMonth() + 1)
                       color: Theme.fg5
                       font { family: Theme.fontFamily; pixelSize: 8; weight: 600; letterSpacing: 1 }
                     }
@@ -1138,14 +1139,41 @@ Item {
             Layout.rightMargin: 6
             Layout.bottomMargin: 5
             spacing: 6
-            Text {
-              text: "THIS WEEK"
-              color: Theme.fg5
-              font { family: Theme.fontFamily; pixelSize: 8; weight: 600; letterSpacing: 1 }
+            Row {
+              spacing: 2
+              Repeater {
+                model: [
+                  { key: "thisweek", label: "WEEK" },
+                  { key: "today", label: "TODAY" },
+                  { key: "year", label: "YEAR" }
+                ]
+                delegate: Rectangle {
+                  readonly property bool active: usageWeek.range === modelData.key
+                  width: chipText.implicitWidth + 10
+                  height: 15
+                  radius: 6
+                  color: active ? Theme.bg : (chipArea.containsMouse ? Theme.bg5 : Theme.transparent)
+                  Behavior on color { ColorAnimation { duration: 120 } }
+                  Text {
+                    id: chipText
+                    anchors.centerIn: parent
+                    text: modelData.label
+                    color: parent.active ? Theme.fg : Theme.fg5
+                    font { family: Theme.fontFamily; pixelSize: 8; weight: 600; letterSpacing: 1 }
+                  }
+                  MouseArea {
+                    id: chipArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: usageWeek.range = modelData.key
+                  }
+                }
+              }
             }
             Item { Layout.fillWidth: true }
             Text {
-              text: usageWeek.weekLabel
+              text: usageWeek.summaryText
               color: Theme.fg4
               font { family: Theme.fontFamily; pixelSize: 10; weight: 600 }
             }

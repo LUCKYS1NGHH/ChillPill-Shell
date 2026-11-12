@@ -7,7 +7,7 @@ Page {
     TextRow { label: "Default terminal"; hint: "To open Console-Only apps in the Terminal"; fieldWidth: 200; value: ConfigStore.get("defaultTerminal", ""); onEdited: (v) => ConfigStore.set("defaultTerminal", v) }
     TextRow { label: "Screen lock app command"; placeholder: "chillpill-lock"; fieldWidth: 200; value: ConfigStore.get("screenLockAppCommand", ""); onEdited: (v) => ConfigStore.set("screenLockAppCommand", v) }
     Heading { text: "DASHBOARD" }
-    ToggleRow { label: "Live network speed"; hint: "Show download / upload bandwidth in the Network tile header (per second)"; value: ConfigStore.get("internetSpeedTestInDashboard", false); onEdited: (v) => ConfigStore.set("internetSpeedTestInDashboard", v) }
+    ToggleRow { label: "Live network speed"; hint: "Show download / upload bandwidth in the Network tile header (per second)"; value: ConfigStore.get("internetSpeedTestInDashboard", false); onEdited: (v) => ConfigStore.set("internetSpeedTestInDashboard", v) } 
     Heading { text: "LOCKSCREEN (ChillPill)"}
     ToggleRow { label: "Lockscreen power buttons"; hint: "Show suspend / restart / shutdown on the lockscreen surface (hide them on shared machines)"; value: ConfigStore.get("lockscreenPowerActions", true); onEdited: (v) => ConfigStore.set("lockscreenPowerActions", v) }
     ToggleRow { label: "Lockscreen media player"; hint: "Show the media card on the lockscreen card (only when something plays)"; value: ConfigStore.get("lockscreenMedia", true); onEdited: (v) => ConfigStore.set("lockscreenMedia", v) }
