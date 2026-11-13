@@ -147,6 +147,9 @@ into your session at all times. It's not bound to any dotfiles.
   you want this image cache to auto delete when you delete the cliphist (clipboard manager) image item, there's the `deleteCliphistImgCache` config
   option (enabled by default).
 
+- Cliphist image full preview tab supports image drag and drop, drop the image anywhere you want, or just drop it on your desktop screen to
+  apply the image as wallpaper.
+
 - In Cliphist full preview tab (which opens through <kbd>Tab</kbd> key), you can switch to other item by <kbd>Up</kbd>/<kbd>Down</kbd> keys,
   and can also delete the item from there. Full preview tab also shows previous/next item type (Image / Text) badges in bottom area,
   only if you toggle off the `separatePreviewTabTypes` (enabled by default).

@@ -34,23 +34,11 @@ Rectangle {
 
   function applyWallpaper(path) {
     wallpaperPopup.selectedWallpaper = "file://" + path
-    saveCurrentWallpaper(path)
-    if (Config.customWallpaperScript.trim() === "") {
-      Quickshell.execDetached(["awww", "img", "--transition-type", "random", path])
-    }
-    else {
-      let script = Config.customWallpaperScript
-      let cmd = script.includes("{path}")
-          ? script.replace(/["']?\{path\}["']?/g, "\"$1\"")
-          : script + " \"$1\"" // fallback for old-style configs without the placeholder
-      Quickshell.execDetached(["sh", "-c", cmd, "_", path])
-    }
+    shellRoot.applyWallpaper(path)
   }
 
   function saveCurrentWallpaper(path) {
-    // execDetached, not a Process child: closeRequested() unloads this item right
-    // after applyWallpaper(), which kills a child Process before it ever runs
-    Quickshell.execDetached(["sh", "-c", 'mkdir -p "$1" && printf %s "$2" > "$1/last_wallpaper"', "_", cacheDir, path])
+    shellRoot.saveCurrentWallpaper(path)
   }
 
   function activateCurrent() {

@@ -28,6 +28,7 @@ Item {
 
     signal closeRequested()
     signal previewToggled(bool active)
+    signal imageDroppedAsWallpaper(string path)
 
     visible: shown
     opacity: shown ? 1 : 0
@@ -1008,8 +1009,9 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 horizontalAlignment: Text.AlignHCenter
                                 text: (root.selectedIndex + 1) + " / " + listModel.count
+                                      + (currentIsImage ? " • drag to drop" : "")
                                 color: Theme.fg3
-                                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+                                font { family: Theme.fontFamily; pixelSize: 10; weight: 300 }
                             }
                         }
 
@@ -1136,6 +1138,58 @@ Item {
                                     }
                                 }
                             }
+                        }
+
+                        // image drag, following the manual MouseArea drag pattern:
+                        // press lifts the image once it moves, a ghost follows the cursor
+                        // (rendered by the shell above the pill), release outside the pill
+                        // drops it as wallpaper, inside cancels back to the preview
+                        property point dragPressPos: Qt.point(0, 0)
+                        property bool imageDragging: false
+
+                        function finishImageDrag(releaseGlobal) {
+                            if (!imageDragging) return
+                            imageDragging = false
+                            shellRoot.clipDragLive = false
+                            let outside = false
+                            if (releaseGlobal) {
+                                let p = root.mapFromItem(null, releaseGlobal.x, releaseGlobal.y)
+                                outside = p.x < 0 || p.y < 0 || p.x > root.width || p.y > root.height
+                            }
+                            if (shellRoot.clipDragNative) return
+                            shellRoot.clipDragImage = null
+                            if (outside && entry) root.imageDroppedAsWallpaper(entry.imagePath)
+                        }
+
+                        MouseArea {
+                            id: imageDragArea
+                            anchors.fill: parent
+                            enabled: currentIsImage && entry
+                            acceptedButtons: Qt.LeftButton
+                            cursorShape: currentIsImage ? (pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.IBeamCursor
+                            onPressed: (mouse) => {
+                                previewRoot.dragPressPos = Qt.point(mouse.x, mouse.y)
+                                previewRoot.imageDragging = false
+                            }
+                            onPositionChanged: (mouse) => {
+                                let dx = mouse.x - previewRoot.dragPressPos.x
+                                let dy = mouse.y - previewRoot.dragPressPos.y
+                                if (!previewRoot.imageDragging && dx * dx + dy * dy > 64)
+                                    previewRoot.imageDragging = true
+                                if (previewRoot.imageDragging) {
+                                    shellRoot.clipDragLive = true
+                                    let g = imageDragArea.mapToItem(null, mouse.x, mouse.y)
+                                    shellRoot.clipDragImage = { path: entry.imagePath, x: g.x, y: g.y }
+                                    // leaving the pill hands the drag to the system, so it
+                                    // can be dropped into browsers / file managers
+                                    let p = root.mapFromItem(null, g.x, g.y)
+                                    if (p.x < -16 || p.y < -16 || p.x > root.width + 16 || p.y > root.height + 16)
+                                        shellRoot.beginNativeImageDrag()
+                                }
+                            }
+                            onReleased: (mouse) => previewRoot.finishImageDrag(
+                                previewRoot.imageDragging ? imageDragArea.mapToItem(null, mouse.x, mouse.y) : null)
+                            onCanceled: previewRoot.finishImageDrag(null)
                         }
 
                         onCurrentEntryIdChanged: {

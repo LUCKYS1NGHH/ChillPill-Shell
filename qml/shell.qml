@@ -91,6 +91,106 @@ ShellRoot {
 
   property bool pillHoverActive: false
 
+  // clipboard image being dragged out of the full preview (null when idle);
+  // x/y are window coords reported by the drag area via mapToItem(null)
+  property var clipDragImage: null
+  // drag is live (pointer still tracked by the panel) — guards the async
+  // handoff so a drag that ends before the native start can't resurrect
+  property bool clipDragLive: false
+  // true once the drag crosses the pill edge and the native (browser/file
+  // manager) drag takes over from the manual ghost
+  property bool clipDragNative: false
+  // drop action reported by Drag.dragFinished, Qt.IgnoreAction by default
+  property int clipDragResult: Qt.IgnoreAction
+  property url clipDragIcon: ""
+  readonly property url clipDragUrl: clipDragImage ? "file://" + clipDragImage.path : ""
+  // the ghost item, so panels can grab its thumbnail for the drag icon
+  property Item dragGhost: null
+
+  function beginNativeImageDrag() {
+    if (clipDragNative || !clipDragLive || !clipDragImage) return
+    dragGhost.grabToImage(function (result) {
+      // the drag may have ended while the grab was in flight
+      if (!clipDragLive || !clipDragImage) return
+      clipDragIcon = result.url
+      clipDragNative = true
+    }, Qt.size(180, 130))
+  }
+
+  // a catcher (browser, file manager...) accepting the drop yields a real
+  // drop action and nothing else happens; an ignored drop applies the
+  // wallpaper unless the cursor came back over the pill (cancel)
+  function finishClipDrag(dropAction) {
+    let img = clipDragImage
+    clipDragNative = false
+    clipDragLive = false
+    clipDragImage = null
+    clipDragIcon = ""
+    if (!img) return
+    if (dropAction !== Qt.IgnoreAction) return
+    dropTargetProbe.img = img
+    dropTargetProbe.running = false
+    dropTargetProbe.running = true
+  }
+
+  // cursor position at the moment of the drop, for the pill/cancel check
+  Process {
+    id: dropTargetProbe
+    property var img: null
+    command: ["sh", "-c", 'hyprctl cursorpos | tr -d " "']
+    stdout: StdioCollector {
+      onStreamFinished: {
+        let img = dropTargetProbe.img
+        dropTargetProbe.img = null
+        if (!img) return
+        let m = /^(\d+),(\d+)$/.exec(this.text.trim())
+        if (!m) return
+        let p = box.mapFromItem(null, Number(m[1]), Number(m[2]) - panelWindow.margins.top)
+        if (p.x >= 0 && p.y >= 0 && p.x <= box.width && p.y <= box.height) return
+        shellRoot.saveCurrentWallpaper(img.path)
+        shellRoot.applyWallpaper(img.path)
+        box.cliphistOpen = false
+      }
+    }
+  }
+
+  // true while the native drag is running (mirrors the ghost's Drag.active)
+  readonly property bool clipDragActive: dragGhost ? dragGhost.Drag.active : false
+  // if the drag ended but Drag.dragFinished never fired, finalize shortly after
+  onClipDragActiveChanged: {
+    if (clipDragActive || !clipDragNative || !clipDragImage) clipDragWatchdog.stop()
+    else clipDragWatchdog.restart()
+  }
+
+  // Drag.dragFinished is the primary end signal; this catches platforms
+  // where it doesn't fire so the state can't get stuck
+  Timer {
+    id: clipDragWatchdog
+    interval: 250
+    onTriggered: if (shellRoot.clipDragNative) shellRoot.finishClipDrag(shellRoot.clipDragResult)
+  }
+
+  // shared by the wallpaper switcher and the clipboard image drop target
+  function applyWallpaper(path) {
+    if (Config.customWallpaperScript.trim() === "") {
+      Quickshell.execDetached(["awww", "img", "--transition-type", "random", path])
+    }
+    else {
+      let script = Config.customWallpaperScript
+      let cmd = script.includes("{path}")
+          ? script.replace(/["']?\{path\}["']?/g, "\"$1\"")
+          : script + " \"$1\"" // fallback for old-style configs without the placeholder
+      Quickshell.execDetached(["sh", "-c", cmd, "_", path])
+    }
+  }
+
+  function saveCurrentWallpaper(path) {
+    // execDetached, not a Process child: callers may close panels right after,
+    // which would kill a child Process before it ever runs
+    Quickshell.execDetached(["sh", "-c", 'mkdir -p "$1" && printf %s "$2" > "$1/last_wallpaper"',
+      "_", Quickshell.env("HOME") + "/.cache/chillpill-shell", path])
+  }
+
   property string bg: Theme.bg
   property string fg: Theme.fg
   property string fontFamily: Theme.fontFamily
@@ -200,6 +300,43 @@ ShellRoot {
       id: hidePillTimer
       interval: 250
       onTriggered: shellRoot.pillHoverActive = false
+    }
+
+    // ghost image following the cursor while a clipboard image is dragged
+    // out of the full preview; kept unclipped at window level so it can
+    // travel past the pill while dragging. Once the cursor leaves the pill
+    // the same item becomes the source of a native drag (uri payload), so
+    // the image can be dropped into browsers, file managers, etc.
+    Image {
+      id: clipDragGhost
+      visible: shellRoot.clipDragImage !== null && !shellRoot.clipDragNative
+      x: visible ? shellRoot.clipDragImage.x - width / 2 : 0
+      y: visible ? shellRoot.clipDragImage.y - height / 2 : 0
+      width: 220
+      height: 150
+      fillMode: Image.PreserveAspectFit
+      cache: false
+      source: shellRoot.clipDragImage !== null ? "file://" + shellRoot.clipDragImage.path : ""
+      opacity: visible ? 1 : 0
+      Behavior on opacity { NumberAnimation { duration: 120 } }
+
+      Drag.dragType: Drag.Automatic
+      Drag.active: shellRoot.clipDragNative
+      Drag.supportedActions: Qt.CopyAction
+      Drag.proposedAction: Qt.CopyAction
+      // center the drag icon on the cursor instead of its top-left corner
+      Drag.hotSpot: Qt.point(90, 65)
+      Drag.imageSource: shellRoot.clipDragIcon
+      Drag.mimeData: {
+        "text/uri-list": shellRoot.clipDragUrl
+      }
+      Drag.onDragFinished: (dropAction) => {
+        shellRoot.clipDragResult = dropAction
+        shellRoot.finishClipDrag(dropAction)
+      }
+
+      Component.onCompleted: shellRoot.dragGhost = clipDragGhost
+      Component.onDestruction: if (shellRoot.dragGhost === clipDragGhost) shellRoot.dragGhost = null
     }
 
     // shadow under the pill, drawn as its own item so the pill itself stays
@@ -682,6 +819,11 @@ ShellRoot {
             shown: box.cliphistOpen
             onCloseRequested: box.cliphistOpen = false
             onPreviewToggled: (active) => box.cliphistPreviewing = active
+            onImageDroppedAsWallpaper: (path) => {
+              shellRoot.saveCurrentWallpaper(path)
+              shellRoot.applyWallpaper(path)
+              box.cliphistOpen = false
+            }
           }
         }
       }
