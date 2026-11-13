@@ -731,7 +731,7 @@ Item {
               }
 
               Behavior on implicitWidth {
-                NumberAnimation { duration: 250; easing.type: Easing.cubic }
+                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
               }
             }
           }
