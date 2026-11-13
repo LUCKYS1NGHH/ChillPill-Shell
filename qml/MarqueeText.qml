@@ -24,13 +24,13 @@ RowLayout {
 
     Item {
         id: textBox
-        property bool overflowing: label.width > root.maxWidth
+        property bool overflowing: label.width > root.maxWidth && label.width > 0
 
         Layout.maximumWidth: root.maxWidth
         Layout.preferredWidth: implicitWidth
         implicitWidth: Math.min(label.width, root.maxWidth)
         implicitHeight: label.contentHeight
-        clip: overflowing
+        clip: true
 
         Text {
             id: label
@@ -42,15 +42,16 @@ RowLayout {
                 property: "x"
                 value: (textBox.width - label.width) / 2
                 when: !textBox.overflowing
+                restoreMode: Binding.RestoreBindingOrValue
             }
 
             SequentialAnimation on x {
                 running: textBox.overflowing
                 loops: Animation.Infinite
                 PauseAnimation { duration: root.pauseDuration }
-                NumberAnimation { to: -(label.width - root.maxWidth + 4); duration: Math.max(1500, label.width * 30); easing.type: Easing.InOutQuad }
+                NumberAnimation { from: 0; to: -(label.width - root.maxWidth + 4); duration: Math.max(1500, label.width * 30); easing.type: Easing.InOutQuad }
                 PauseAnimation { duration: root.pauseDuration }
-                NumberAnimation { to: 0; duration: Math.max(1500, label.width * 30); easing.type: Easing.InOutQuad }
+                NumberAnimation { from: -(label.width - root.maxWidth + 4); to: 0; duration: Math.max(1500, label.width * 30); easing.type: Easing.InOutQuad }
             }
         }
     }
