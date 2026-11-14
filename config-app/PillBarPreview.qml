@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Services.SystemTray
 import "components"
 import "."
 
@@ -87,10 +88,25 @@ Item {
     }
 
     function thumbProps(entry) {
+        if (typeof entry === "object" && entry !== null && entry.tray !== undefined) {
+            var t = bar.findTray(String(entry.tray))
+            return {
+                icon: "",
+                imageIcon: t !== null ? t.icon : "",
+                color: Theme.fg,
+                text: t !== null && t.title !== "" ? t.title : String(entry.tray),
+                segments: false, segN: 0, activeSeg: -1,
+                spectrum: false,
+                flag: t === null, flagColor: Theme.warning,
+                editable: false,
+                iconSize: 13
+            }
+        }
         if (typeof entry === "object" && entry !== null) {
             var base = entry.run ? String(entry.run).split("/").pop() : "custom"
             return {
                 icon: entry.icon || "",
+                imageIcon: "",
                 color: Theme.fg,
                 text: base,
                 segments: false, segN: 0, activeSeg: -1,
@@ -103,13 +119,20 @@ Item {
         var s = bar.sample(String(entry))
         var unk = bar.known.indexOf(String(entry)) < 0
         return {
-            icon: s.icon, color: s.color, text: s.text,
+            icon: s.icon, imageIcon: "", color: s.color, text: s.text,
             segments: s.segments === true, segN: s.n || 0, activeSeg: 0,
             spectrum: s.spectrum === true,
             flag: unk, flagColor: Theme.warning,
             editable: false,
             iconSize: s.iconSize || 10
         }
+    }
+
+    function findTray(id) {
+        var list = SystemTray.items.values
+        for (var i = 0; i < list.length; i++)
+            if (String(list[i].id) === id) return list[i]
+        return null
     }
 
     Rectangle {
@@ -154,6 +177,7 @@ Item {
                     scale: thumb.dragging ? 1.04 : 1.0
 
                     icon: props.icon
+                    imageIcon: props.imageIcon || ""
                     text: props.text
                     iconColor: props.color
                     segments: props.segments === true
@@ -344,6 +368,7 @@ Item {
         bar.grabX = lx
         var p = bar.thumbProps(entry)
         availGhost.icon = p.icon
+        availGhost.imageIcon = p.imageIcon || ""
         availGhost.text = p.text
         availGhost.iconColor = p.color
         availGhost.segments = p.segments === true

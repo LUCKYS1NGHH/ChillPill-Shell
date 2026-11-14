@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Services.SystemTray
 import "components"
 import "."
 
@@ -19,6 +20,10 @@ ColumnLayout {
     readonly property var cachedAvail: m.customCache.filter(
         e => !value.some(o => typeof o === "object" && String(o.run) === String(e.run)))
     readonly property var available: builtinAvail.concat(cachedAvail)
+    // live tray icons not already placed in the bar
+    readonly property var trayAvail: SystemTray.items.values
+        .filter(i => !value.some(o => typeof o === "object" && o !== null && o.tray === i.id))
+        .map(i => ({ tray: i.id }))
 
     function syncCache() {
         if (!ConfigStore.customCacheLoaded) return
@@ -26,6 +31,8 @@ ColumnLayout {
         for (var i = 0; i < m.value.length; i++) {
             var e = m.value[i]
             if (typeof e !== "object" || e === null) continue
+            // tray entries ({tray: id}) are system state, not user modules
+            if (e.tray !== undefined) continue
             var run = String(e.run)
             var idx = -1
             for (var j = 0; j < c.length; j++)
@@ -182,6 +189,41 @@ ColumnLayout {
                     iconSize: props.iconSize || 10
                     removable: addThumb.isCustom
                     onRemoveRequested: m.removeFromCache(modelData)
+                    onDragBegin: (lx, gx, gy) => bar.availBegin(modelData, lx, gx, gy)
+                    onDragMove: (gx, gy) => bar.availMove(gx, gy)
+                    onDragEnd: bar.availEnd
+                }
+            }
+        }
+    }
+
+    // second row: available tray modules, same drag-onto-the-bar behaviour
+    ColumnLayout {
+        visible: m.trayAvail.length > 0
+        Layout.fillWidth: true
+        spacing: 8
+
+        Text {
+            text: "TRAY MODULES"
+            color: Theme.fg4
+            font.family: Theme.fontFamily
+            font.pixelSize: 10
+        }
+        Row {
+            spacing: 12
+            Repeater {
+                model: m.trayAvail
+                ModuleThumb {
+                    required property var modelData
+                    height: 30
+                    readonly property var props: bar.thumbProps(modelData)
+                    icon: props.icon
+                    imageIcon: props.imageIcon || ""
+                    text: props.text
+                    iconColor: props.color
+                    flag: props.flag === true
+                    flagColor: props.flagColor
+                    iconSize: props.iconSize || 13
                     onDragBegin: (lx, gx, gy) => bar.availBegin(modelData, lx, gx, gy)
                     onDragMove: (gx, gy) => bar.availMove(gx, gy)
                     onDragEnd: bar.availEnd

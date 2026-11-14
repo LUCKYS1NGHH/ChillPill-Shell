@@ -7,6 +7,7 @@ Rectangle {
     id: mt
 
     property string icon: ""
+    property string imageIcon: "" // real icon source (tray), wins over the glyph
     property string text: ""
     property color iconColor: Theme.fg
     property bool segments: false
@@ -85,11 +86,20 @@ Rectangle {
             ps: mt.ps
         }
         Text {
-            visible: !mt.segments && !mt.spectrum && mt.icon !== ""
+            visible: !mt.segments && !mt.spectrum && mt.imageIcon === "" && mt.icon !== ""
             text: mt.icon
             color: mt.iconColor
             font.family: Theme.nerdFontFamily
             font.pixelSize: mt.iconSize * mt.ps
+        }
+        Image {
+            visible: !mt.segments && !mt.spectrum && mt.imageIcon !== ""
+            source: mt.imageIcon
+            sourceSize.width: 20
+            sourceSize.height: 20
+            fillMode: Image.PreserveAspectFit
+            Layout.preferredWidth: mt.iconSize * mt.ps
+            Layout.preferredHeight: mt.iconSize * mt.ps
         }
         Text {
             visible: !mt.segments && mt.text !== ""

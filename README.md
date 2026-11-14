@@ -91,7 +91,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Features (Pill States)
 
-- **Main pill bar**                  - Battery, volume, workspaces, network, clock (default; fully customizable in the config app) — for more module options, see 'Know more' below.
+- **Main pill bar**                  - Battery, volume, workspaces, network, clock (default; fully customizable in the config app) — for more module options, see 'Know more' below, including system tray modules.
 - **Control center**                 - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
   - **Wifi state**                   - List of available networks, hero card, password prompt, forget prompt, USB tethering, network info (band, signal strength and security), refresh networks button etc.
   - **Bluetooth state**              - List of available devices, hero card, tips in footer, refresh devices button etc.

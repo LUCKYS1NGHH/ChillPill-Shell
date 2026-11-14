@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Services.SystemTray
 import QtQuick
 
 Row {
@@ -47,21 +48,35 @@ Row {
       implicitWidth: moduleLoader.implicitWidth
       implicitHeight: moduleLoader.implicitHeight
 
-      // pillModules entries can be a module name ('clock') or a waybar-style
-      // custom module object ({ "run": "...", ... }) handled by CustomBarModule.qml
+      // pillModules entries can be a module name ('clock'), a waybar-style
+      // custom module object ({ "run": "...", ... }) handled by CustomBarModule.qml,
+      // or a tray module object ({ "tray": "<id>" }) handled by TrayModule.qml
       readonly property bool isCustom: typeof modelData === "object" && modelData !== null
+      readonly property bool isTray: isCustom && modelData.tray !== undefined
       readonly property string moduleID: isCustom ? "custom" + index : String(modelData)
 
-      visible: !isCustom || !!modelData.run
+      // tray entries vanish (Row skips them, no gap) while their app is not running
+      function trayItemFor(id) {
+        const list = SystemTray.items.values
+        for (let i = 0; i < list.length; i++) if (String(list[i].id) === id) return list[i]
+        return null
+      }
+      visible: !isCustom || (isTray ? trayItemFor(String(modelData.tray)) !== null : !!modelData.run)
 
       Loader {
         id: moduleLoader
         anchors.fill: parent
-        source: isCustom ? "CustomBarModule.qml" : moduleFile(modelData)
+        source: isTray ? "TrayModule.qml"
+              : isCustom ? "CustomBarModule.qml" : moduleFile(modelData)
         // every bar module builds in parallel off the GUI thread, so the pill
         // shows up right away instead of after every module compiled
         asynchronous: true
         onLoaded: {
+          if (isTray) {
+            item.trayID = String(modelData.tray)
+            item.moduleID = moduleID
+            return
+          }
           if (isCustom) {
             item.spec = modelData
             item.moduleID = moduleID
@@ -113,7 +128,7 @@ Row {
       HoverHandler {
         id: hoverHandler
         cursorShape: isCustom
-          ? (modelData.click
+          ? (isTray || modelData.click
              ? Qt.PointingHandCursor : Qt.ArrowCursor)
           : (modelData === "workspaces" || modelData === "volume"
              || modelData === "network" || modelData === "bluetooth")
