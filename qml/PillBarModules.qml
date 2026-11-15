@@ -101,12 +101,13 @@ Row {
             case "bluetooth": box.bluetoothModule = item; break
             case "clock":     box.clockModule = item; break
             case "vpn":       box.vpnModule = item; break
+            case "mic":       box.micModule = item; break
           }
         }
       }
       TapHandler {
         acceptedButtons: Qt.LeftButton
-        enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth")
+        enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth" || modelData === "mic")
         onTapped: {
           if (isCustom) return
           switch (modelData) {
@@ -122,6 +123,10 @@ Row {
               if (moduleLoader.item && moduleLoader.item.toggleBluetooth)
                 moduleLoader.item.toggleBluetooth()
               break
+            case "mic":
+              if (moduleLoader.item && moduleLoader.item.toggleMute)
+                moduleLoader.item.toggleMute()
+              break
           }
         }
       }
@@ -131,7 +136,8 @@ Row {
           ? (isTray || modelData.click
              ? Qt.PointingHandCursor : Qt.ArrowCursor)
           : (modelData === "workspaces" || modelData === "volume"
-             || modelData === "network" || modelData === "bluetooth")
+             || modelData === "network" || modelData === "bluetooth"
+             || modelData === "mic")
             ? Qt.PointingHandCursor : Qt.ArrowCursor
         onHoveredChanged: {
           if (hovered) {

@@ -120,6 +120,12 @@ PanelWindow {
         }
         return s
       }
+      case "mic": {
+        const m = box.micModule   // force-read
+        if (!m || !m.ready) return "No microphone"
+        if (m.muted) return "Mic muted"
+        return "Mic • " + m.vol + "%"
+      }
       case "notifications": {
         const m = notificationModule
         if (!m || m.notifications.length === 0) return "No Notifications"

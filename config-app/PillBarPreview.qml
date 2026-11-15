@@ -74,6 +74,7 @@ Item {
         switch (name) {
         case "battery":       return { icon: String.fromCodePoint(0xf0081), color: Theme.batteryFg, text: "98%" }
         case "volume":        return { icon: String.fromCodePoint(0xf057e), color: Theme.fg,     text: "64%" }
+        case "mic":           return { icon: String.fromCodePoint(0xf036c), color: Theme.fg,     text: "on" }
         case "workspaces":    return { icon: "",       color: Theme.fg,     text: "", segments: true, n: Math.min(Math.max(ConfigStore.get("maxWorkspaces", 5), 1), 6) }
         case "network":       return { icon: String.fromCodePoint(0xf0928), color: Theme.netFg, text: "Home" }
         case "clock":         return { icon: "",       color: Theme.fg,     text: Qt.formatTime(new Date(), ConfigStore.get("clockFormat", "hh:mm")) }

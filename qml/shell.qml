@@ -409,6 +409,7 @@ ShellRoot {
       property var bluetoothModule: null
       property var clockModule: clock
       property var vpnModule: null
+      property var micModule: null
 
       property bool tooltipVisible: false
       property string tooltipModule: ""
