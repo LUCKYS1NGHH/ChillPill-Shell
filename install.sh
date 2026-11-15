@@ -24,7 +24,7 @@ if [[ ! "$EUID" -eq 0 ]]; then
 fi
 
 needed_pkgs=(quickshell cliphist brightnessctl
-             wl-clipboard inotify-tools cmake
+             wl-clipboard cmake
              qt6-multimedia python-psutil blueman pipewire
 )
 
@@ -96,7 +96,6 @@ bin_exists awww || warn "Awww not installed. it will be needed if you don't use 
 bin_exists quickshell || die "Quickshell not installed."
 bin_exists cliphist || die "Cliphist not installed."
 bin_exists nusgmon || die "Nusgmon not installed."
-bin_exists inotifywait || die "Inotify not installed."
 bin_exists brightnessctl || die "Brightnessctl not installed."
 bin_exists cmake || die "Cmake not installed."
 bin_exists blueman-manager || warn "Blueman not installed." # warn here because not everyone use bluetooth

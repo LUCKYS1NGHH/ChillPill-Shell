@@ -278,7 +278,6 @@ Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar
 | [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) | Dashboard · today's data usage |
 | [brightnessctl](https://github.com/Hummer12007/brightnessctl) | Brightness module, slider and OSD |
 | [wl-clipboard](https://github.com/bugaevc/wl-clipboard) | Wayland clipboard I/O |
-| [inotify-tools](https://github.com/inotify-tools/inotify-tools) | File watchers (wallpaper switch, notification sounds) |
 | [pipewire](https://github.com/PipeWire/pipewire) | Audio server (volume, media player, visualizer) |
 | [blueman](https://github.com/blueman-project/blueman) | Bluetooth manager state |
 | Qt Multimedia (`qt6-multimedia`) | For notification popup sound |

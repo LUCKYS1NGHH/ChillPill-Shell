@@ -14,6 +14,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Services.Pam
+import PillBackend
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
@@ -117,36 +118,10 @@ Scope {
     // ---------- idle dim: drop the backlight after N idle seconds, wake on input ----------
     property int savedBrightness: -1
     property bool dimmed: false
-    property bool dimPending: false
     property int lastBright: -1
     readonly property int dimTarget: Math.max(1, Math.round(savedBrightness * Config.lockscreenIdleDimTo / 100))
 
-    Process {
-        id: brightGet
-        command: ["brightnessctl", "get"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const v = parseInt(text.trim());
-                if (isNaN(v) || v <= 0) {
-                    root.dimPending = false;
-                    return;
-                }
-                root.savedBrightness = v;
-                root.lastBright = v;
-                if (!root.dimPending)
-                    return;
-                root.dimPending = false;
-                root.dimmed = true;
-                startBrightAnim(v, root.dimTarget, dimDuration)
-            }
-        }
-    }
-
-    Process {
-        id: brightSet
-    }
-
-    // smooth backlight transitions: stepped brightnessctl commands on a timer
+    // smooth backlight transitions: direct sysfs/logind writes on a timer
     property int dimDuration: 1400
     property int wakeDuration: 500
 
@@ -166,8 +141,7 @@ Scope {
             const v = Math.round(fromV + (toV - fromV) * e);
             if (v !== root.lastBright) {
                 root.lastBright = v;
-                brightSet.command = ["brightnessctl", "set", v];
-                brightSet.running = true;
+                BrightnessMonitor.setBrightness(v);
             }
             if (progress >= 1)
                 stop();
@@ -183,14 +157,18 @@ Scope {
     }
 
     function dimScreen() {
-        if (Config.lockscreenIdleDim <= 0 || root.dimmed || root.dimPending)
+        if (Config.lockscreenIdleDim <= 0 || root.dimmed)
             return;
-        root.dimPending = true;
-        brightGet.running = true;
+        const v = BrightnessMonitor.brightness
+        if (v <= 0)
+            return
+        root.savedBrightness = v
+        root.lastBright = v
+        root.dimmed = true
+        startBrightAnim(v, root.dimTarget, dimDuration)
     }
 
     function wakeScreen() {
-        root.dimPending = false;
         if (!root.dimmed)
             return;
         root.dimmed = false;

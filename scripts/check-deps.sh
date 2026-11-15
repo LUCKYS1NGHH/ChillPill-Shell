@@ -21,7 +21,6 @@ holpy() {
 }
 
 add cliphist cliphist required cliphist cliphist "Clipboard history backend"                    $(bin cliphist && echo true || echo false)
-add inotifywait inotify-tools required inotify-tools inotify-tools "File watcher" $(bin inotifywait && echo true || echo false)
 add brightnessctl brightnessctl required brightnessctl brightnessctl "Backlight control"        $(bin brightnessctl && echo true || echo false)
 add wl-copy wl-clipboard required wl-clipboard wl-clipboard "Wayland clipboard (wl-clipboard)"   $(bin wl-copy && echo true || echo false)
 add pw-cli pipewire required pipewire pipewire "PipeWire audio server"                          $(bin pw-cli && echo true || echo false)
