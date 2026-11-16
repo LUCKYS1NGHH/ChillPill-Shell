@@ -45,6 +45,19 @@ Scope {
     readonly property bool confirmPower: Config.confirmPowerActions
     readonly property bool showBattery: Config.pillModules.indexOf("battery") !== -1
 
+    // connected wifi (PillBackend WifiController, same source as the cc button)
+    readonly property bool wifiOk: WifiController.available && WifiController.enabled
+                                   && WifiController.currentSsid.length > 0
+
+    function wifiGlyph(sig) {
+        if (sig < 0) return String.fromCodePoint(0xf092d)
+        let tier = sig >= 75 ? 4
+                 : sig >= 50 ? 3
+                 : sig >= 25 ? 2
+                 : 1
+        return String.fromCodePoint(0xf091f + (tier - 1) * 3)
+    }
+
     // mirrored from the media card so the type scale can react to it
     property bool mediaActive: false
     readonly property bool mediaShown: Config.lockscreenMedia && mediaActive
@@ -1240,6 +1253,13 @@ Scope {
 
                                             I { text: root.wGlyph; color: root.wGlyphColor; font.pixelSize: 24; height: 20; verticalAlignment: Text.AlignVCenter }
                                             T { text: Math.round(root.wTemp) + root.wUnit; height: 20; verticalAlignment: Text.AlignVCenter }
+                                        }
+
+                                        Pill {
+                                            visible: root.wifiOk
+
+                                            I { text: root.wifiGlyph(WifiController.currentSignal); color: Theme.netFg; font.pixelSize: 23; height: 20; verticalAlignment: Text.AlignVCenter }
+                                            T { text: WifiController.currentSsid; height: 20; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight; Layout.maximumWidth: 220 }
                                         }
 
                                         Pill {

@@ -606,7 +606,7 @@ ShellRoot {
           ? (mprisModule.hasPlayer ? 27 : 25)
           : (mprisModule.hasPlayer ? 26 : 22))
         : spotlight ? 29
-        : dashboard ? 24
+        : dashboard ? 27
         : themePicker ? 26
         : wallpaperSwitcherOpen ? 30
         : activeOsd !== "" ? 20
