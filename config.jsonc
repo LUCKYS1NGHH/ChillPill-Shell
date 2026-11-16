@@ -37,6 +37,7 @@
   "showAudioVisuals": true,
   "showSensitiveInfo": true,
   "showShadows": true,
+  "showNotifAppName": true,
   "confirmPowerActions": true,
   "lockscreenPowerActions": true,
   "lockscreenMedia": true,

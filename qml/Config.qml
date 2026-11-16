@@ -33,6 +33,8 @@ Singleton {
       property string weatherLocation: "Delhi"
       property int weatherRefreshInterval: 3600000
       property bool avoidDuplicateNotifications: true
+      // sender app name line in the notification popups (pill + fullscreen)
+      property bool showNotifAppName: true
       property string defaultTerminal: "kitty"
       property real pillScale: 1.0
       property real dpiScale: 1.0
@@ -99,6 +101,7 @@ Singleton {
   readonly property alias weatherLocation: adapter.weatherLocation
   readonly property alias weatherRefreshInterval: adapter.weatherRefreshInterval
   readonly property alias avoidDuplicateNotifications: adapter.avoidDuplicateNotifications
+  readonly property alias showNotifAppName: adapter.showNotifAppName
   readonly property alias defaultTerminal: adapter.defaultTerminal
   readonly property alias pillScale: adapter.pillScale
   readonly property alias dpiScale: adapter.dpiScale

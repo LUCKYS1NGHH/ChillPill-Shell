@@ -565,7 +565,7 @@ ShellRoot {
                      : activeOsd === "timer" ? osdWidth
                      : activeOsd === "volume" ? osdWidth
                      : activeOsd === "brightness" ? osdWidth
-                     : (notificationModule.active && !notifFullscreenMode) ? 320
+                     : (notificationModule.active && !notifFullscreenMode) ? 326
                      : powerMenu ? 350
                      : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : ccBaseWidth)
                      : spotlight ? 328
@@ -581,7 +581,7 @@ ShellRoot {
                   : activeOsd === "timer" ? osdHeight
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
-                  : (notificationModule.active && !notifFullscreenMode) ? 52
+                  : (notificationModule.active && !notifFullscreenMode) ? 60
                   : powerMenu ? 102
                   : wifiPanelOpen ? wifiPanelHeight
                   : bluetoothPanelOpen ? bluetoothPanelHeight
@@ -1211,37 +1211,100 @@ ShellRoot {
     cardHeight: 52 * box.dpi
 
     property var displayNotif: null
+    property var pendingNotif: null
+    // countdown progress 1→0, drawn as the ring around the icon chip
+    property real timeFrac: 1
+    onTimeFracChanged: ringCanvas.requestPaint()
+
+    function showNotif(next) {
+      if (active && displayNotif && displayNotif !== next) {
+        pendingNotif = next
+        fsSwap.restart()
+      } else {
+        displayNotif = next
+        fsShrink.restart()
+      }
+    }
 
     RowLayout {
       Layout.alignment: Qt.AlignVCenter
-      spacing: 12 * box.dpi
+      spacing: 10 * box.dpi
+      transform: Translate { id: fsSlide; x: 0 }
 
-      Text {
-        text: String.fromCodePoint(0xf0f3)
-        color: Theme.fg
-        font { family: Theme.nerdFontFamily; pixelSize: 14 * box.dpi }
-        visible: cardIcon.status !== Image.Ready
-      }
+      Rectangle {
+        Layout.preferredWidth: 30 * box.dpi
+        Layout.preferredHeight: 30 * box.dpi
+        radius: 20 * box.dpi
+        color: Theme.bg2
 
-      Image {
-        id: cardIcon
-        width: 23; height: 23
-        fillMode: Image.PreserveAspectCrop
-        source: {
-          if (fsNotif.displayNotif && fsNotif.displayNotif.image) return fsNotif.displayNotif.image
-          if (fsNotif.displayNotif && fsNotif.displayNotif.appIcon) {
-            return fsNotif.displayNotif.appIcon.startsWith("/")
-              ? "file://" + fsNotif.displayNotif.appIcon
-              : "image://icon/" + fsNotif.displayNotif.appIcon
-          }
-          return ""
+        Text {
+          anchors.centerIn: parent
+          text: String.fromCodePoint(0xf0f3)
+          color: Theme.fg
+          font { family: Theme.nerdFontFamily; pixelSize: 14 * box.dpi }
+          visible: cardIcon.status !== Image.Ready
         }
-        sourceSize: Qt.size(23 * box.dpi, 23 * box.dpi)
-        visible: status === Image.Ready
+
+        Image {
+          id: cardIcon
+          anchors.centerIn: parent
+          width: 18 * box.dpi
+          height: 18 * box.dpi
+          fillMode: Image.PreserveAspectFit
+          source: {
+            if (fsNotif.displayNotif && fsNotif.displayNotif.image) return fsNotif.displayNotif.image
+            if (fsNotif.displayNotif && fsNotif.displayNotif.appIcon) {
+              return fsNotif.displayNotif.appIcon.startsWith("/")
+                ? "file://" + fsNotif.displayNotif.appIcon
+                : "image://icon/" + fsNotif.displayNotif.appIcon
+            }
+            return ""
+          }
+          sourceSize: Qt.size(18 * box.dpi, 18 * box.dpi)
+          visible: status === Image.Ready
+        }
+
+        // countdown ring around the chip: accent arc unwinds from 12 o'clock
+        Canvas {
+          id: ringCanvas
+          anchors.fill: parent
+          anchors.margins: -3 * box.dpi
+          antialiasing: true
+
+          onPaint: {
+            const ctx = getContext("2d")
+            ctx.reset()
+            const cx = width / 2, cy = height / 2
+            const lw = 2.5 * box.dpi
+            const r = parent.width / 2 + lw / 2 // hug the chip's outer edge
+            ctx.lineWidth = lw
+            ctx.lineCap = "round"
+            ctx.strokeStyle = Qt.alpha(Theme.accent, 0.22)
+            ctx.beginPath()
+            ctx.arc(cx, cy, r, 0, 2 * Math.PI)
+            ctx.stroke()
+            if (fsNotif.timeFrac > 0) {
+              ctx.strokeStyle = Theme.accent
+              ctx.beginPath()
+              ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * fsNotif.timeFrac)
+              ctx.stroke()
+            }
+          }
+        }
       }
 
       ColumnLayout {
         spacing: 3 * box.dpi
+
+        Text {
+          text: fsNotif.displayNotif && fsNotif.displayNotif.appName ? fsNotif.displayNotif.appName : ""
+          textFormat: Text.PlainText
+          color: Theme.fg3
+          font { family: Theme.fontFamily; pixelSize: 8 * box.dpi; weight: 600; letterSpacing: 0.5 }
+          elide: Text.ElideRight
+          Layout.maximumWidth: 200
+          visible: text !== "" && Config.showNotifAppName
+        }
 
         Text {
           text: fsNotif.displayNotif ? fsNotif.displayNotif.summary : ""
@@ -1267,6 +1330,43 @@ ShellRoot {
         }
       }
     }
+
+    extra: [
+      NumberAnimation {
+        id: fsShrink
+        target: fsNotif
+        property: "timeFrac"
+        from: 1
+        to: 0
+        duration: Config.notificationDisplayTime
+        easing.type: Easing.Linear
+      },
+
+      // queued-notification swap: slide old content out left, swap, slide new in
+      SequentialAnimation {
+        id: fsSwap
+
+        ParallelAnimation {
+          NumberAnimation { target: fsNotif.cardOpacity; property: "opacity"; to: 0; duration: 110; easing.type: Easing.InQuad }
+          NumberAnimation { target: fsSlide; property: "x"; to: -14 * box.dpi; duration: 110; easing.type: Easing.InQuad }
+        }
+
+        ScriptAction {
+          script: {
+            fsNotif.displayNotif = fsNotif.pendingNotif
+            fsNotif.pendingNotif = null
+            fsSlide.x = 14 * box.dpi
+            fsNotif.timeFrac = 1
+            fsShrink.restart()
+          }
+        }
+
+        ParallelAnimation {
+          NumberAnimation { target: fsNotif.cardOpacity; property: "opacity"; to: 1; duration: 150; easing.type: Easing.OutCubic }
+          NumberAnimation { target: fsSlide; property: "x"; to: 0; duration: 150; easing.type: Easing.OutCubic }
+        }
+      }
+    ]
   }
 
   Connections {
@@ -1278,10 +1378,13 @@ ShellRoot {
             box.bluetoothPanelOpen = false
         } else {
             notifFullscreenMode = false
+            // if a hide lands mid-swap, unstick the content fade
+            fsNotif.cardOpacity = 1
+            fsNotif.timeFrac = 1
         }
     }
     function onCurrentChanged() {
-      if (notificationModule.current) fsNotif.displayNotif = notificationModule.current
+      if (notificationModule.current) fsNotif.showNotif(notificationModule.current)
     }
   }
 

@@ -99,7 +99,13 @@ Item {
 
   function advance(): void {
     if (queue.length === 0) { current = null; return }
-    current = queue.shift()
+    const next = queue.shift()
+    if (current === next) {
+      // re-displaying the same entry (duplicate spam): bounce through null
+      // so QML change notifications on `current` actually fire
+      current = null
+    }
+    current = next
     hideTimer.restart()
   }
 

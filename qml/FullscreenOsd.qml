@@ -19,6 +19,8 @@ PanelWindow {
   property int cardHeight: 50
   property int cardRadius: 99
   property int restMargin: 1
+  // content row opacity, for swap-style animations from the instance side
+  property alias cardOpacity: cardRow.opacity
 
   // in decelerates into place, out accelerates away and is quicker
   property int enterDuration: 300
