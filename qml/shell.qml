@@ -570,7 +570,7 @@ ShellRoot {
                      : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : ccBaseWidth)
                      : spotlight ? 328
                      : dashboard ? (dashboardLoader.item ? dashboardLoader.item.implicitWidth + 14 : 546)
-                     : themePicker ? 310
+                     : themePicker ? 295
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
                      : cliphistOpen ? 440
@@ -607,7 +607,7 @@ ShellRoot {
           : (mprisModule.hasPlayer ? 26 : 22))
         : spotlight ? 29
         : dashboard ? 27
-        : themePicker ? 26
+        : themePicker ? 28
         : wallpaperSwitcherOpen ? 30
         : activeOsd !== "" ? 20
         : powerMenu ? 22
@@ -1118,8 +1118,8 @@ ShellRoot {
       Item {
         id: themePickerItem
         anchors.centerIn: parent
-        width: box.implicitWidth - 30
-        height: box.themePicker ? box.implicitHeight - 30 : 0
+        width: box.implicitWidth - 16
+        height: box.themePicker ? box.implicitHeight - 16 : 0
         opacity: box.themePicker
                  && !notificationModule.active
                  && box.activeOsd === "" ? 1 : 0

@@ -5,22 +5,30 @@ import QtQuick.Layouts
 
 // theme picker pill state, same language as the bluetooth / control center panels:
 // header (back, title + status, reset) -> hairline -> rows with mini desktop previews -> key hint
-// fills the pill (320x320, final): fixed margins around, the list takes whatever height is left.
 // selection is a single pill that slides between rows (spotlight style), the list scrolls with it.
 // keys: up/down or j/k move (wraps), home/end jump, enter/space apply, 1-9 apply directly,
 //       r reset, esc close
+
 Item {
   id: root
-  implicitWidth: 400
-  implicitHeight: 340
+  implicitWidth: 550
+  implicitHeight: 390
+
+  Rectangle {
+      anchors.fill: parent
+      radius: 20
+      color: Theme.bgD1
+      border.color: Theme.borderBg2
+      border.width: 1
+  }
 
   signal closeRequested()
   signal applyRequested(string name)
 
   readonly property int count: Theme.themeNames.length
-  readonly property real rowH: 45
-  readonly property real pad: 3          // left / right / bottom edge margin
-  readonly property real padTop: 1       // header gets a bit more room under the rounded top
+  readonly property real rowH: 42
+  readonly property real pad: 8          // left / right / bottom edge margin
+  readonly property real padTop: 11       // header gets a bit more room under the rounded top
   // selection is tracked by theme NAME, so a rescan / reorder of the list can never
   // make enter or a click apply a different theme than the one highlighted
   property string currentName: ""
@@ -179,19 +187,16 @@ Item {
     anchors.rightMargin: root.pad
     anchors.bottomMargin: root.pad
     anchors.topMargin: root.padTop
-    spacing: 8
+    spacing: 4
 
     // header: back | title + status | reset
     RowLayout {
       Layout.fillWidth: true
+      Layout.bottomMargin: 6
+      Layout.leftMargin: 14
       spacing: 8
       opacity: root.stage(0)
       transform: Translate { y: (1 - root.stage(0)) * 8 }
-
-      HeaderButton {
-        glyph: "\uf053" // nf-fa-chevron_left
-        onClicked: root.closeRequested()
-      }
 
       Column {
         Layout.fillWidth: true
@@ -313,8 +318,8 @@ Item {
         // mini "desktop" preview painted in the preset's own colors
         Rectangle {
           id: preview
-          width: 30
-          height: 25
+          width: 28
+          height: 22
           radius: 7
           anchors.left: parent.left
           anchors.leftMargin: 11
@@ -327,8 +332,8 @@ Item {
 
           Rectangle {   // accent pill
             id: pvBar
-            x: 5; y: 5
-            width: 10; height: 3
+            x: 5; y: 4
+            width: 7; height: 3
             radius: height / 2
             color: row.pvAccent
           }
@@ -338,7 +343,7 @@ Item {
             anchors.leftMargin: 5
             anchors.top: pvBar.bottom
             anchors.topMargin: 4
-            width: 14; height: 2
+            width: 12; height: 2
             radius: height / 2
             color: row.pvFg; opacity: 0.6
           }
