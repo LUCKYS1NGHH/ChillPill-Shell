@@ -1059,8 +1059,8 @@ Scope {
 
                                                 SequentialAnimation {
                                                     id: typePulse
-                                                    NumberAnimation { target: field; property: "scale"; to: 1.012; duration: 90; easing.type: Easing.OutQuad }
-                                                    NumberAnimation { target: field; property: "scale"; to: 1; duration: 160; easing.type: Easing.OutQuad }
+                                                    NumberAnimation { target: field; property: "scale"; to: 1.008; duration: 120; easing.type: Easing.OutCubic }
+                                                    NumberAnimation { target: field; property: "scale"; to: 1; duration: 260; easing.type: Easing.OutCubic }
                                                 }
 
                                                 Connections {
@@ -1089,56 +1089,139 @@ Scope {
                                                     anchors.rightMargin: 46
                                                     clip: true
 
-                                                    Row {
-                                                        visible: !root.reveal
-                                                        anchors.horizontalCenter: parent.horizontalCenter
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        spacing: 6
+                                                    // dots live in fixed slots, so typing and backspacing both animate:
+                                                    // a slot pops in (little overshoot) / shrinks out, and the strip
+                                                    // glides sideways to stay centred, like hyprlock's input field
+                                                    Item {
+                                                        id: dotStrip
+                                                        readonly property int slots: 40
+                                                        readonly property real dotSize: 9
+                                                        readonly property real gap: 7
+                                                        readonly property real step: dotSize + gap
+                                                        readonly property int count: Math.min(root.buffer.length, slots)
+                                                        readonly property real stripW: Math.max(0, count * step - gap)
+
+                                                        width: stripW
+                                                        height: parent.height
+                                                        // centred while it fits, then the newest dot stays pinned to the right edge
+                                                        x: stripW <= parent.width ? (parent.width - stripW) / 2 : parent.width - stripW
+                                                        opacity: root.reveal ? 0 : 1
+                                                        visible: opacity > 0
+
+                                                        Behavior on x {
+                                                            NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+                                                        }
+                                                        Behavior on opacity {
+                                                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                                                        }
 
                                                         Repeater {
-                                                            model: Math.min(root.buffer.length, 14)
+                                                            model: dotStrip.slots
 
-                                                            // minimal bullets
                                                             Rectangle {
+                                                                id: dot
                                                                 required property int index
 
-                                                                readonly property int age: Math.min(root.buffer.length, 14) - 1 - index
+                                                                readonly property int age: root.buffer.length - 1 - index
+                                                                readonly property bool present: index < root.buffer.length
+                                                                // 0 = newest dot, 1 = 11+ dots old: drives both the colour blend and the alpha
+                                                                readonly property real fade: Math.min(1, Math.max(0, age) / 11)
 
-                                                                width: 9
-                                                                height: 9
-                                                                radius: 4.5
+                                                                width: dotStrip.dotSize
+                                                                height: dotStrip.dotSize
+                                                                radius: width / 2
+                                                                x: index * dotStrip.step
+                                                                y: (dotStrip.height - height) / 2
+
+                                                                // newest dot is bright th.hi, older ones melt toward th.sub and go transparent
                                                                 color: root.failed ? th.error
-                                            : Qt.rgba(th.hi.r, th.hi.g, th.hi.b, Math.max(0.55, 1 - age * 0.07))
+                                                                    : Qt.rgba(th.hi.r + (th.sub.r - th.hi.r) * fade,
+                                                                              th.hi.g + (th.sub.g - th.hi.g) * fade,
+                                                                              th.hi.b + (th.sub.b - th.hi.b) * fade,
+                                                                              1 - 0.8 * fade)
 
-                                                                property real pop: 0
-                                                                opacity: 0.55 + 0.45 * pop
-                                                                scale: 0.78 + 0.22 * pop
+                                                                property real pop: present ? 1 : 0
+                                                                scale: pop
+                                                                opacity: Math.min(1, pop * 1.8)
 
-                                                                NumberAnimation on pop {
-                                                                    from: 0
-                                                                    to: 1
-                                                                    duration: 320
-                                                                    easing.type: Easing.OutCubic
+                                                                Behavior on pop {
+                                                                    NumberAnimation {
+                                                                        duration: dot.present ? 290 : 170
+                                                                        easing.type: dot.present ? Easing.OutBack : Easing.InCubic
+                                                                        easing.overshoot: 2.2
+                                                                    }
                                                                 }
 
+                                                                // colours glide as dots age instead of stepping on every key
                                                                 Behavior on color {
-                                                                    ColorAnimation { duration: 180 }
+                                                                    ColorAnimation { duration: 190; easing.type: Easing.OutCubic }
                                                                 }
                                                             }
                                                         }
                                                     }
 
-                                                    // revealed password, same spot the bullets sit in
-                                                    T {
-                                                        visible: root.reveal && root.buffer.length > 0
-                                                        anchors.horizontalCenter: parent.horizontalCenter
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        width: parent.width
-                                                        horizontalAlignment: Text.AlignHCenter
-                                                        elide: Text.ElideMiddle
-                                                        color: root.failed ? th.error : th.hi
-                                                        text: root.buffer
-                                                        Behavior on color { ColorAnimation { duration: 180 } }
+                                                    // revealed password: every character rises from below into its slot (flip-clock feel),
+                                                    // and sinks back down on backspace. the font is monospaced, so slots are a fixed width
+                                                    Item {
+                                                        id: textStrip
+                                                        readonly property int slots: 64
+                                                        readonly property real charW: charMetrics.advanceWidth
+                                                        readonly property int count: Math.min(root.buffer.length, slots)
+                                                        readonly property real stripW: count * charW
+
+                                                        width: stripW
+                                                        height: parent.height
+                                                        // centred while it fits, then the newest character stays pinned to the right edge
+                                                        x: stripW <= parent.width ? (parent.width - stripW) / 2 : parent.width - stripW
+                                                        opacity: (root.reveal && root.buffer.length > 0) ? 1 : 0
+                                                        visible: opacity > 0
+
+                                                        Behavior on x {
+                                                            NumberAnimation { duration: 240; easing.type: Easing.OutCubic }
+                                                        }
+                                                        Behavior on opacity {
+                                                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                                                        }
+
+                                                        TextMetrics {
+                                                            id: charMetrics
+                                                            font.family: root.textFont
+                                                            font.pixelSize: 16
+                                                            text: "M"
+                                                        }
+
+                                                        Repeater {
+                                                            model: textStrip.slots
+
+                                                            T {
+                                                                id: glyph
+                                                                required property int index
+
+                                                                readonly property string cur: root.buffer.charAt(index)
+                                                                readonly property bool present: cur !== ""
+                                                                // keeps the last character alive while the slot sinks away
+                                                                property string shown: cur
+                                                                onCurChanged: if (cur !== "") shown = cur
+
+                                                                property real rise: present ? 1 : 0
+                                                                text: shown
+                                                                color: root.failed ? th.error : th.hi
+                                                                x: index * textStrip.charW
+                                                                // starts 6px below its spot and fades in on the way up
+                                                                y: (textStrip.height - height) / 2 + (1 - rise) * 6
+                                                                opacity: rise
+
+                                                                Behavior on rise {
+                                                                    NumberAnimation {
+                                                                        duration: glyph.present ? 80 : 100
+                                                                        easing.type: glyph.present ? Easing.OutCubic : Easing.InCubic
+                                                                    }
+                                                                }
+                                                                Behavior on color {
+                                                                    ColorAnimation { duration: 180 }
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
 
