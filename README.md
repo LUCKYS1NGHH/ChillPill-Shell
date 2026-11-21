@@ -26,16 +26,16 @@ into your session at all times. It's not bound to any dotfiles.
 
 <div align="center">
 
-[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-404040?style=flat-square)](#resource-usage)
-[![Showcase](https://img.shields.io/badge/Showcase-424242?style=flat-square)](#showcase)
-[![Features](https://img.shields.io/badge/Features-404040?style=flat-square)](#features-pill-states)
-[![Configuration](https://img.shields.io/badge/Configuration%20App-424242?style=flat-square)](#configuration-app)
-[![Extras](https://img.shields.io/badge/Extras-404040?style=flat-square)](#lockscreen-optional)
-[![Dependencies](https://img.shields.io/badge/Dependencies-424242?style=flat-square)](#dependencies)
-[![Installation](https://img.shields.io/badge/Installation-404040?style=flat-square)](#install)
-[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-424242?style=flat-square)](#auto-startup)
-[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-404040?style=flat-square)](#key-bindings)
-[![Acknowledgements](https://img.shields.io/badge/Acknowledgements-424242?style=flat-square)](#co-cookers)
+[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-383838?style=flat-square)](#resource-usage)
+[![Showcase](https://img.shields.io/badge/Showcase-414141?style=flat-square)](#showcase)
+[![Features](https://img.shields.io/badge/Features-383838?style=flat-square)](#features-pill-states)
+[![Configuration](https://img.shields.io/badge/Configuration%20App-414141?style=flat-square)](#configuration-app)
+[![Extras](https://img.shields.io/badge/Extras-383838?style=flat-square)](#lockscreen-default)
+[![Dependencies](https://img.shields.io/badge/Dependencies-414141?style=flat-square)](#dependencies)
+[![Installation](https://img.shields.io/badge/Installation-383838?style=flat-square)](#install)
+[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-414141?style=flat-square)](#auto-startup)
+[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-383838?style=flat-square)](#key-bindings)
+[![Acknowledgements](https://img.shields.io/badge/Acknowledgements-414141?style=flat-square)](#co-cookers)
 
 </div>
 
@@ -63,16 +63,18 @@ into your session at all times. It's not bound to any dotfiles.
 
 <div align="center">
 
-<strong>Pill bar · Control Center</strong><br>
-<img src="screenshots/pillBar.webp" width="49%" alt="Pill bar">
+<img src="screenshots/pillBar.webp" alt="Pill bar">
+
+<strong>Control Center · Dashboard</strong><br>
 <img src="screenshots/controlCenter.webp" width="49%" alt="Control Center">
-
-<strong>Clipboard manager · Full preview</strong><br>
-<img src="screenshots/clipboardManager.webp" width="49%" alt="Clipboard manager (cliphist)">
-<img src="screenshots/clipboardImageFullPreview.webp" width="49%" alt="Clipboard item full preview">
-
-<strong>Dashboard · Theme Picker</strong><br>
 <img src="screenshots/dashboard.webp" width="49%" alt="Dashboard">
+
+<strong>Clipboard manager · Clipboard full preview (image)</strong><br>
+<img src="screenshots/clipboardManager.webp" width="49%" alt="Clipboard manager (cliphist)">
+<img src="screenshots/clipboardImageFullPreview.webp" width="49%" alt="Clipboard image full preview">
+
+<strong>Clipboard full preview (text) · Theme Picker</strong><br>
+<img src="screenshots/clipboardTextFullPreview.webp" width="49%" alt="Clipboard text full preview">
 <img src="screenshots/themePicker.webp" width="49%" alt="Theme Picker">
 
 <strong>Wi-Fi · Bluetooth states</strong><br>
@@ -179,7 +181,7 @@ top filters every visible setting across them.
 
 <img src="screenshots/configApp.webp" width="100%" alt="GUI Config App for ChillPill-Shell">
 
-## Lockscreen (Optional)
+## Lockscreen (Default)
 > Default lockscreen app - authenticates through PAM's `login` service and uses the
 > Wayland session-lock protocol, so it is safe on Wayland compositors (Hyprland, Sway, river etc.)
 
@@ -438,7 +440,7 @@ qs ipc -p /usr/share/chillpill-shell call <target> <toggle|show|hide>
 Thanks to the Co-cookers (contributors) who helped make the shell better and are continuing it, and special thanks to [enhaoswen](https://github.com/enhaoswen) for the Wi-Fi controller backend for Quickshell.
 
 <a href="https://github.com/LUCKYS1NGHH/chillpill-shell/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="220" />
+  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="400" />
 </a>
 
 ### Cooked by
