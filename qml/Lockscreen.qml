@@ -660,6 +660,7 @@ Scope {
                 }
 
                 Image {
+                    id: wallpaperImg
                     anchors.fill: parent
                     source: root.wallpaper !== "" ? "file://" + encodeURI(root.wallpaper) : ""
                     fillMode: Image.PreserveAspectCrop
@@ -667,6 +668,22 @@ Scope {
                     cache: false
                     sourceSize.width: 1920
                     scale: 1.10          // hides the dark edge the blur leaves behind
+
+                    // parallax: wallpaper drifts opposite the cursor (max 24px each way)
+                    property real px: 0
+                    property real py: 0
+                    Behavior on px { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                    Behavior on py { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                    transform: Translate { x: -wallpaperImg.px * 15; y: -wallpaperImg.py * 15 }
+
+                    HoverHandler {
+                        onPointChanged: {
+                            if (scene.width <= 0 || scene.height <= 0)
+                                return;
+                            wallpaperImg.px = point.scenePosition.x / scene.width - 0.7;
+                            wallpaperImg.py = point.scenePosition.y / scene.height - 0.7;
+                        }
+                    }
                     opacity: status === Image.Ready ? 1 : 0
 
                     Behavior on opacity {
