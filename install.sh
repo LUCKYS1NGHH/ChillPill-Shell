@@ -255,6 +255,11 @@ fi
 info "Cleaning up build files"
 rm -rf build
 
+if bin_exists pgrep >/dev/null 2>/dev/null; then
+   if ! pgrep wl-paste >/dev/null 2>/dev/null; then
+      warn "wl-paste isn't active to copy/paste the clipboard content, please run it."
+   fi
+fi
 
 echo -e "\nRun the command '${GREEN}chillpill-shell${NC}' to start now."
 echo -e "or open '${GREEN}CP-Shell${NC}' through your current app launcher."

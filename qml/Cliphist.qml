@@ -37,6 +37,8 @@ Item {
     Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
     transformOrigin: Item.Center
 
+    property bool wlClipboardMissing: false
+
     ListModel { id: listModel }
 
     onShownChanged: {
@@ -193,6 +195,7 @@ Item {
 
     function copySelected() {
         if (listModel.count === 0) return
+        if (root.wlClipboardMissing) return
         let entry = listModel.get(selectedIndex)
         console.log("cliphist entry id:", entry.id)
         copyProc.command = ["sh", "-c", "cliphist decode " + entry.id + " | wl-copy"]
@@ -553,6 +556,14 @@ Item {
         running: false
     }
 
+    // detect whether wl-clipboard (wl-copy) is available; copy/paste breaks without it
+    Process {
+        id: wlClipboardCheck
+        command: ["sh", "-c", "command -v wl-copy >/dev/null 2>&1"]
+        running: true
+        onExited: (code) => { root.wlClipboardMissing = (code !== 0) }
+    }
+
     Process {
         id: decodeProc
         running: false
@@ -604,6 +615,17 @@ Item {
             Layout.alignment: Qt.AlignRight
             Layout.rightMargin: 6
           }
+        }
+
+        // warning: wl-clipboard not available -> copy/paste broken
+        Text {
+            visible: root.wlClipboardMissing && !fullPreview
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            color: Theme.warning
+            text: "wl-clipboard not found on $PATH\ninstall wl-clipboard to copy/paste cliphist items"
+            font { family: Theme.fontFamily; pixelSize: 11 }
         }
 
         // search box
