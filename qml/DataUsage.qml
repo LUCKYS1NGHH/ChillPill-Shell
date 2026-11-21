@@ -185,7 +185,6 @@ Item {
                     root.todaySeries = root.parseSeries(d, true, f)
                     root.adjustFlag("today", d, f, bwProc)
                 } catch (e) {
-                    console.log("nusgmon parse error:", e)
                 }
             }
         }
@@ -217,7 +216,6 @@ Item {
                     root.weekLabel = root.fmtMB(total)
                     root.adjustFlag("thisweek", d, f, weekProc)
                 } catch (e) {
-                    console.log("nusgmon week parse error:", e)
                 }
             }
         }
@@ -251,7 +249,6 @@ Item {
                     root.rebuildYear()
                     if (root.adjustFlag("m" + root.yearCur, d, f, monthProc)) return
                 } catch (e) {
-                    console.log("nusgmon month parse error:", e, this.text)
                 }
                 root.nextMonth()
             }

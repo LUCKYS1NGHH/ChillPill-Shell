@@ -3,6 +3,7 @@ import Quickshell.Io
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Shapes
 import PillBackend
 
 // Dashboard (no longer mini :|) -- bento layout
@@ -102,6 +103,16 @@ Item {
   property bool holidaysEnabled: Config.holidaysUsable()
   property string cachePath: holidaysEnabled
     ? `${Quickshell.env("HOME")}/.cache/chillpill-shell/${Config.holidaysCacheName(viewYear)}` : ""
+
+  // "today" is read once each time the dashboard opens (also fixes a stale highlight after midnight)
+  property var today: new Date()
+  readonly property int todayY: today.getFullYear()
+  readonly property int todayM: today.getMonth()
+  readonly property int todayD: today.getDate()
+  Connections {
+    target: box
+    function onDashboardChanged() { if (box.dashboard) root.today = new Date() }
+  }
 
   readonly property var monthNames: ["January","February","March","April","May","June","July","August","September","October","November","December"]
   readonly property var dayNames: ["Su","Mo","Tu","We","Th","Fr","Sa"]
@@ -282,6 +293,9 @@ Item {
 
     radius: 14
     color: hoverable && hh.hovered ? hoverColor : baseColor
+    // hairline edge gives the tile definition without shadows/blur (those are what hurt on an iGPU)
+    border.width: baseColor.a > 0 ? 1 : 0
+    border.color: Qt.alpha(Theme.fg, 0.06)
     opacity: 0
     transform: Translate { id: shift; y: 12 }
     Behavior on color { ColorAnimation { duration: 140 } }
@@ -339,34 +353,44 @@ Item {
     }
   }
 
-  // circular gauge, animates to its value
+  // circular gauge, animates to its value.
+  // Shape arcs live on the GPU: animating sweepAngle just updates a tiny path, where the old Canvas
+  // repainted on the CPU and re-uploaded a texture on every frame of the animation.
   component Ring: Item {
     id: r
     property real value: 0
     property color accent: Theme.todayFg
     property real shown: value
-    Behavior on shown { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
-    onShownChanged: cv.requestPaint()
-    onAccentChanged: cv.requestPaint()
+    Behavior on shown { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
     implicitWidth: 48; implicitHeight: 48
+    readonly property real lw: Math.max(4, width * 0.13)
+    readonly property real rad: width / 2 - lw / 2
 
-    Canvas {
-      id: cv
+    Shape {
       anchors.fill: parent
-      antialiasing: true
-      onPaint: {
-        const ctx = getContext("2d")
-        ctx.reset()
-        const c = width / 2, lw = Math.max(4, width * 0.13), rad = c - lw / 2
-        ctx.lineWidth = lw
-        ctx.lineCap = "round"
-        ctx.strokeStyle = Theme.bg
-        ctx.beginPath(); ctx.arc(c, c, rad, 0, Math.PI * 2); ctx.stroke()
-        if (r.shown > 0.005) {
-          ctx.strokeStyle = r.accent
-          ctx.beginPath()
-          ctx.arc(c, c, rad, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, r.shown))
-          ctx.stroke()
+      // smooth edges without MSAA (Qt 6.6+); delete this line on an older Qt
+      preferredRendererType: Shape.CurveRenderer
+
+      ShapePath {   // track
+        strokeColor: Theme.bg
+        strokeWidth: r.lw
+        fillColor: "transparent"
+        capStyle: ShapePath.RoundCap
+        PathAngleArc {
+          centerX: r.width / 2; centerY: r.height / 2
+          radiusX: r.rad; radiusY: r.rad
+          startAngle: -90; sweepAngle: 359.9
+        }
+      }
+      ShapePath {   // value
+        strokeColor: r.shown > 0.005 ? r.accent : "transparent"
+        strokeWidth: r.lw
+        fillColor: "transparent"
+        capStyle: ShapePath.RoundCap
+        PathAngleArc {
+          centerX: r.width / 2; centerY: r.height / 2
+          radiusX: r.rad; radiusY: r.rad
+          startAngle: -90; sweepAngle: 360 * Math.min(1, r.shown)
         }
       }
     }
@@ -434,10 +458,6 @@ Item {
           color: (imgPath === "" || avatarImg.status !== Image.Ready) ? Theme.bg5 : Theme.transparent
           border.width: 2
           border.color: Theme.bg2
-          layer.enabled: true
-          layer.smooth: true
-          layer.mipmap: true
-          layer.textureSize: Qt.size(root.avatar, root.avatar)
 
           Image {
             id: avatarImg
@@ -470,8 +490,8 @@ Item {
             font { family: Theme.fontFamily; pixelSize: 11; weight: 400 }
           }
           Text {
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 19
+            Layout.bottomMargin: 6
+            Layout.alignment: Qt.AlignBottom
             text: root.username
             color: Theme.fg
             font { family: Theme.fontFamily; pixelSize: 17; weight: 600 }
@@ -623,12 +643,8 @@ Item {
                 readonly property var cellDate: new Date(root.viewYear, root.viewMonth, index - root.firstDay + 1)
                 readonly property int dayNum: cellDate.getDate()
                 readonly property bool inMonth: cellDate.getMonth() === root.viewMonth
-                readonly property bool isToday: {
-                  const t = new Date()
-                  return cellDate.getFullYear() === t.getFullYear()
-                    && cellDate.getMonth() === t.getMonth()
-                    && dayNum === t.getDate()
-                }
+                readonly property bool isToday: cellDate.getFullYear() === root.todayY
+                  && cellDate.getMonth() === root.todayM && dayNum === root.todayD
                 readonly property bool isHoliday: inMonth && root.holidayFor(cellDate) !== ""
                 readonly property bool isSelected: inMonth && root.selectedDay === dayNum
                 readonly property bool weekend: index % 7 === 0 || index % 7 === 6
@@ -1019,7 +1035,7 @@ Item {
               implicitWidth: speedText.implicitWidth + 12
               radius: 6
               color: Theme.bg
-              Behavior on implicitWidth { NumberAnimation { duration: 250; easing.type: Easing.cubic } }
+              Behavior on implicitWidth { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
               Text {
                 id: speedText
                 anchors.centerIn: parent
