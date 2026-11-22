@@ -1207,8 +1207,8 @@ ShellRoot {
   FullscreenOsd {
     id: fsNotif
     active: notificationModule.active && notifFullscreenMode
-    cardWidth: 300 * box.dpi
-    cardHeight: 52 * box.dpi
+    cardWidth: 326 * box.dpi
+    cardHeight: 60 * box.dpi
 
     property var displayNotif: null
     property var pendingNotif: null

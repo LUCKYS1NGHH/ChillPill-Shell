@@ -1031,7 +1031,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 horizontalAlignment: Text.AlignHCenter
                                 text: (root.selectedIndex + 1) + " / " + listModel.count
-                                      + (currentIsImage ? " • drag to drop" : "")
+                                      + (currentIsImage ? " • drag to drop" : root.previewText.split("\n").length >= 8 ? " • Shift + Up/Down to scroll" : "")
                                 color: Theme.fg3
                                 font { family: Theme.fontFamily; pixelSize: 10; weight: 300 }
                             }
