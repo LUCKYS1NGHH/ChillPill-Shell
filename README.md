@@ -63,7 +63,9 @@ into your session at all times. It's not bound to any dotfiles.
 
 <div align="center">
 
-<img src="screenshots/pillBar.webp" alt="Pill bar">
+<img src="screenshots/pillBar.webp" alt="Pill bar"><br>
+<strong>macOS like notch bar style (config option)</strong>
+<img src="screenshots/notchBar.webp" alt="Notch bar">
 
 <strong>Control Center · Dashboard</strong><br>
 <img src="screenshots/controlCenter.webp" width="49%" alt="Control Center">

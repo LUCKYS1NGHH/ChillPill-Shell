@@ -3,6 +3,7 @@
   "clockFormat": "hh:mm",
   "pillTopMargin": 9,
   "pillBottomMargin": 26,
+  "pillNotch": false,
   "theme": "",
   "pillModules": ["battery", "volume", "workspaces", "network", "clock"],
   "pillOnHover": false,

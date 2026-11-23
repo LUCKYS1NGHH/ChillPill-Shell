@@ -7,6 +7,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Effects
+import QtQuick.Shapes
 import Quickshell.Widgets
 import Quickshell.Services.UPower
 import Quickshell.Services.Notifications
@@ -255,8 +256,9 @@ ShellRoot {
     }
 
     // reserve top space only while the pill is shown
-    margins.top: box.revealed ? Config.pillTopMargin : 0
-    exclusiveZone: box.revealed ? Config.pillBottomMargin : 0
+    margins.top: box.revealed ? (Config.pillNotch ? 0 : Config.pillTopMargin) : 0
+    margins.bottom: box.revealed && Config.pillNotch ? Config.pillBottomMargin : 0
+    exclusiveZone: box.revealed ? (Config.pillNotch ? Config.pillBottomMargin + 4 : Config.pillBottomMargin) : 0
     color: Theme.transparent
 
     // Mask input to only the capsule
@@ -282,11 +284,11 @@ ShellRoot {
       id: hoverRevealAreaItem
       anchors {
         top: parent.top
-        topMargin: -Math.round(Config.pillTopMargin)
+        topMargin: (Config.pillNotch && !box.revealed) ? 0 : -Math.round(Config.pillTopMargin)
         left: parent.left
         right: parent.right
       }
-      height: Math.max(box.implicitHeight + Config.pillTopMargin + 8, 48)
+      height: Math.max(box.implicitHeight + (Config.pillNotch ? 4 : Config.pillTopMargin) + 8, 48)
 
       HoverHandler {
         id: revealHover
@@ -344,13 +346,14 @@ ShellRoot {
     // unlayered (a layer would re-render it at unscaled size and blur it)
     Item {
       id: pillShadow
+      z: -2
       readonly property real pad: 24
       readonly property real drop: 5 * box.dpi
       readonly property real visX: box.x - box.width * (box.dpi - 1) / 2
       readonly property real visW: box.width * box.dpi
       x: visX - pad
       y: box.y - pad
-      width: visW + pad * 2
+      width: visW + pad * 2 + (Config.pillNotch ? notchShape.r * 2 : 0)
       height: box.height * box.dpi + pad * 2.2
       property real t: Config.showShadows ? 1 : 0
       Behavior on t { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
@@ -378,12 +381,52 @@ ShellRoot {
       }
     }
 
+    // macOS notch background: pill flush to the top screen edge with smooth
+    // rounded corners (chillnotch style). Sibling of box (not a child) so
+    // box.clip never cuts the flared tips; box goes transparent and the shape
+    // draws the background.
+    Shape {
+      id: notchShape
+      anchors.top: box.top
+      anchors.horizontalCenter: box.horizontalCenter
+      // flared tips extend r beyond the pill on each side, sharp tips at the
+      // top edge flush with the screen
+      width: box.width + 2 * notchShape.r
+      height: box.height
+      scale: box.dpi
+      transformOrigin: Item.Top
+      z: -1
+      layer.enabled: true
+      layer.samples: 4
+      visible: Config.pillNotch && box.opacity > 0
+      opacity: box.opacity
+      Behavior on opacity { NumberAnimation { duration: 220; easing.type: Easing.OutExpo } }
+      readonly property real r: Math.min(box.radius, box.width / 2, box.height / 2)
+      ShapePath {
+        fillColor: box.wifiPanelOpen || box.bluetoothPanelOpen ? Theme.bgD : Theme.bg
+        strokeColor: "transparent"
+        PathSvg {
+          // sharp top tips with concave shoulders, straight sides, rounded
+          // bottom corners (chillnotch path)
+          path: "M 0 0 " +
+                "Q " + notchShape.r + " 0, " + notchShape.r + " " + notchShape.r + " " +
+                "L " + notchShape.r + " " + (notchShape.height - notchShape.r) + " " +
+                "Q " + notchShape.r + " " + notchShape.height + ", " + (notchShape.r * 2) + " " + notchShape.height + " " +
+                "L " + (notchShape.width - notchShape.r * 2) + " " + notchShape.height + " " +
+                "Q " + (notchShape.width - notchShape.r) + " " + notchShape.height + ", " + (notchShape.width - notchShape.r) + " " + (notchShape.height - notchShape.r) + " " +
+                "L " + (notchShape.width - notchShape.r) + " " + notchShape.r + " " +
+                "Q " + (notchShape.width - notchShape.r) + " 0, " + notchShape.width + " 0 " +
+                "Z"
+        }
+      }
+    }
+
     // main dynamic pill bar
     Rectangle {
       id: box
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
-      readonly property bool revealed: !Config.pillOnHover
+      readonly property bool revealed: Config.pillNotch || !Config.pillOnHover
         || shellRoot.pillHoverActive
         || controlCenter
         || dashboard
@@ -595,7 +638,7 @@ ShellRoot {
                   : wallpaperSwitcherOpen ? 308
                   : cliphistOpen ? 276
                   : mediaPopupShown ? 94
-                  : (row.implicitHeight * Config.pillScale) + 10
+                  : (row.implicitHeight * Config.pillScale) + (Config.pillNotch ? 4 : 0) + 10
 
       readonly property real baseRadius: notificationModule.active ? 99
         : cliphistOpen && cliphistPreviewing ? 33
@@ -624,7 +667,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: wifiPanelOpen || bluetoothPanelOpen ? Theme.bgD : bg
+      color: Config.pillNotch ? "transparent" : (wifiPanelOpen || bluetoothPanelOpen ? Theme.bgD : bg)
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
       NumberAnimation { id: heightAnim; target: box; property: "height"; easing.type: Easing.OutExpo }

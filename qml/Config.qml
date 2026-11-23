@@ -54,6 +54,8 @@ Singleton {
       property var pillModules: ["battery", "volume", "workspaces", "network", "clock"]
       property string customWallpaperScript: ""
       property bool pillOnHover: false
+      // macOS notch: pill bar flush to the top screen edge with smooth round corners
+      property bool pillNotch: false
       property bool confirmPowerActions: true
       // suspend/restart/shutdown buttons on the lockscreen card
       property bool lockscreenPowerActions: true
@@ -121,6 +123,7 @@ Singleton {
   readonly property alias pillModules: adapter.pillModules
   readonly property alias customWallpaperScript: adapter.customWallpaperScript
   readonly property alias pillOnHover: adapter.pillOnHover
+  readonly property alias pillNotch: adapter.pillNotch
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
   readonly property alias lockscreenPowerActions: adapter.lockscreenPowerActions
   readonly property alias lockscreenMedia: adapter.lockscreenMedia
