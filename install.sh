@@ -185,9 +185,9 @@ install -m 644 qml/* /usr/share/chillpill-shell
 
 # copy launcher (bash)
 info "Copying bash launchers (main shell, lockscreen and config-app)"
-install -m 755 launcher.sh /usr/local/bin/chillpill-shell
-install -m 755 config-launcher.sh /usr/local/bin/chillpill-config
-install -m 755 lockscreen.sh /usr/local/bin/chillpill-lock
+install -m 755 launcher.sh /usr/bin/chillpill-shell
+install -m 755 config-launcher.sh /usr/bin/chillpill-config
+install -m 755 lockscreen.sh /usr/bin/chillpill-lock
 
 # copy app launcher
 info "Copying app launchers"

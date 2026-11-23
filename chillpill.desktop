@@ -4,6 +4,6 @@ Name=CP-Shell
 GenericName=CP-Shell
 Comment=Feature rich dynamic pill bar for Hyprland
 Icon=/usr/share/chillpill-shell/share/logo.png
-Exec=/usr/local/bin/chillpill-shell
+Exec=/usr/bin/chillpill-shell
 Terminal=false
 Categories=System;Utility;

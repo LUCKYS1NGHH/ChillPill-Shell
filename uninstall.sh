@@ -9,12 +9,12 @@ if [[ -e /usr/share/chillpill-shell ]]; then
    rm -rf /usr/share/chillpill-shell
 fi
 
-if [[ -e /usr/local/bin/chillpill-shell ]]; then
-   rm /usr/local/bin/chillpill-shell
+if [[ -e /usr/bin/chillpill-shell ]]; then
+   rm /usr/bin/chillpill-shell
 fi
 
-if [[ -e /usr/local/bin/chillpill-config ]]; then
-   rm /usr/local/bin/chillpill-config
+if [[ -e /usr/bin/chillpill-config ]]; then
+   rm /usr/bin/chillpill-config
 fi
 
 if [[ -e /usr/share/applications/chillpill.desktop ]]; then
