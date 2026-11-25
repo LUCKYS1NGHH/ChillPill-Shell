@@ -184,6 +184,7 @@ ShellRoot {
           : script + " \"$1\"" // fallback for old-style configs without the placeholder
       Quickshell.execDetached(["sh", "-c", cmd, "_", path])
     }
+    saveCurrentWallpaper(path)
   }
 
   function saveCurrentWallpaper(path) {
