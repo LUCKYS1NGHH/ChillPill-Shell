@@ -1152,8 +1152,7 @@ ShellRoot {
           id: dashboardLoader
           anchors.fill: parent
           active: box.dashboard
-          asynchronous: true
-
+          asynchronous: false
           sourceComponent: Dashboard {}
         }
       }

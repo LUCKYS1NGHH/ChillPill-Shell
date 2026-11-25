@@ -799,6 +799,7 @@ Item {
       Layout.preferredWidth: 270
       Layout.fillWidth: true
       Layout.fillHeight: true
+      Layout.minimumWidth: 270
       spacing: 8
 
       // battery: header + telemetry chip, big % + status, meter pinned to the bottom
