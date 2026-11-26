@@ -11,13 +11,23 @@ Rectangle {
   property string selectedWallpaper: ""
   property bool awwwMissing: false
   property bool cwsMissing: false
-  anchors.fill: parent
+
+  // delete flow: Delete key -> confirm prompt in a bottom corner
+  property string pendingDeletePath: ""
+  property string pendingDeleteName: ""
+  property int confirmIndex: 0      // 0: cancel, 1: delete
+  property int hoveredButton: -1    // mouse hover, cosmetic only
+  readonly property bool promptOnRight: true
+  readonly property int promptMargin: 16
+  property string promptPath: ""    // what the card displays; survives the fade-out
+  property string promptName: ""
 
   onShownChanged: {
     if (shown && wallpaperModel.status === FolderListModel.Ready) {
       wallGrid.currentIndex = 0
       wallGrid.forceActiveFocus()
     }
+    if (!shown) { pendingDeletePath = ""; pendingDeleteName = "" }
   }
 
   color: Theme.bgD
@@ -37,17 +47,48 @@ Rectangle {
     shellRoot.applyWallpaper(path)
   }
 
-  function saveCurrentWallpaper(path) {
-    shellRoot.saveCurrentWallpaper(path)
-  }
-
   function activateCurrent() {
     var path = wallpaperModel.get(wallGrid.currentIndex, "filePath")
     if (path) applyWallpaper(path)
     if (Config.wsCloseOnWallpaperSet) closeRequested()
   }
 
-  // check once whether awww exists on PATH, only if customWallpaperScript is empty string
+  function requestDelete() {
+    var idx = wallGrid.hoverIdx !== -1 ? wallGrid.hoverIdx : wallGrid.currentIndex
+    var path = wallpaperModel.get(idx, "filePath")
+    if (!path) return
+    pendingDeleteName = wallpaperModel.get(idx, "fileName")
+    pendingDeletePath = path
+    promptName = pendingDeleteName
+    promptPath = path
+    confirmIndex = 0
+    hoveredButton = -1
+  }
+
+  function cancelDelete() {
+    pendingDeletePath = ""
+    pendingDeleteName = ""
+    hoveredButton = -1
+    wallGrid.forceActiveFocus()
+  }
+
+  function confirmDelete() {
+    var p = pendingDeletePath
+    Quickshell.execDetached(["sh", "-c",
+      'gio trash -- "$1" 2>/dev/null || trash-put -- "$1" 2>/dev/null || rm -f -- "$1"', "_", p])
+    wallGrid.hoverIdx = -1
+    cancelDelete()
+  }
+
+  function enterPressed() {
+    if (pendingDeletePath !== "") {
+      if (confirmIndex === 1) confirmDelete()
+      else cancelDelete()
+    } else {
+      activateCurrent()
+    }
+  }
+
   Process {
     id: awwwCheck
     command: ["sh", "-c", "command -v awww"]
@@ -66,14 +107,9 @@ Rectangle {
     command: ["sh", "-c", "command -v \"$1\" >/dev/null 2>&1 || test -f \"$1\"", "_", targetBin]
     running: targetBin !== ""
     onExited: (code) => { wallpaperPopup.cwsMissing = (targetBin !== "" && code !== 0) }
-
     onTargetBinChanged: {
-      if (targetBin === "") {
-        wallpaperPopup.cwsMissing = false
-      } else {
-        running = false
-        running = true
-      }
+      if (targetBin === "") wallpaperPopup.cwsMissing = false
+      else { running = false; running = true }
     }
   }
 
@@ -99,7 +135,6 @@ Rectangle {
     anchors.margins: 8
     spacing: 15
 
-    // fallback: awww missing
     Text {
       visible: wallpaperPopup.awwwMissing
       Layout.alignment: Qt.AlignHCenter
@@ -111,7 +146,6 @@ Rectangle {
       font { family: Theme.fontFamily; pixelSize: 11 }
     }
 
-    // fallback: cws missing
     Text {
       visible: wallpaperPopup.cwsMissing
       Layout.alignment: Qt.AlignHCenter
@@ -123,11 +157,10 @@ Rectangle {
       font { family: Theme.fontFamily; pixelSize: 11 }
     }
 
-    // fallback: no wallpapers found
     Text {
       visible: (!wallpaperPopup.awwwMissing && !wallpaperPopup.cwsMissing)
-                && wallpaperModel.status === FolderListModel.Ready
-                && wallpaperModel.count === 0
+               && wallpaperModel.status === FolderListModel.Ready
+               && wallpaperModel.count === 0
       Layout.alignment: Qt.AlignHCenter
       Layout.fillWidth: true
       horizontalAlignment: Text.AlignHCenter
@@ -151,12 +184,31 @@ Rectangle {
       keyNavigationEnabled: true
       keyNavigationWraps: true
       cacheBuffer: 400
-      Keys.onEscapePressed: wallpaperPopup.closeRequested()
-      Keys.onReturnPressed: wallpaperPopup.activateCurrent()
-      Keys.onEnterPressed: wallpaperPopup.activateCurrent()
+      property int hoverIdx: -1
+
+      Keys.onEscapePressed: {
+        if (wallpaperPopup.pendingDeletePath !== "") wallpaperPopup.cancelDelete()
+        else wallpaperPopup.closeRequested()
+      }
+      Keys.onReturnPressed: wallpaperPopup.enterPressed()
+      Keys.onEnterPressed: wallpaperPopup.enterPressed()
 
       Keys.onPressed: (event) => {
-        // Ctrl+H or . toggles dot-prefixed (hidden) wallpapers
+        if (wallpaperPopup.pendingDeletePath !== "") {
+          if (event.key === Qt.Key_Left || event.key === Qt.Key_Right || event.key === Qt.Key_Tab)
+            wallpaperPopup.confirmIndex = wallpaperPopup.confirmIndex === 0 ? 1 : 0
+          else if (event.key === Qt.Key_Space) wallpaperPopup.enterPressed()
+          else if (event.key === Qt.Key_Y) wallpaperPopup.confirmDelete()
+          else if (event.key === Qt.Key_N) wallpaperPopup.cancelDelete()
+          event.accepted = true
+          return
+        }
+        if (event.key === Qt.Key_Delete) {
+          if (!event.isAutoRepeat) wallpaperPopup.requestDelete()
+          event.accepted = true
+          return
+        }
+        hoverIdx = -1
         if (event.key === Qt.Key_Period || ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_H)) {
           wallpaperModel.showHidden = !wallpaperModel.showHidden
           event.accepted = true
@@ -177,26 +229,15 @@ Rectangle {
         property string wallUrl: "file://" + filePath
         property bool isCurrent: GridView.isCurrentItem
         property bool isSelected: wallpaperPopup.selectedWallpaper === wallUrl
-
-        property int columns: 3
-        property real rowIdx: Math.floor(index / columns)
-        property real colIdx: index % columns
-        property real totalRows: Math.ceil(wallGrid.count / columns)
-        property real centerRow: (totalRows - 1) / 2
-        property real centerCol: (columns - 1) / 2
-        property real distFromCenter: Math.sqrt((rowIdx - centerRow) * (rowIdx - centerRow) + (colIdx - centerCol) * (colIdx - centerCol))
+        property bool isPendingDelete: wallpaperPopup.pendingDeletePath !== "" && filePath === wallpaperPopup.pendingDeletePath
 
         opacity: 0
         scale: 0.4
         transformOrigin: Item.Center
 
         Component.onCompleted: {
-          if (Config.wsAnimation) {
-            entryAnim.start()
-          } else {
-            opacity = 1
-            scale = 1.0
-          }
+          if (Config.wsAnimation) entryAnim.start()
+          else { opacity = 1; scale = 1.0 }
         }
 
         SequentialAnimation {
@@ -207,6 +248,14 @@ Rectangle {
             NumberAnimation { target: cell; property: "scale"; to: 1.0; duration: 320; easing.type: Easing.OutBack; easing.overshoot: 0.5 }
           }
         }
+
+        property int columns: 3
+        property real rowIdx: Math.floor(index / columns)
+        property real colIdx: index % columns
+        property real totalRows: Math.ceil(wallGrid.count / columns)
+        property real centerRow: (totalRows - 1) / 2
+        property real centerCol: (columns - 1) / 2
+        property real distFromCenter: Math.sqrt((rowIdx - centerRow) * (rowIdx - centerRow) + (colIdx - centerCol) * (colIdx - centerCol))
 
         Rectangle {
           id: thumbFrame
@@ -230,9 +279,7 @@ Rectangle {
               cache: true
               sourceSize.width: 200
               sourceSize.height: 150
-              onStatusChanged: {
-                if (status === Image.Error) console.log("FAILED:", wallUrl)
-              }
+              onStatusChanged: { if (status === Image.Error) console.log("FAILED:", wallUrl) }
             }
 
             Rectangle {
@@ -242,7 +289,6 @@ Rectangle {
               Behavior on opacity { NumberAnimation { duration: 115 } }
             }
 
-            // filename shadowed bar
             Rectangle {
               anchors.left: parent.left
               anchors.right: parent.right
@@ -254,7 +300,6 @@ Rectangle {
                 GradientStop { position: 0.0; color: Theme.transparent }
                 GradientStop { position: 1.0; color: Theme.fadeBottom }
               }
-
               Text {
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -266,18 +311,179 @@ Rectangle {
                 font { family: Theme.fontFamily; pixelSize: 9 }
               }
             }
+
+            Rectangle {
+              anchors.fill: parent
+              radius: 10
+              color: Theme.transparent
+              border.width: 2
+              border.color: Theme.danger
+              opacity: cell.isPendingDelete ? 1 : 0
+              Behavior on opacity { NumberAnimation { duration: 120 } }
+            }
           }
         }
 
         MouseArea {
           id: mouseArea
           anchors.fill: parent
+          enabled: wallpaperPopup.pendingDeletePath === ""
           hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
+          onEntered: wallGrid.hoverIdx = index
+          onExited: if (wallGrid.hoverIdx === index) wallGrid.hoverIdx = -1
           onClicked: {
             wallGrid.currentIndex = index
             wallpaperPopup.applyWallpaper(filePath)
             if (Config.wsCloseOnWallpaperSet) closeRequested()
+          }
+        }
+      }
+    }
+  }
+
+  // delete confirmation: card in a bottom corner
+  Rectangle {
+    id: deletePrompt
+    readonly property bool open: wallpaperPopup.pendingDeletePath !== ""
+    z: 20
+    anchors.bottom: parent.bottom
+    anchors.bottomMargin: wallpaperPopup.promptMargin
+    anchors.right: wallpaperPopup.promptOnRight ? parent.right : undefined
+    anchors.rightMargin: wallpaperPopup.promptMargin
+    anchors.left: wallpaperPopup.promptOnRight ? undefined : parent.left
+    anchors.leftMargin: wallpaperPopup.promptMargin
+    width: Math.min(249, parent.width - 2 * wallpaperPopup.promptMargin)
+    height: promptCol.implicitHeight + 24
+    radius: 15
+    color: Theme.bg1
+    border.color: Theme.borderBg3
+    border.width: 1
+
+    opacity: open ? 1 : 0
+    visible: opacity > 0
+    scale: open ? 1 : 0.94
+    transformOrigin: wallpaperPopup.promptOnRight ? Item.BottomRight : Item.BottomLeft
+    Behavior on opacity { NumberAnimation { duration: open ? 180 : 120; easing.type: Easing.OutCubic } }
+    Behavior on scale { NumberAnimation { duration: open ? 240 : 140; easing.type: Easing.OutCubic } }
+    Behavior on height { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+
+    MouseArea { anchors.fill: parent }
+
+    ColumnLayout {
+      id: promptCol
+      anchors.fill: parent
+      anchors.margins: 12
+      spacing: 12
+
+      RowLayout {
+        Layout.fillWidth: true
+        spacing: 10
+
+        ClippingRectangle {
+          implicitWidth: 56
+          implicitHeight: 38
+          radius: 8
+          color: Theme.bg4
+          Image {
+            anchors.fill: parent
+            source: wallpaperPopup.promptPath !== "" ? "file://" + wallpaperPopup.promptPath : ""
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            sourceSize.width: 112
+            sourceSize.height: 76
+          }
+        }
+
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: 2
+          Text {
+            text: "Delete wallpaper?"
+            color: Theme.fg
+            font { family: Theme.fontFamily; pixelSize: 12; weight: 600 }
+          }
+          Text {
+            Layout.fillWidth: true
+            text: wallpaperPopup.promptName
+            color: Theme.fg4
+            elide: Text.ElideMiddle
+            font { family: Theme.fontFamily; pixelSize: 10 }
+          }
+        }
+      }
+
+      RowLayout {
+        id: promptButtons
+        Layout.fillWidth: true
+        spacing: 10
+        opacity: open ? 1 : 0
+        Behavior on opacity {
+          SequentialAnimation {
+            PauseAnimation { duration: open ? 70 : 0 }
+            NumberAnimation { duration: open ? 170 : 100; easing.type: Easing.OutCubic }
+          }
+        }
+
+        // Cancel button
+        Rectangle {
+          readonly property bool active: wallpaperPopup.confirmIndex === 0 || wallpaperPopup.hoveredButton === 0
+          Layout.fillWidth: true
+          implicitHeight: 27
+          radius: 8
+          color: active ? Theme.focusBgL : Theme.bg1
+          border.color: active ? Theme.borderBgFocus : Theme.borderBg3
+          border.width: 1
+          scale: cancelMouse.pressed ? 0.94 : (active ? 1.03 : 1.0)
+          Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
+          Behavior on color { ColorAnimation { duration: 120 } }
+          Behavior on border.color { ColorAnimation { duration: 120 } }
+
+          RowLayout {
+            anchors.centerIn: parent
+            spacing: 4
+            Text { text: "\uea76"; color: Theme.fg4; Layout.alignment: Qt.AlignVCenter; Layout.topMargin: 1; font { family: Theme.nerdFontFamily; pixelSize: 11 } }
+            Text { text: "Cancel"; color: Theme.fg2; font { family: Theme.fontFamily; pixelSize: 9; weight: 500 } }
+          }
+
+          MouseArea {
+            id: cancelMouse
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            hoverEnabled: true
+            onEntered: wallpaperPopup.hoveredButton = 0
+            onExited: if (wallpaperPopup.hoveredButton === 0) wallpaperPopup.hoveredButton = -1
+            onClicked: wallpaperPopup.cancelDelete()
+          }
+        }
+
+        // Delete button
+        Rectangle {
+          readonly property bool active: wallpaperPopup.confirmIndex === 1 || wallpaperPopup.hoveredButton === 1
+          Layout.fillWidth: true
+          implicitHeight: 27
+          radius: 8
+          color: Theme.danger
+          opacity: active ? 1.0 : 0.85
+          scale: confirmMouse.pressed ? 0.94 : (active ? 1.03 : 1.0)
+          Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
+          Behavior on opacity { NumberAnimation { duration: 120 } }
+
+          RowLayout {
+            anchors.centerIn: parent
+            spacing: 4
+            Text { text: "\uf00c"; color: Theme.white; Layout.alignment: Qt.AlignVCenter; Layout.topMargin: 1; font { family: Theme.nerdFontFamily; pixelSize: 11 } }
+            Text { text: "Delete"; color: Theme.white; font { family: Theme.fontFamily; pixelSize: 9; weight: 600 } }
+          }
+
+          MouseArea {
+            id: confirmMouse
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            hoverEnabled: true
+            onEntered: wallpaperPopup.hoveredButton = 1
+            onExited: if (wallpaperPopup.hoveredButton === 1) wallpaperPopup.hoveredButton = -1
+            onClicked: wallpaperPopup.confirmDelete()
           }
         }
       }

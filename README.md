@@ -104,7 +104,7 @@ into your session at all times. It's not bound to any dotfiles.
 - **Spotlight**                      - List of applications (<kbd>Tab</kbd> to read the long app description), optional fuzzy search for apps, web search (<kbd>Tab</kbd> to expand the full search url), math and shell commands run
 - **DBus notification**              - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                            - Battery, volume, brightness, timer
-- **Wallpaper switcher**             - <kbd>.</kbd> or <kbd>CTRL</kbd> + <kbd>H</kbd> to see hidden images (dot prefixed)
+- **Wallpaper switcher**             - <kbd>.</kbd> or <kbd>CTRL</kbd> + <kbd>H</kbd> to see hidden images (dot prefixed), <kbd>Delete</kbd> to get image deletion prompt
 - **Power menu**                     - 5 actions (Lock, Sleep, Logout, Restart, Shutdown) and action confirmation prompt
 - **Theme picker**                   - One-click live theme switching from the pill
 
