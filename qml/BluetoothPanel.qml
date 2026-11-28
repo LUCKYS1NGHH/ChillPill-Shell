@@ -185,6 +185,12 @@ Item {
     if (pairing) cancelPairing()
     else closeRequested()
   }
+  Keys.onPressed: (event) => {
+    if (event.key === Qt.Key_R && (event.modifiers & Qt.ControlModifier)) {
+        BluetoothController.refreshDevices(true)
+        event.accepted = true
+    }
+  }
 
   // hidden: one item per device, only to know who is connected
   Repeater {

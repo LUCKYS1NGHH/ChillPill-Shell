@@ -148,6 +148,12 @@ Item {
     }
     closeRequested()
   }
+  Keys.onPressed: (event) => {
+    if (event.key === Qt.Key_R && (event.modifiers & Qt.ControlModifier)) {
+        WifiController.refreshNetworks(true)
+        event.accepted = true
+    }
+  }
 
   // selection can live on the hero card: up from the first row moves there,
   // enter disconnects,delete toggles the forget footer, enter confirms it
