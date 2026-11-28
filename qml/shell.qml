@@ -11,6 +11,7 @@ import QtQuick.Shapes
 import Quickshell.Widgets
 import Quickshell.Services.UPower
 import Quickshell.Services.Notifications
+import PillBackend
 
 ShellRoot {
   id: shellRoot
@@ -228,19 +229,28 @@ ShellRoot {
       mediaPopupHideTimer.stop()
     }
   }
-  property var visualizerValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  property bool cavaAvailable: false
   // the pill bar's "audioVisualizer" module draws the same spectrum, so cava has
   // to run while the pill is revealed too (not just for the control center)
   readonly property bool pillHasVisualizer: (Config.pillModules || []).some(
     m => m === "audioVisualizer")
 
-  Process {
-    id: cavaCheckProc
-    command: ["sh", "-c", "which cava"]
-    running: true
-    onExited: (exitCode) => { shellRoot.cavaAvailable = (exitCode === 0) }
+  // one cava backend for the whole shell: CavaMonitor spawns cava, parses the
+  // raw frames and clamps the bins in C++, so QML never touches per-frame text.
+  // barCount=16 covers every consumer; the media player and pill bar slice the
+  // bins they need out of `values` instead of each running their own cava.
+  CavaMonitor {
+    id: cavaMonitor
+    barCount: 16
+    skipLow: 0
+    skipHigh: 0
+    framerate: 45
+    active: available
+            && ((Config.showAudioVisuals && box.controlCenter)
+                || (box.revealed && shellRoot.pillHasVisualizer))
   }
+
+  readonly property var visualizerValues: cavaMonitor.values
+  readonly property bool cavaAvailable: cavaMonitor.available
 
   PanelWindow {
     id: panelWindow
@@ -1517,27 +1527,6 @@ ShellRoot {
         color: Theme.fg
         font { family: Theme.fontFamily; pixelSize: 10 * box.dpi; weight: 600 }
         Layout.alignment: Qt.AlignVCenter
-      }
-    }
-  }
-
-  // audio visualizer spectrum process
-  Process {
-    id: cavaProc
-    command: ["sh", "-c", "cava -p ~/.cache/chillpill-shell/cava.conf"]
-    running: shellRoot.cavaAvailable
-             && ((Config.showAudioVisuals && box.controlCenter)
-                 || (box.revealed && shellRoot.pillHasVisualizer))
-    stdout: SplitParser {
-      splitMarker: "\n"
-      onRead: data => {
-        let parts = data.trim().split(";")
-        let vals = []
-        for (let i = 0; i < 16; i++) {
-          let v = Number(parts[i])
-          vals.push(isNaN(v) ? 0 : Math.min(100, Math.max(0, v)))
-        }
-        shellRoot.visualizerValues = vals
       }
     }
   }

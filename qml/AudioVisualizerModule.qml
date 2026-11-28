@@ -4,26 +4,17 @@ import PillBackend
 //  AudioVisualizerModule.qml - pill bar module, enabled with
 //  "audioVisualizer" in Config.pillModules.
 //
-//  cava spawning, parsing and bin slicing now live in C++ (CavaMonitor).
-//  QML only draws the bars.
+//  cava spawning, parsing and bin slicing live in C++ (CavaMonitor), with a
+//  single shared instance owned by shell.qml. QML only draws the bars.
 
 Item {
   id: root
 
   // no cava binary → the module takes no space in the bar at all.
-  readonly property bool available: cava.available
+  readonly property bool available: shellRoot.cavaAvailable
 
   implicitWidth: available ? viz.implicitWidth : 0
   implicitHeight: available ? viz.implicitHeight : 0
-
-  CavaMonitor {
-    id: cava
-    active: root.available && root.visible
-    barCount: 10
-    skipLow: 2   // lowest cava bins are near constant
-    skipHigh: 0
-    framerate: 60
-  }
 
   AudioVisualizer {
     id: viz
@@ -31,7 +22,7 @@ Item {
     visible: root.available
 
     centered: true
-    barCount: cava.barCount
+    barCount: 10
     barWidth: 2 * Config.pillScale
     barSpacing: 1.9 * Config.pillScale
     maxBarHeight: 12 * Config.pillScale
@@ -39,6 +30,8 @@ Item {
     barRadius: 1 * Config.pillScale
     barColor: Theme.fg
     barSecondaryColor: Theme.fg4
-    values: cava.values
+    // shared cava bins: drop the two lowest (near constant) bins, take 10
+    values: shellRoot.visualizerValues.length >= 12
+        ? shellRoot.visualizerValues.slice(2, 12) : []
   }
 }
